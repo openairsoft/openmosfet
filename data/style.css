@@ -1,0 +1,11 @@
+.floatingNav {
+  box-shadow: 0px 1px 10px #999;
+}
+#nav-menu .nav {
+  display: flex;
+  justify-content: center;
+}
+
+.card-header[data-toggle="collapse"] {
+  cursor: pointer;
+}

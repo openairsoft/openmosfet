@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <title>OpenMosfet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="lib/font-awesome.min.css">
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body class="bg-dark text-light">
+    <form id="mainForm" action="/" method="POST">
+        <div class="container-fluid sticky-top bg-dark text-light" id="nav-menu">
+            <div class="container text-center">
+                <ul class="nav nav-pills pb-3 pt-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link text-light active" id="panel-preferences-tab" data-toggle="pill"
+                            href="#panel-preferences" role="tab" aria-controls="panel-preferences"
+                            aria-selected="true">Préférences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" id="panel-firemodes-tab" data-toggle="pill"
+                            href="#panel-firemodes" role="tab" aria-controls="panel-firemodes"
+                            aria-selected="false">Modes de tir</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" id="panel-instructions-tab" data-toggle="pill"
+                            href="#panel-instructions" role="tab" aria-controls="panel-instructions"
+                            aria-selected="false">Instructions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="mainContainer" class="container">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="panel-preferences" role="tabpanel"
+                    aria-labelledby="panel-preferences-tab">
+
+                    <div class="row">
+
+                        <div class="form-group col-md-6">
+                            <label for="inputAppSsid">SSID Wifi</label>
+                            <input type="text" class="form-control bg-dark text-light" id="inputAppSsid" name="appSsid"
+                                aria-describedby="inputAppSsidHelp">
+                            <small id="inputAppSsidHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
+                                caractères spéciaux.</small>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputAppPasswd">Mot de passe Wifi</label>
+                            <input type="text" class="form-control bg-dark text-light" id="inputAppPasswd"
+                                name="appPasswd" aria-describedby="inputAppPasswdHelp">
+                            <small id="inputAppPasswdHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
+                                caractères spéciaux.</small>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <!-- <label for="inputConnectToNetworkIfAvailable">Protection de la batterie</label><br> -->
+                            <div class="btn-group btn-group-toggle d-flex" role="group" id="inputConnectToNetworkIfAvailable"
+                                data-toggle="buttons">
+                                <label class="btn btn-outline-primary active align-middle w-100"
+                                    data-toggle="collapse-show" data-target="#collapseConnectToNetworkIfAvailable">
+                                    <input type="radio" name="connectToNetworkIfAvailable" value="true">Utiliser un réseau connu si disponible
+                                </label>
+                                <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide"
+                                    data-target="#collapseConnectToNetworkIfAvailable">
+                                    <input type="radio" name="connectToNetworkIfAvailable" value="false">Mode hotspot uniquement
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12 collapse show" id="collapseConnectToNetworkIfAvailable">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputAvailableNetworkAppSsid">SSID Wifi externe</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="inputAvailableNetworkAppSsid" name="availableNetworkAppSsid"
+                                        aria-describedby="inputAvailableNetworkAppSsidHelp">
+                                    <small id="inputAvailableNetworkAppSsidHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
+                                        caractères spéciaux.</small>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputAvailableNetworkAppPasswd">Mot de passe Wifi externe</label>
+                                    <input type="text" class="form-control bg-dark text-light" id="inputAvailableNetworkAppPasswd"
+                                        name="availableNetworkAppPasswd" aria-describedby="inputAvailableNetworkAppPasswdHelp">
+                                    <small id="inputAvailableNetworkAppPasswdHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
+                                        caractères spéciaux.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ------------------------ WIFI SHUTDOWN AND SLEEP MODE ------------------------ -->
+
+                        <div class="form-group col-md-6">
+                            <label for="inputWifiShutdownDelayMinutes">Coupure wifi</label>
+
+                            <div class="input-group">
+                                <input type="number" min="0" step="1" id="inputWifiShutdownDelayMinutes" name="wifiShutdownDelayMinutes"
+                                    class="form-control bg-dark text-light" aria-label="Recipient's username"
+                                    aria-describedby="inputWifiShutdownDelayMinutesHelp">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-secondary text-light"
+                                        id="inputWifiShutdownDelayMinutes-unit">Minutes</span>
+                                </div>
+                            </div>
+
+                            <small id="inputWifiShutdownDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du wifi après inutilisation de l'interface.</small>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="inputDeepSleepDelayMinutes">Coupure inactivité</label>
+
+                            <div class="input-group">
+                                <input type="number" min="0" step="1" id="inputDeepSleepDelayMinutes" name="deepSleepDelayMinutes"
+                                    class="form-control bg-dark text-light" aria-label="Recipient's username"
+                                    aria-describedby="inputDeepSleepDelayMinutesHelp">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-secondary text-light"
+                                        id="inputDeepSleepDelayMinutes-unit">Minutes</span>
+                                </div>
+                            </div>
+                            
+                            <small id="inputDeepSleepDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du système après inactivité de la réplique.</small>
+                        </div>
+
+
+                        <div class="form-group col-md-12">
+                            <!-- <label for="inputUseBatteryProtection">Protection de la batterie</label><br> -->
+                            <div class="btn-group btn-group-toggle d-flex" role="group" id="inputUseBatteryProtection"
+                                data-toggle="buttons">
+                                <label class="btn btn-outline-primary active align-middle w-100"
+                                    data-toggle="collapse-show" data-target="#collapseBatteryProtection">
+                                    <input type="radio" name="useBatteryProtection" value="true">activer la Protection
+                                    de la batterie
+                                </label>
+                                <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide"
+                                    data-target="#collapseBatteryProtection">
+                                    <input type="radio" name="useBatteryProtection" value="false">désactiver la
+                                    protection de la batterie
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group col-md-12 collapse show" id="collapseBatteryProtection">
+
+                            <label for="inputBatteryNominalVoltage">Voltage batterie</label>
+
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-secondary text-light">nominal</span>
+                                </div>
+                                <input type="text" id="inputBatteryNominalVoltage" name="batteryNominalVoltage"
+                                    class="form-control bg-dark text-light" aria-label="Recipient's username"
+                                    aria-describedby="inputBatteryNominalVoltage-unit">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-secondary text-light"
+                                        id="inputBatteryNominalVoltage-unit">Volts</span>
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-secondary text-light">alerte</span>
+                                </div>
+                                <input type="text" id="inputBatteryLowVoltage" name="batteryLowVoltage"
+                                    class="form-control bg-dark text-light" aria-label="Recipient's username"
+                                    aria-describedby="inputBatteryLowVoltage-unit">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-secondary text-light"
+                                        id="inputBatteryLowVoltage-unit">Volts</span>
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-secondary text-light">coupure</span>
+                                </div>
+                                <input type="text" id="inputBatteryShutdownVoltage" name="batteryShutdownVoltage"
+                                    class="form-control bg-dark text-light" aria-label="Recipient's username"
+                                    aria-describedby="inputBatteryShutdownVoltage-unit">
+                                <div class="input-group-append">
+                                    <span class="input-group-text bg-secondary text-light"
+                                        id="inputBatteryShutdownVoltage-unit">Volts</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <!-- <label for="inputUseActiveBreaking">Active breaking</label><br> -->
+                            <div class="btn-group btn-group-toggle d-flex" role="group" id="inputUseActiveBreaking"
+                                data-toggle="buttons">
+                                <label class="btn btn-outline-primary active align-middle w-100"
+                                    data-toggle="collapse-show">
+                                    <input type="radio" name="useActiveBreaking" value="true">active breaking actif
+                                </label>
+                                <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide">
+                                    <input type="radio" name="useActiveBreaking" value="false">active breaking inactif
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="panel-firemodes" role="tabpanel" aria-labelledby="panel-firemodes-tab">
+
+                </div>
+                <div class="tab-pane fade" id="panel-instructions" role="tabpanel"
+                    aria-labelledby="panel-instructions-tab">
+                    instructions
+                </div>
+            </div>
+        </div>
+        <div id="saveContainer" class="container-fluid fixed-bottom bg-dark text-light">
+            <div class="container text-center">
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <button id="mainSubmit" type="submit" class="btn mt-3 btn-primary btn-block">
+                            <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
+                            <span class="buttonText">Enregistrer</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="lib/jquery.min.js"></script>
+        <script src="lib/popper.min.js"></script>
+        <script src="lib/bootstrap.min.js"></script>
+        <script src="script.js"></script>
+    </form>
+</body>
+
+</html>

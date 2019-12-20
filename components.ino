@@ -1,0 +1,204 @@
+#include "components.h"
+
+
+
+
+//----------------------------- TRIGGER -------------------------------------
+
+
+
+
+void AAMVirtualTrigger::pull(void)
+{
+  #ifdef DEBUG
+  Serial.println("AAMVirtualTrigger::pull");
+  #endif
+  _state = AAMVirtualTrigger::statePulled;
+  this->_replica->triggerPulled();
+  this->_replica->updateLastActive();
+}
+
+void AAMVirtualTrigger::release(void)
+{  
+  #ifdef DEBUG
+  Serial.println("AAMVirtualTrigger::release");
+  #endif
+  _state = AAMVirtualTrigger::stateReleased;
+  this->_replica->triggerReleased();
+  this->_replica->updateLastActive();
+}
+
+
+
+
+//----------------------------- GEARBOX -------------------------------------
+
+
+
+
+void AAMVirtualGearbox::cycle(unsigned int precockDuration_ms)
+{
+  #ifdef DEBUG
+  Serial.println("AAMVirtualGearbox::cycle");
+  #endif
+  motorOn();
+  this->_precockDuration_ms = precockDuration_ms;
+  this->_state = AAMVirtualGearbox::stateCycling;
+  this->_cycleState = AAMVirtualGearbox::stateCocking;
+}
+
+void AAMVirtualGearbox::cycleEndDetected(void)
+{
+  #ifdef DEBUG
+  Serial.println("cycleEndDetected");
+  #endif
+  if(this->_precockDuration_ms <= 0)
+  {
+    this->endCycle(AAMVirtualGearbox::stateResting);
+  }else
+  {
+    this->_precockEndTime_ms = millis() + _precockDuration_ms;
+    this->_cycleState = AAMVirtualGearbox::statePrecocking;
+  }
+}
+
+void AAMVirtualGearbox::update(void)
+{
+  if(
+      this->_state == AAMVirtualGearbox::stateCycling
+      &&
+      this->_cycleState == AAMVirtualGearbox::statePrecocking
+    )
+  {
+    if(millis() >= this->_precockEndTime_ms)
+    {
+      AAMVirtualGearbox::endCycle(AAMVirtualGearbox::statePrecocked);
+    }
+  }
+}
+
+void AAMVirtualGearbox::endCycle(AAMVirtualGearbox::GearboxState state)
+{
+  #ifdef DEBUG
+  Serial.println("endCycle");
+  #endif
+  motorOff();
+  
+  this->_state = state;
+  this->_replica->endFiringCycle();
+}
+
+
+
+
+//----------------------------- SELECTOR -------------------------------------
+
+
+
+
+void AAMVirtualSelector::setState(AAMVirtualSelector::SelectorState state)
+{
+  #ifdef DEBUG
+  Serial.println("AAMVirtualSelector::setState");
+  #endif
+  _state = state;
+  this->_replica->updateLastActive();
+}
+
+
+
+
+//----------------------------- REPLICA -------------------------------------
+
+
+
+
+void AAMVirtualReplica::update(void)
+{
+  if( millis() - this->_lastActiveTimeMs > OMConfiguration::deepSleepDelayMinutes * 60000 )
+  {
+    #ifdef DEBUG
+    Serial.print("deepsleep enabled after ");
+    Serial.print( float(millis() - this->_lastActiveTimeMs) / 60000 );
+    Serial.println(" minutes.");
+    #endif
+
+    ESP.deepSleep(0);
+  }else{
+    this->_gearbox.update();
+  }
+}
+
+void AAMVirtualReplica::updateLastActive(void)
+{
+  this->_lastActiveTimeMs = millis();
+}
+
+void AAMVirtualReplica::triggerPulled(void)
+{
+  #ifdef DEBUG
+  Serial.println("triggerPulled");
+  #endif
+  this->_bbs_fired = 0;
+  this->startFiringCycle();
+}
+
+void AAMVirtualReplica::triggerReleased(void)
+{
+  #ifdef DEBUG
+  Serial.println("triggerReleased");
+  #endif
+  this->_state = AAMVirtualReplica::stateIdle;
+}
+
+
+#define COND_SAFETY_OFF this->_selector.getState() != AAMVirtualSelector::stateSafe
+#define COND_GEARBOX_NOT_CYCLING this->_gearbox.getState() != AAMVirtualGearbox::stateCycling
+#define COND_TRIGGER_PULLED this->_trigger.getState() == AAMVirtualTrigger::statePulled
+#define COND_BURST_NOT_INTERRUPTIBLE getCurrentFiringSetting(this->getSelector()).getBurstMode() != AAMFiringSettings::burstModeInterruptible
+#define COND_BURST_NOT_FINISHED this->_bbs_fired < getCurrentFiringSetting(this->getSelector()).getBurstLength()
+#define COND_BURST_EXTENDIBLE getCurrentFiringSetting(this->getSelector()).getBurstMode() == AAMFiringSettings::burstModeExtendible
+
+void AAMVirtualReplica::startFiringCycle(void)
+{
+  #ifdef DEBUG
+  Serial.println("startFiringCycle");
+  #endif
+  
+  if(COND_SAFETY_OFF && COND_GEARBOX_NOT_CYCLING )
+  {
+    if    
+      (
+        COND_TRIGGER_PULLED && (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE)
+        ||
+        COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED
+      )
+      {
+      #ifdef DEBUG
+      Serial.println("\nCOND_TRIGGER_PULLED");
+      Serial.println(COND_TRIGGER_PULLED);
+      Serial.println("COND_BURST_NOT_FINISHED");
+      Serial.println(COND_BURST_NOT_FINISHED);
+      Serial.println("\nCOND_BURST_EXTENDIBLE");
+      Serial.println(COND_BURST_EXTENDIBLE);
+      Serial.println("\nCOND_BURST_NOT_INTERRUPTIBLE");
+      Serial.println(COND_BURST_NOT_INTERRUPTIBLE);
+      Serial.println("\nCOND_BURST_NOT_FINISHED");
+      Serial.println(COND_BURST_NOT_FINISHED);
+      #endif
+        
+        this->_state = AAMVirtualReplica::stateFiring;
+        this->_gearbox.cycle(getCurrentFiringSetting(this->getSelector()).getPrecockDurationMs());
+      }
+  }
+}
+
+void AAMVirtualReplica::endFiringCycle(void)
+{
+  #ifdef DEBUG
+  Serial.println("endFiringCycle");
+  #endif
+  
+  this->_bbs_fired++;
+  this->startFiringCycle();
+}

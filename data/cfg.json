@@ -1,0 +1,30 @@
+{
+  "appSsid": "openmosfet wifi",
+  "appPasswd": "12345678",
+  "connectToNetworkIfAvailable": false,
+  "availableNetworkAppSsid": "externalssid",
+  "availableNetworkAppPasswd": "externalpassword",
+  "useBatteryProtection": true,
+  "wifiShutdownDelayMinutes": 15,
+  "deepSleepDelayMinutes": 60,
+  "batteryNominalVoltage": 11.1,
+  "batteryLowVoltage": 10.5,
+  "batteryShutdownVoltage": 9.9,
+  "useActiveBreaking": false,
+  "fireModes": [
+    {
+       "burstMode": 1,
+       "burstLength": 1,
+       "precockDuration_ms": 0,
+       "motorPower": 255,
+       "timeBetweenShots_ms": 0
+    },
+    {
+       "burstMode": 2,
+       "burstLength": 3,
+       "precockDuration_ms": 0,
+       "motorPower": 255,
+       "timeBetweenShots_ms": 0
+    }
+  ]
+}
