@@ -22,10 +22,10 @@ The hardware provides all the electronics needed and allows different boards to 
 ## hardware
 ## contribute
 ## TODO
-- launch in AP mode when wifi router is not available
-- implement sleep modes to prevent battery over-discharge
-    - ability to cut wifi off after X sec to save power
-    - deep sleep when inactive for two long
+- ~~launch in AP mode when wifi router is not available~~
+- ~~implement sleep modes to prevent battery over-discharge~~
+    - ~~ability to cut wifi off after X sec to save power~~
+    - ~~deep sleep when inactive for two long~~
 - add buzzer ?
 - implement motor vibration
 - create an example module
@@ -36,4 +36,5 @@ The hardware provides all the electronics needed and allows different boards to 
   - none
 - change max ssid and password length to 32 chars instead of 16 : https://serverfault.com/questions/45439/what-is-the-maximum-length-of-a-wifi-access-points-ssid
 - add "try to connect now" button next to external wifi settings
+- check if wifi cutoff current economy is reliable
 
