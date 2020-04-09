@@ -123,7 +123,8 @@ void AAMVirtualReplica::update(void)
     Serial.println(" minutes.");
     #endif
 
-    ESP.deepSleep(0);
+    //ESP.deepSleep(0);//esp8266
+    esp_deep_sleep_start();
   }else{
     this->_gearbox.update();
   }

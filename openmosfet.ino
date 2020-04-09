@@ -39,32 +39,35 @@ AAMFiringSettings &getCurrentFiringSetting(AAMVirtualSelector &selector)//MANDAT
 void motorOn()//MANDATORY FUNCTION
 {
   //digitalWrite(GGTR16_MOTOR_PIN, HIGH);
-  analogWrite(GGTR16_MOTOR_PIN, 900);
+  ledcWrite(MOTOR_LEDC_CHANNEL, 255);
 }
 
 void motorOff()//MANDATORY FUNCTION
 {
   //digitalWrite(GGTR16_MOTOR_PIN, LOW);
-  analogWrite(GGTR16_MOTOR_PIN, 0);
+  ledcWrite(MOTOR_LEDC_CHANNEL, 0);
 }
 #endif
 
 void setup() {
-  //---------- X : Replica specific code 3 -----------------------------------------------------------------------------------------
-
   Serial.begin(115200);
+
+  // motor pwm setup
+  ledcAttachPin(GGTR16_MOTOR_PIN, MOTOR_LEDC_CHANNEL);
+  ledcSetup(MOTOR_LEDC_CHANNEL, MOTOR_LEDC_FREQ, MOTOR_LEDC_RES);
+  ledcWrite(MOTOR_LEDC_CHANNEL, 0); //turn off motor
   
-  if (!LittleFS.begin()) {
+  if (!FILESYSTEM.begin()) {
     #ifdef DEBUG
       Serial.println("Failed to mount file system, trying to format...");
     #endif
-    if (!LittleFS.format()) {
+    if (!FILESYSTEM.format()) {
       #ifdef DEBUG
         Serial.println("Unable to format(), aborting...");
       #endif   
       return;
     }else{
-      if (!LittleFS.begin()) {
+      if (!FILESYSTEM.begin()) {
       #ifdef DEBUG
         Serial.println("Failed to mount file system, evn after formating...");
       #endif
@@ -104,8 +107,7 @@ void setup() {
   
 
   #endif
-  // END G&G TR16 specific code
-
+  // END G&G TR16 specific code 
 
 
   Mosfetv2wifiserver::begin();

@@ -2,9 +2,17 @@
 #define CONFIGURATION_H
 
 #include "components.h"
-#include <EEPROM.h>
-#include <LittleFS.h>
+#include "FS.h"
+
+// FFat or SPIFFS
+#define FILESYSTEM SPIFFS
+
+// include de corresponding filesystem libraries
+#include "SPIFFS.h"
+//#include "FFat.h"
+
 #include <ArduinoJson.h>
+
 
 /** Le nombre magique et le numéro de version actuelle */
 #define OM_CFG_VERSION 4 //NOTE: change this value if you modify the data structure ?

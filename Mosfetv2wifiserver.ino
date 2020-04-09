@@ -19,6 +19,7 @@ void Mosfetv2wifiserver::begin()
 
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
+    WiFi.mode(WIFI_AP_STA);
     WiFi.begin(OMConfiguration::availableNetworkAppSsid, OMConfiguration::availableNetworkAppPasswd);
     Mosfetv2wifiserver::wifiIsOn = true;
   
@@ -37,18 +38,15 @@ void Mosfetv2wifiserver::begin()
           Serial.println("");
           Serial.println("station connection timeout.");
           WiFi.disconnect();
+          WiFi.mode(WIFI_AP);
           break;
         #endif
       }
     }
   }
   /* You can remove the password parameter if you want the AP to be open. */
-  //WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(Mosfetv2wifiserver::ip, Mosfetv2wifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);
-  
-  
-
+  WiFi.softAPConfig(Mosfetv2wifiserver::ip, Mosfetv2wifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
   
 WiFi.printDiag(Serial);
 
@@ -63,7 +61,7 @@ WiFi.printDiag(Serial);
   Mosfetv2wifiserver::webServer.on("/", Mosfetv2wifiserver::handleRoot);//send back as web page
   Mosfetv2wifiserver::webServer.on("/json", Mosfetv2wifiserver::handleRoot);//update and send back as json (if POST)
 
-  Mosfetv2wifiserver::webServer.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  Mosfetv2wifiserver::webServer.serveStatic("/", FILESYSTEM, "/").setDefaultFile("index.html");
  
   // relay all unknown requests to root
   Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
@@ -108,7 +106,7 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
 
   if (request->method() != HTTP_POST) {
     //Mosfetv2wifiserver::webServer.send(200, "text/html", "<h1>You are connected lol</h1>");
-    request->send(LittleFS, "/index.html");
+    request->send(FILESYSTEM, "/index.html");
   } else {
     #ifdef DEBUG
     int params = request->params();
@@ -298,9 +296,9 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
 
     //send back the json
     if(request->url().equals("/json")){
-      request->send(LittleFS, "/cfg.json");//for ajax
+      request->send(FILESYSTEM, "/cfg.json");//for ajax
     }else{
-      request->send(LittleFS, "/index.html");//for standard use
+      request->send(FILESYSTEM, "/index.html");//for standard use
     }
   }
 }
@@ -317,9 +315,9 @@ void Mosfetv2wifiserver::update() {
     Serial.print( float(millis() - Mosfetv2wifiserver::lastActivityTimeMs) / 60000 );
     Serial.println(" minutes.");
     #endif
-    WiFi.disconnect();
-    WiFi.mode(WIFI_OFF);
-    WiFi.forceSleepBegin();
+    //esp_bt_controller_disable();
+    esp_wifi_stop();
+    //esp_light_sleep_start();
     
     Mosfetv2wifiserver::wifiIsOn = false;
   }else{

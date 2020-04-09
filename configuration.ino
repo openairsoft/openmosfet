@@ -78,7 +78,7 @@ boolean OMConfiguration::load(void){
   #endif
 
   // code from https://projetsdiy.fr/esp8266-webserveur-partie4-arduinojson-charger-enregistrer-fichiers-spiffs/#Manipuler_le_JSON_Ajout_modification_suppression_de_donnees
-  File file = LittleFS.open(OM_CONFIGFILE_NAME, "r");
+  File file = FILESYSTEM.open(OM_CONFIGFILE_NAME, "r");
   if (!file){
     #ifdef DEBUG
       Serial.println("Aucun historique existe - No History Exist");
@@ -154,7 +154,7 @@ boolean OMConfiguration::save(void){
   Serial.println("JSON SAUVE");
   serializeJson(doc, Serial);
 
-  File file = LittleFS.open(OM_CONFIGFILE_NAME, "w");
+  File file = FILESYSTEM.open(OM_CONFIGFILE_NAME, "w");
   serializeJson(doc, file);
   file.close(); 
 

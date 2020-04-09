@@ -75,13 +75,22 @@
 #ifdef REPLICA_TYPE_GGTR16
 //#define OM_NB_ACTIVE_MODES 2
 
-#define GGTR16_MOTOR_PIN D5
-#define GGTR16_FIRINGGROUP_PIN D6
-#define GGTR16_CUTOFF_PIN D7
-#define GGTR16_SELECTOR_PIN D1
+#define GGTR16_MOTOR_PIN 2// this is the builtin led pin
+#define GGTR16_FIRINGGROUP_PIN 15
+#define GGTR16_CUTOFF_PIN 4
+#define GGTR16_SELECTOR_PIN 16
 #define GGTR16_DEBOUNCE_TIME_MS 5
 #endif
 // END G&G TR16 specific code
+
+//---------- X : timers related variables ------------------------------------------------------------------------------------------------
+//channels
+#define MOTOR_LEDC_CHANNEL 1
+#define MOTOR_LEDC_FREQ 12000
+#define MOTOR_LEDC_RES 8
+
+
+
 
 //---------- X : Global variables ------------------------------------------------------------------------------------------------
 
