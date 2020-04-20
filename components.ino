@@ -41,7 +41,7 @@ void AAMVirtualGearbox::cycle(unsigned int precockDuration_ms)
   #ifdef DEBUG
   Serial.println("AAMVirtualGearbox::cycle");
   #endif
-  motorOn();
+  OMInputsInterface::motorOn();
   this->_precockDuration_ms = precockDuration_ms;
   this->_state = AAMVirtualGearbox::stateCycling;
   this->_cycleState = AAMVirtualGearbox::stateCocking;
@@ -82,7 +82,7 @@ void AAMVirtualGearbox::endCycle(AAMVirtualGearbox::GearboxState state)
   #ifdef DEBUG
   Serial.println("endCycle");
   #endif
-  motorOff();
+  OMInputsInterface::motorOff();
   
   this->_state = state;
   this->_replica->endFiringCycle();
@@ -156,9 +156,9 @@ void AAMVirtualReplica::triggerReleased(void)
 #define COND_SAFETY_OFF this->_selector.getState() != AAMVirtualSelector::stateSafe
 #define COND_GEARBOX_NOT_CYCLING this->_gearbox.getState() != AAMVirtualGearbox::stateCycling
 #define COND_TRIGGER_PULLED this->_trigger.getState() == AAMVirtualTrigger::statePulled
-#define COND_BURST_NOT_INTERRUPTIBLE getCurrentFiringSetting(this->getSelector()).getBurstMode() != AAMFiringSettings::burstModeInterruptible
-#define COND_BURST_NOT_FINISHED this->_bbs_fired < getCurrentFiringSetting(this->getSelector()).getBurstLength()
-#define COND_BURST_EXTENDIBLE getCurrentFiringSetting(this->getSelector()).getBurstMode() == AAMFiringSettings::burstModeExtendible
+#define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() != AAMFiringSettings::burstModeInterruptible
+#define COND_BURST_NOT_FINISHED this->_bbs_fired < OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstLength()
+#define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() == AAMFiringSettings::burstModeExtendible
 
 void AAMVirtualReplica::startFiringCycle(void)
 {
@@ -189,7 +189,7 @@ void AAMVirtualReplica::startFiringCycle(void)
       #endif
         
         this->_state = AAMVirtualReplica::stateFiring;
-        this->_gearbox.cycle(getCurrentFiringSetting(this->getSelector()).getPrecockDurationMs());
+        this->_gearbox.cycle(OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getPrecockDurationMs());
       }
   }
 }
