@@ -1,6 +1,7 @@
 #include "Mosfetv2wifiserver.h"
 #include "utilities.h"
 
+#include <AsyncElegantOTA.h>
 
 //TODO: penser à tout gzipper
 
@@ -75,7 +76,8 @@ WiFi.printDiag(Serial);
   Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
     request->send(404);
   });*/
-  
+
+  AsyncElegantOTA.begin(&Mosfetv2wifiserver::webServer);//OTA
   Mosfetv2wifiserver::webServer.begin();
   Serial.println("HTTP server started");
   IPAddress myIP = WiFi.softAPIP();
@@ -323,6 +325,8 @@ void Mosfetv2wifiserver::update() {
   }else{
     Mosfetv2wifiserver::dnsServer.processNextRequest();
   }
+  
+  AsyncElegantOTA.loop();
   
   //Mosfetv2wifiserver::webServer.handleClient();
 }

@@ -17,7 +17,7 @@ void setup() {
   OMInputsInterface::begin(replica);
   
   if (!FILESYSTEM.begin()) {
-    #ifdef DEBUG
+    #ifdef DEBUGM
       Serial.println("Failed to mount file system, trying to format...");
     #endif
     if (!FILESYSTEM.format()) {
