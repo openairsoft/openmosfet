@@ -18,7 +18,7 @@ The hardware provides all the electronics needed and allows different boards to 
   - manually (consult the internet for howto)
     - ESPAsyncWebServer (https://github.com/me-no-dev/ESPAsyncWebServer)
     - AsyncTCP (https://github.com/me-no-dev/AsyncTCP)
-- Install the littleFs data upload tool : https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
+- Install the SPIFFS data upload tool : https://github.com/me-no-dev/arduino-esp32fs-plugin/releases/
 ## hardware
 ## contribute
 ## TODO
