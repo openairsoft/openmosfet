@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "utilities.h"
 
-const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_MODES*JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(13) + 535;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
+const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_MODES*JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(13) + 535 + 1000;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
 //StaticJsonDocument<capacity> doc;
 
 
@@ -83,18 +83,15 @@ boolean OMConfiguration::load(void){
     #ifdef DEBUG
       Serial.println("Aucun historique existe - No History Exist");
     #endif
+    OMConfiguration::save();
   } else {
     size_t size = file.size();
     if ( size == 0 ) {
       #ifdef DEBUG
         Serial.println("Fichier historique vide - History file empty !");
       #endif
+    OMConfiguration::save();
     } else {
-      /*
-      while (file.available()) {      // If anything comes in Serial (USB),
-        Serial.write(file.read());   // read it and send it out Serial1 (pins 0 & 1)
-      }*/
-      
       OMConfiguration::loadFromJson(file);
     }
     file.close();

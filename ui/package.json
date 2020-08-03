@@ -1,0 +1,16 @@
+{
+  "name": "ui",
+  "version": "1.0.0",
+  "description": "ui for OpenMosfet",
+  "main": "index.js",
+  "scripts": {
+    "build": "html-inline src/index.html | html-minifier > build/out.html && node compress.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@gfx/zopfli": "^1.0.15",
+    "html-inline": "^1.2.0",
+    "html-minifier": "^4.0.0"
+  }
+}

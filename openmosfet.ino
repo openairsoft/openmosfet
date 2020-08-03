@@ -44,7 +44,6 @@ void setup() {
   OMConfiguration::load();
   
   Mosfetv2wifiserver::begin();
-  Serial.println("lol");
 }
 
 void loop() {

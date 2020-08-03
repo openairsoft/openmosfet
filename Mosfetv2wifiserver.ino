@@ -3,8 +3,9 @@
 
 #include <AsyncElegantOTA.h>
 
-//TODO: penser à tout gzipper
+#include "ui.h"
 
+//TODO: penser à tout gzipper
 
 unsigned long Mosfetv2wifiserver::lastActivityTimeMs = millis();
 boolean Mosfetv2wifiserver::wifiIsOn = false;
@@ -14,9 +15,11 @@ DNSServer Mosfetv2wifiserver::dnsServer;
 
 const String postForms = "yolo";
 
+
 void Mosfetv2wifiserver::begin()
 {
-  delay(1000);
+  delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
+  //WiFi.setHostname("openmosfet");
 
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
@@ -48,21 +51,24 @@ void Mosfetv2wifiserver::begin()
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);
   WiFi.softAPConfig(Mosfetv2wifiserver::ip, Mosfetv2wifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
-  
-WiFi.printDiag(Serial);
 
+  #ifdef DEBUG
+    WiFi.printDiag(Serial);
+  #endif
 
   // if DNSServer is started with "*" for domain name, it will reply with
   // provided IP to all DNS request
   Mosfetv2wifiserver::dnsServer.start(OM_DNS_PORT, "*", Mosfetv2wifiserver::ip);
 
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.localIP());
+  #ifdef DEBUG
+    Serial.print("AP IP address: ");
+    Serial.println(WiFi.localIP());
+  #endif
 
   Mosfetv2wifiserver::webServer.on("/", Mosfetv2wifiserver::handleRoot);//send back as web page
   Mosfetv2wifiserver::webServer.on("/json", Mosfetv2wifiserver::handleRoot);//update and send back as json (if POST)
 
-  Mosfetv2wifiserver::webServer.serveStatic("/", FILESYSTEM, "/").setDefaultFile("index.html");
+  Mosfetv2wifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
  
   // relay all unknown requests to root
   Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
@@ -107,8 +113,10 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
   replica.updateLastActive();
 
   if (request->method() != HTTP_POST) {
-    //Mosfetv2wifiserver::webServer.send(200, "text/html", "<h1>You are connected lol</h1>");
-    request->send(FILESYSTEM, "/index.html");
+    //thank you https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", UI_HTML, UI_HTML_SIZE);
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   } else {
     #ifdef DEBUG
     int params = request->params();
@@ -300,7 +308,10 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
     if(request->url().equals("/json")){
       request->send(FILESYSTEM, "/cfg.json");//for ajax
     }else{
-      request->send(FILESYSTEM, "/index.html");//for standard use
+      //thank you https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
+      AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", UI_HTML, UI_HTML_SIZE);
+      response->addHeader("Content-Encoding", "gzip");
+      request->send(response);
     }
   }
 }
