@@ -13,15 +13,15 @@
 /**
  * This is an implementation for the input board included inside a G&G TR16
  */
-// START G&G TR16 specific code ---------------------------------------
-#ifdef REPLICA_TYPE_GGTR16
+// START G&G TR16 & P90 specific code ---------------------------------------
+#if defined(REPLICA_TYPE_GGTR16) || defined(REPLICA_TYPE_CYMACGP90)
 
 //#define OM_NB_ACTIVE_MODES 2
 
-#define GGTR16_MOTOR_PIN 2// this is the builtin led pin
-#define GGTR16_FIRINGGROUP_PIN 15
-#define GGTR16_CUTOFF_PIN 4
-#define GGTR16_SELECTOR_PIN 16
+#define GGTR16_MOTOR_PIN 32// this is the builtin led pin
+#define GGTR16_FIRINGGROUP_PIN 27
+#define GGTR16_CUTOFF_PIN 12
+#define GGTR16_SELECTOR_PIN 10
 #define GGTR16_DEBOUNCE_TIME_MS 5
 
 //channels

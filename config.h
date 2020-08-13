@@ -65,7 +65,8 @@
 #define MAX_CONTINUOUS_TRIGGER_PULL_DURATION_MS 3000
 
 //This constant specify the replica used
-#define REPLICA_TYPE_GGTR16
+//#define REPLICA_TYPE_GGTR16
+#define REPLICA_TYPE_CYMACGP90
 
 //This specify the max number of config modes stored
 #define OM_MAX_NB_STORED_MODES 2
