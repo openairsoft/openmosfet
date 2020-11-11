@@ -31,9 +31,11 @@ void Mosfetv2wifiserver::begin()
     
     // Wait for connection for OM_DEFAULT_WIFI_SEARCH_TIMEOUT_SECONDS
     unsigned long searchStartTime = millis();
+    #ifdef DEBUG
+      Serial.println("connecting to existing network...");
+    #endif
     while (WiFi.status() != WL_CONNECTED) {
       #ifdef DEBUG
-        delay(500);
         Serial.print(".");
       #endif
       if( millis() - searchStartTime > SEC_TO_MILLIS(OM_DEFAULT_WIFI_SEARCH_TIMEOUT_SECONDS) )
@@ -42,10 +44,14 @@ void Mosfetv2wifiserver::begin()
           Serial.println("");
           Serial.println("station connection timeout.");
           WiFi.disconnect();
-          WiFi.mode(WIFI_AP);
-          break;
         #endif
+        WiFi.mode(WIFI_AP);
+        break;
       }
+    }
+    
+    if(!MDNS.begin("openmosfet")) {
+      Serial.println("Error starting mDNS");
     }
   }
   /* You can remove the password parameter if you want the AP to be open. */
@@ -74,7 +80,7 @@ void Mosfetv2wifiserver::begin()
   Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
     Serial.print("webServer.onNotFound : ");
   
-    const char *metaRefreshStr = "<head><meta http-equiv=\"refresh\" content=\"0; url=http://openmosfet.org/\" /></head><body><p>redirecting...</p></body>";
+    const char *metaRefreshStr = "<head><meta http-equiv=\"refresh\" content=\"0; url=http://openmosfet.local/\" /></head><body><p>redirecting...</p></body>";
     request->send(200, "text/html", metaRefreshStr);//using this redirect method allows to send a 200 status and it helps with captive portal detection
       
   });

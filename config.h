@@ -50,7 +50,7 @@
 #define OM_MAX_SHUTDOWN_VOLTAGE 20.
 
 #define OM_WIFI_SSID_MIN_SIZE 8 //below 8 chars esp8266 wont take it into account 
-#define OM_WIFI_SSID_MAX_SIZE 16
+#define OM_WIFI_SSID_MAX_SIZE 32
 #define OM_WIFI_SSID_REAL_MAX_SIZE 17 //NOTE: must be equal to OM_WIFI_SSID_MAX_SIZE+1
 #define OM_WIFI_PSSWD_MIN_SIZE 8
 #define OM_WIFI_PSSWD_MAX_SIZE 16

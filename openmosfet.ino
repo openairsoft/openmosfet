@@ -13,6 +13,7 @@ AAMVirtualReplica replica;
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Bonjour");
 
   OMInputsInterface::begin(replica);
   
