@@ -256,9 +256,7 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
       String appPasswd = request->getParam("appPasswd", true)->value();//compairing to false for safety reasons
       unsigned int appPasswdLength = (unsigned int) appPasswd.length();
       //TODO: '=' or '\r' are forbidden. validate
-      Serial.print("appPasswdLength: ");
-      Serial.println(appPasswdLength);
-      if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= appPasswdLength && appPasswdLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
+      if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= appPasswdLength && appPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
         appPasswd.toCharArray(OMConfiguration::appPasswd, appPasswdLength+1);
       }
     }
@@ -279,9 +277,7 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
       String availableNetworkAppPasswd = request->getParam("availableNetworkAppPasswd", true)->value();//compairing to false for safety reasons
       unsigned int availableNetworkAppPasswdLength = (unsigned int) availableNetworkAppPasswd.length();
       //TODO: '=' or '\r' are forbidden. validate
-      Serial.print("availableNetworkAppPasswdLength: ");
-      Serial.println(availableNetworkAppPasswdLength);
-      if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= availableNetworkAppPasswdLength && availableNetworkAppPasswdLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
+      if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= availableNetworkAppPasswdLength && availableNetworkAppPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
         availableNetworkAppPasswd.toCharArray(OMConfiguration::availableNetworkAppPasswd, availableNetworkAppPasswdLength+1);
       }
     }

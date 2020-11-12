@@ -8,13 +8,13 @@
 //---------- X : Global default parameters ---------------------------------------------------------------------------------------
 
 #define OM_CONFIGFILE_NAME "/cfg.json"
-#define OM_DEFAULT_APSSID "OpenMosfet"//Note : must be [1-16] character (exluding '\0') in order to work
-#define OM_DEFAULT_APP_PASSWD  "password"//Note : must be [8-16] character (exluding '\0') in order to work
-//#define OM_DEFAULT_APSSID {'o','p','e','n','M','o','s','f','e','t','\0'}//Note : must be [1-16] character (exluding '\0') in order to work
+#define OM_DEFAULT_APSSID "OpenMosfet"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character (exluding '\0') in order to work
+#define OM_DEFAULT_APP_PASSWD  "password"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work
+//#define OM_DEFAULT_APSSID {'o','p','e','n','M','o','s','f','e','t','\0'}//Note : must be [8-32] character (exluding '\0') in order to work
 //#define OM_DEFAULT_APP_PASSWD  {'p','a','s','s','w','o','r','d','\0'}//Note : must be [8-16] character (exluding '\0') in order to work
 
-#define OM_DEFAULT_AVAILABLE_NETWORK_APSSID "externalssid"//Note : must be [1-16] character (exluding '\0') in order to work
-#define OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD  "externalpassword"//Note : must be [8-16] character (exluding '\0') in order to work
+#define OM_DEFAULT_AVAILABLE_NETWORK_APSSID "externalssid"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character (exluding '\0') in order to work
+#define OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD  "externalpassword"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work
 
 
 #define OM_DEFAULT_WIFI_SEARCH_TIMEOUT_SECONDS 5
@@ -27,7 +27,7 @@
 #define OM_DEFAULT_USE_BATTERY_PROTECTION true
 #define OM_DEFAULT_USE_ACTIVE_BRAKING false
 
-#define OM_DNS_PORT  53//Note : must be [8-16] character in order to work
+#define OM_DNS_PORT  53
 
 // If motor is spinning and no cycle has been detected in this time interval, then somethings wrong
 // shut down the motor and report the error.
@@ -51,7 +51,7 @@
 
 #define OM_WIFI_SSID_MIN_SIZE 8 //below 8 chars esp8266 wont take it into account 
 #define OM_WIFI_SSID_MAX_SIZE 32
-#define OM_WIFI_SSID_REAL_MAX_SIZE 17 //NOTE: must be equal to OM_WIFI_SSID_MAX_SIZE+1
+#define OM_WIFI_SSID_REAL_MAX_SIZE 33 //NOTE: must be equal to OM_WIFI_SSID_MAX_SIZE+1
 #define OM_WIFI_PSSWD_MIN_SIZE 8
 #define OM_WIFI_PSSWD_MAX_SIZE 16
 #define OM_WIFI_PSSWD_REAL_MAX_SIZE 17 //NOTE: must be equal to OM_WIFI_PSSWD_MAX_SIZE+1
