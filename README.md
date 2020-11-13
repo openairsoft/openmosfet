@@ -53,7 +53,7 @@ We are french but we can chat in english no prob.
   - predefined
   - manual
   - none
-- change max ssid and password length to 32 chars instead of 16 : https://serverfault.com/questions/45439/what-is-the-maximum-length-of-a-wifi-access-points-ssid
+- ~~change max ssid and password length to 32 chars instead of 16 : https://serverfault.com/questions/45439/what-is-the-maximum-length-of-a-wifi-access-points-ssid~~
 - add "try to connect now" button next to external wifi settings
 - check if wifi cutoff current economy is reliable
 
