@@ -20,7 +20,7 @@ The team is composed of a programmer ([Simon](https://github.com/simonjamain)) a
   - manually (consult the internet for howto)
     - ESPAsyncWebServer (https://github.com/me-no-dev/ESPAsyncWebServer)
     - AsyncTCP (https://github.com/me-no-dev/AsyncTCP)
-    - AsyncElegantOTA (https://github.com/ayushsharma82/AsyncElegantOTA)
+    - AsyncElegantOTA (https://github.com/simonjamain/AsyncElegantOTA)
 - (Optional, for uploading settings json file through arduino IDE) Install the SPIFFS data upload tool : https://github.com/me-no-dev/arduino-esp32fs-plugin/releases/
 
 ### compiling the ui (in case of )
