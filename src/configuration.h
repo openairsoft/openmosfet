@@ -1,6 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include <Arduino.h>
 #include "components.h"
 #include "FS.h"
 
@@ -21,14 +22,15 @@
 class OMConfiguration {
   public:
 
-    // NOTE: usefull ressource here: https://arduino.stackexchange.com/questions/60112/value-of-uninitialized-eeprom-in-esp8266
-    static boolean loadFromJson(Stream &stream);
-    static boolean load(void);
-    static boolean save(void);
-
     #ifdef DEBUG
       static void printCfg(void);
     #endif
+    
+    // NOTE: usefull ressource here: https://arduino.stackexchange.com/questions/60112/value-of-uninitialized-eeprom-in-esp8266
+    static void loadFromJson(Stream &stream);
+    static boolean load(void);
+    static boolean save(void);
+
 
     byte versionNumber;
     uint16_t checksum;

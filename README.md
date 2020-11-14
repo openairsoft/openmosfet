@@ -10,18 +10,8 @@ The hardware provides all the electronics needed and allows different boards to 
 The team is composed of a programmer ([Simon](https://github.com/simonjamain)) and two electronitians (Romain & Marcellin), all french airsofters.
 
 ## installation
-- Install arduino IDE https://www.arduino.cc/en/main/software.
-- add `https://dl.espressif.com/dl/package_esp32_index.json` in **File > Preferences > Additional Boards Manager URLs**
-- go to **Tools > Board > Boards Manager** and add the **esp32** board
-- Install required libraries
-  - via arduino IDE libraby manager (**Sketch > Library > Manage Libraries**)
-    - Bounce2
-    - ArduinoJson
-  - manually (consult the internet for howto)
-    - ESPAsyncWebServer (https://github.com/me-no-dev/ESPAsyncWebServer)
-    - AsyncTCP (https://github.com/me-no-dev/AsyncTCP)
-    - AsyncElegantOTA (https://github.com/simonjamain/AsyncElegantOTA)
-- (Optional, for uploading settings json file through arduino IDE) Install the SPIFFS data upload tool : https://github.com/me-no-dev/arduino-esp32fs-plugin/releases/
+- Install platformio
+- I think that's about it... 
 
 ### compiling the ui (in case of )
 For reasons, the ui files (html, css,js, etc... ) are compiled in `ui.h` file.

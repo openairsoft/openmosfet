@@ -1,6 +1,7 @@
 #ifndef MOSFETV2WIFISERVER_HPP
 #define MOSFETV2WIFISERVER_HPP
 
+#include <Arduino.h>
 #include "config.h"
 #include "configuration.h"
 

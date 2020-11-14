@@ -21,7 +21,7 @@ float OMConfiguration::batteryLowVoltage = OM_DEFAULT_LOW_VOLTAGE;
 float OMConfiguration::batteryShutdownVoltage = OM_DEFAULT_SHUTDOWN_VOLTAGE;
 boolean OMConfiguration::useActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
 
-boolean OMConfiguration::loadFromJson(Stream &stream){
+void OMConfiguration::loadFromJson(Stream &stream){
   DynamicJsonDocument doc(capacity);
   
   Serial.println(deserializeJson(doc, stream).c_str());
@@ -60,6 +60,7 @@ boolean OMConfiguration::loadFromJson(Stream &stream){
       break;
       
       case 2 :
+      default :
         currentBurstMode = AAMFiringSettings::burstModeExtendible;
       break;
     }

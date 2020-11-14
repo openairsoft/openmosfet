@@ -1,5 +1,6 @@
 #include "components.h"
-
+#include "configuration.h"
+#include "inputsInterface.h"
 
 
 
@@ -170,9 +171,9 @@ void AAMVirtualReplica::startFiringCycle(void)
   {
     if    
       (
-        COND_TRIGGER_PULLED && (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE)
+        ( COND_TRIGGER_PULLED && (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE) )
         ||
-        COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED
+        ( COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED )
       )
       {
       #ifdef DEBUG

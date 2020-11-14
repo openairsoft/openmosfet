@@ -1,6 +1,7 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include <Arduino.h>
 #include "config.h"
 
 class AAMFiringSettings;
@@ -63,7 +64,12 @@ class AAMVirtualTrigger
       stateReleased,
       statePulled,
     };
+
+  private:    
+    AAMVirtualReplica *_replica;
+    AAMVirtualTrigger::TriggerState _state;
     
+  public:
     AAMVirtualTrigger(AAMVirtualReplica *replica)
     :_replica(replica),_state(AAMVirtualTrigger::stateReleased)
     {};
@@ -73,10 +79,9 @@ class AAMVirtualTrigger
     void release(void);
     
     AAMVirtualTrigger::TriggerState getState(void){ return this->_state; }
+
+
     
-  private:    
-    AAMVirtualTrigger::TriggerState _state;
-    AAMVirtualReplica *_replica;
 };
 
 
@@ -96,12 +101,22 @@ class AAMVirtualGearbox
       statePrecocked,
       stateCycling,
     };
-    
+
     enum GearboxCycleState
     {
       stateCocking,
       statePrecocking,
     };
+
+  private:
+    uint8_t _motorPin;
+    unsigned int _precockDuration_ms;
+    unsigned long _precockEndTime_ms;
+    AAMVirtualReplica *_replica;
+    AAMVirtualGearbox::GearboxState _state;
+    AAMVirtualGearbox::GearboxCycleState _cycleState;
+
+  public:
 
     AAMVirtualGearbox(AAMVirtualReplica *replica)
     :_replica(replica),_state(AAMVirtualGearbox::stateResting),_cycleState(AAMVirtualGearbox::stateCocking)
@@ -117,13 +132,6 @@ class AAMVirtualGearbox
 
     void update(void);
     
-  private:
-    uint8_t _motorPin;
-    unsigned int _precockDuration_ms;
-    unsigned long _precockEndTime_ms;
-    AAMVirtualGearbox::GearboxState _state;
-    AAMVirtualGearbox::GearboxCycleState _cycleState;
-    AAMVirtualReplica *_replica;
     
     //unsigned int precockedTime_ms;
 };
@@ -145,7 +153,15 @@ class AAMVirtualSelector
       stateSemi,
       stateAuto,
     };
+
+  private:
+    AAMVirtualReplica *_replica;
+    AAMVirtualSelector::SelectorState _state;
     
+    AAMFiringSettings firingSettingsSemi;
+    AAMFiringSettings firingSettingsFull;
+    
+  public:
     AAMVirtualSelector(AAMVirtualReplica *replica)
     :_replica(replica),_state(AAMVirtualSelector::stateSafe)
     {};
@@ -161,13 +177,6 @@ class AAMVirtualSelector
     AAMVirtualSelector::SelectorState getState(void){ return this->_state; }
   
     AAMFiringSettings *currentFiringSettings;
-
-  private:
-    AAMVirtualSelector::SelectorState _state;
-    AAMVirtualReplica *_replica;
-    
-    AAMFiringSettings firingSettingsSemi;
-    AAMFiringSettings firingSettingsFull;
 };
 
 
@@ -179,15 +188,31 @@ class AAMVirtualSelector
 
 
 class AAMVirtualReplica
-{
+{  
   public:
-    
     enum ReplicaState
     {
       stateIdle,
       stateFiring,
     };
+
+  private:
+    AAMVirtualGearbox _gearbox;
+    AAMVirtualTrigger _trigger;
+    AAMVirtualSelector _selector;
+
+  public:
+    uint8_t _bbs_fired;
+
+  private:
+    AAMVirtualReplica::ReplicaState _state;
+    uint8_t _currentBurstBBCount;
+    unsigned long _lastActiveTimeMs;
     
+    void startFiringCycle();
+    void endFiringCycle();
+    
+  public:
     AAMVirtualReplica()
     :_gearbox(this), _trigger(this), _selector(this), _bbs_fired(0), _state(AAMVirtualReplica::stateIdle), _currentBurstBBCount(0), _lastActiveTimeMs(millis())
     {}
@@ -210,27 +235,11 @@ class AAMVirtualReplica
 
     void update(void);
 
-    uint8_t _bbs_fired;
 
     AAMVirtualTrigger &getTrigger(){ return this->_trigger; }
     AAMVirtualGearbox &getGearbox(){ return this->_gearbox; }
     AAMVirtualSelector &getSelector(){ return this->_selector; }
 
-  private:
-    unsigned long _lastActiveTimeMs;
-    
-    AAMVirtualTrigger _trigger;
-    AAMVirtualGearbox _gearbox;
-    AAMVirtualSelector _selector;
-
-    uint8_t _currentBurstBBCount;
-    
-    void startFiringCycle();
-    void endFiringCycle();
-    
-    AAMVirtualReplica::ReplicaState _state;
-
-        
   friend class AAMVirtualGearbox;
 };
 #endif

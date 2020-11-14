@@ -1,5 +1,4 @@
-//comment line below if not debug
-#define DEBUG
+#include <Arduino.h>
 
 #include "utilities.h"
 #include "config.h"
@@ -10,6 +9,8 @@
 
 AAMVirtualReplica replica;
 
+void setup();
+void loop();
 
 void setup() {
   Serial.begin(115200);

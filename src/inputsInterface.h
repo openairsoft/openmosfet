@@ -1,6 +1,7 @@
 #ifndef INPUTS_INTERFACE_H
 #define INPUTS_INTERFACE_H
 
+#include <Arduino.h>
 #include "components.h"
 
 class OMInputsInterface

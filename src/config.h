@@ -39,7 +39,7 @@
 #else
 #define OM_MIN_WIFI_SHUTDOWN_DELAY_MINUTES 1
 #define OM_MIN_DEEP_SLEEP_DELAY_MINUTES 10
-#endif DEBUG
+#endif
 
 // define accepted tensions for voltages config
 #define OM_MIN_NOMINAL_VOLTAGE 0.

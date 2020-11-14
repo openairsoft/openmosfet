@@ -1,5 +1,7 @@
+#include "inputsInterface.h"
 #include "config.h"
 #include "components.h"
+#include "configuration.h"
 
 /**
  * README

@@ -7,6 +7,8 @@
 
 //TODO: penser à tout gzipper
 
+extern AAMVirtualReplica replica;
+
 unsigned long Mosfetv2wifiserver::lastActivityTimeMs = millis();
 boolean Mosfetv2wifiserver::wifiIsOn = false;
 AsyncWebServer Mosfetv2wifiserver::webServer(80);
