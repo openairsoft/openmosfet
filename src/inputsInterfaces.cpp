@@ -41,10 +41,10 @@ Bounce ggtr16TriggerDebouncer = Bounce();
 Bounce ggtr16CutoffDebouncer = Bounce();
 Bounce ggtr16SelectorDebouncer = Bounce();
 
-//AAMFiringSettings ggtr16FiringSettingsSemi(AAMFiringSettings::burstModeNormal, 1, 0, 255, 0);
-//AAMFiringSettings ggtr16FiringSettingsAuto(AAMFiringSettings::burstModeExtendible, 3, 0, 255, 0);
+//OMFiringSettings ggtr16FiringSettingsSemi(OMFiringSettings::burstModeNormal, 1, 0, 255, 0);
+//OMFiringSettings ggtr16FiringSettingsAuto(OMFiringSettings::burstModeExtendible, 3, 0, 255, 0);
 
-void OMInputsInterface::begin(AAMVirtualReplica &replica)
+void OMInputsInterface::begin(OMVirtualReplica &replica)
 {
   // motor pwm setup
   ledcAttachPin(GGTR16_MOTOR_PIN, GGTR16_MOTOR_LEDC_CHANNEL);
@@ -64,15 +64,15 @@ void OMInputsInterface::begin(AAMVirtualReplica &replica)
 
   if(digitalRead(GGTR16_SELECTOR_PIN) == LOW)
   {
-    replica.getSelector().setState(AAMVirtualSelector::stateAuto);
+    replica.getSelector().setState(OMVirtualSelector::stateAuto);
   }else
   {
-    replica.getSelector().setState(AAMVirtualSelector::stateSemi);//NOTE: on the G&G TR16 we have no mean to know when selector is on safe, it just physicaly disable the firing group, so we have to initialize on semi.
+    replica.getSelector().setState(OMVirtualSelector::stateSemi);//NOTE: on the G&G TR16 we have no mean to know when selector is on safe, it just physicaly disable the firing group, so we have to initialize on semi.
   }
 
 }
 
-void OMInputsInterface::update(AAMVirtualReplica &replica)
+void OMInputsInterface::update(OMVirtualReplica &replica)
 {
   ggtr16TriggerDebouncer.update();
   ggtr16CutoffDebouncer.update();
@@ -89,23 +89,23 @@ void OMInputsInterface::update(AAMVirtualReplica &replica)
   }
 
   if( ggtr16SelectorDebouncer.fell()) {  // Call code if button transitions from HIGH to LOW
-    replica.getSelector().setState(AAMVirtualSelector::stateAuto);
+    replica.getSelector().setState(OMVirtualSelector::stateAuto);
   }else if( ggtr16SelectorDebouncer.rose()) {
-    replica.getSelector().setState(AAMVirtualSelector::stateSemi);
+    replica.getSelector().setState(OMVirtualSelector::stateSemi);
   }
 }
 
-AAMFiringSettings &OMInputsInterface::getCurrentFiringSetting(AAMVirtualSelector &selector)
+OMFiringSettings &OMInputsInterface::getCurrentFiringSetting(OMVirtualSelector &selector)
 {
   switch(selector.getState())
   {
-    case AAMVirtualSelector::stateAuto:
+    case OMVirtualSelector::stateAuto:
       //return ggtr16FiringSettingsAuto;
       return OMConfiguration::fireModes[1];
       break;
 
-    case AAMVirtualSelector::stateSafe://NOTE: in an ideal world, this should raise an exception, but meh...
-    case AAMVirtualSelector::stateSemi:
+    case OMVirtualSelector::stateSafe://NOTE: in an ideal world, this should raise an exception, but meh...
+    case OMVirtualSelector::stateSemi:
     default:
       //return ggtr16FiringSettingsSemi;
       return OMConfiguration::fireModes[0];

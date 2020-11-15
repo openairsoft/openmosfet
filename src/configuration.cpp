@@ -6,7 +6,7 @@ const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_
 
 
 //initialization
-AAMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {AAMFiringSettings(AAMFiringSettings::burstModeNormal, 1, 0, 255, 0), AAMFiringSettings(AAMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
+OMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0), OMFiringSettings(OMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
 char OMConfiguration::appSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_APSSID;
 char OMConfiguration::appPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_APP_PASSWD;
 char OMConfiguration::availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APSSID;
@@ -46,22 +46,22 @@ void OMConfiguration::loadFromJson(Stream &stream){
   for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
     JsonObject currentFireMode = doc["fireModes"][i];
-    //info: AAMFiringSettings(AAMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
-    AAMFiringSettings::BurstMode currentBurstMode;
+    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+    OMFiringSettings::BurstMode currentBurstMode;
     
     switch((int)currentFireMode["burstMode"])
     {
       case 0 :
-        currentBurstMode = AAMFiringSettings::burstModeNormal;
+        currentBurstMode = OMFiringSettings::burstModeNormal;
       break;
 
       case 1 :
-        currentBurstMode = AAMFiringSettings::burstModeInterruptible;
+        currentBurstMode = OMFiringSettings::burstModeInterruptible;
       break;
       
       case 2 :
       default :
-        currentBurstMode = AAMFiringSettings::burstModeExtendible;
+        currentBurstMode = OMFiringSettings::burstModeExtendible;
       break;
     }
     uint8_t currentBurstLength = (uint8_t)currentFireMode["burstLength"];
@@ -69,7 +69,7 @@ void OMConfiguration::loadFromJson(Stream &stream){
     uint8_t currentMotorPower = (uint8_t)currentFireMode["motorPower"];
     unsigned int currentTimeBetweenShots = (unsigned int)currentFireMode["timeBetweenShots_ms"];
     
-    OMConfiguration::fireModes[i] = AAMFiringSettings(currentBurstMode, currentBurstLength, currentPrecockDuration, currentMotorPower, currentTimeBetweenShots);
+    OMConfiguration::fireModes[i] = OMFiringSettings(currentBurstMode, currentBurstLength, currentPrecockDuration, currentMotorPower, currentTimeBetweenShots);
   }
 }
 
@@ -126,20 +126,20 @@ boolean OMConfiguration::save(void){
   int i = 0;
   for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
-    //info: AAMFiringSettings(AAMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
     JsonObject currentFireMode = fireModes.createNestedObject();
     
     switch(OMConfiguration::fireModes[i].getBurstMode())
     {
-      case AAMFiringSettings::burstModeNormal :
+      case OMFiringSettings::burstModeNormal :
         currentFireMode["burstMode"] = 0;
       break;
 
-      case AAMFiringSettings::burstModeInterruptible :
+      case OMFiringSettings::burstModeInterruptible :
         currentFireMode["burstMode"] = 1;
       break;
       
-      case AAMFiringSettings::burstModeExtendible :
+      case OMFiringSettings::burstModeExtendible :
         currentFireMode["burstMode"] = 2;
       break;
     }
@@ -169,21 +169,21 @@ boolean OMConfiguration::save(void){
     int i = 0;
     for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
     {
-      //info: AAMFiringSettings(AAMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
       Serial.print(F("fireMode"));
       Serial.print(i);
       Serial.print(F("="));
       switch(OMConfiguration::fireModes[i].getBurstMode())
       {
-        case AAMFiringSettings::burstModeNormal :
+        case OMFiringSettings::burstModeNormal :
           Serial.print(F("0,"));
         break;
   
-        case AAMFiringSettings::burstModeInterruptible :
+        case OMFiringSettings::burstModeInterruptible :
           Serial.print(F("1,"));
         break;
         
-        case AAMFiringSettings::burstModeExtendible :
+        case OMFiringSettings::burstModeExtendible :
           Serial.print(F("2,"));
         break;
       }

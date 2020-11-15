@@ -35,7 +35,7 @@ class OMConfiguration {
     byte versionNumber;
     uint16_t checksum;
   
-    static AAMFiringSettings fireModes[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 1
+    static OMFiringSettings fireModes[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 1
     static char appSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 1
     static char appPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 1
     static char availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4

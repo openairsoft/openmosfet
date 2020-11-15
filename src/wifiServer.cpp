@@ -1,4 +1,4 @@
-#include "Mosfetv2wifiserver.h"
+#include "wifiServer.h"
 #include "utilities.h"
 
 #include <AsyncElegantOTA.h>
@@ -7,18 +7,18 @@
 
 //TODO: penser à tout gzipper
 
-extern AAMVirtualReplica replica;
+extern OMVirtualReplica replica;
 
-unsigned long Mosfetv2wifiserver::lastActivityTimeMs = millis();
-boolean Mosfetv2wifiserver::wifiIsOn = false;
-AsyncWebServer Mosfetv2wifiserver::webServer(80);
-IPAddress Mosfetv2wifiserver::ip(APPIP);
-DNSServer Mosfetv2wifiserver::dnsServer;
+unsigned long OMwifiserver::lastActivityTimeMs = millis();
+boolean OMwifiserver::wifiIsOn = false;
+AsyncWebServer OMwifiserver::webServer(80);
+IPAddress OMwifiserver::ip(APPIP);
+DNSServer OMwifiserver::dnsServer;
 
 const String postForms = "yolo";
 
 
-void Mosfetv2wifiserver::begin()
+void OMwifiserver::begin()
 {
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
   //WiFi.setHostname("openmosfet");
@@ -27,7 +27,7 @@ void Mosfetv2wifiserver::begin()
   {
     WiFi.mode(WIFI_AP_STA);
     WiFi.begin(OMConfiguration::availableNetworkAppSsid, OMConfiguration::availableNetworkAppPasswd);
-    Mosfetv2wifiserver::wifiIsOn = true;
+    OMwifiserver::wifiIsOn = true;
   
     Serial.println("");
     
@@ -58,7 +58,7 @@ void Mosfetv2wifiserver::begin()
   }
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);
-  WiFi.softAPConfig(Mosfetv2wifiserver::ip, Mosfetv2wifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
+  WiFi.softAPConfig(OMwifiserver::ip, OMwifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
 
   #ifdef DEBUG
     WiFi.printDiag(Serial);
@@ -66,20 +66,20 @@ void Mosfetv2wifiserver::begin()
 
   // if DNSServer is started with "*" for domain name, it will reply with
   // provided IP to all DNS request
-  Mosfetv2wifiserver::dnsServer.start(OM_DNS_PORT, "*", Mosfetv2wifiserver::ip);
+  OMwifiserver::dnsServer.start(OM_DNS_PORT, "*", OMwifiserver::ip);
 
   #ifdef DEBUG
     Serial.print("AP IP address: ");
     Serial.println(WiFi.localIP());
   #endif
 
-  Mosfetv2wifiserver::webServer.on("/", Mosfetv2wifiserver::handleRoot);//send back as web page
-  Mosfetv2wifiserver::webServer.on("/json", Mosfetv2wifiserver::handleRoot);//update and send back as json (if POST)
+  OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
+  OMwifiserver::webServer.on("/json", OMwifiserver::handleRoot);//update and send back as json (if POST)
 
-  Mosfetv2wifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
+  OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
  
   // relay all unknown requests to root
-  Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
+  OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
     Serial.print("webServer.onNotFound : ");
   
     const char *metaRefreshStr = "<head><meta http-equiv=\"refresh\" content=\"0; url=http://openmosfet.local/\" /></head><body><p>redirecting...</p></body>";
@@ -87,12 +87,12 @@ void Mosfetv2wifiserver::begin()
       
   });
   /*
-  Mosfetv2wifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
+  OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
     request->send(404);
   });*/
 
-  AsyncElegantOTA.begin(&Mosfetv2wifiserver::webServer);//OTA
-  Mosfetv2wifiserver::webServer.begin();
+  AsyncElegantOTA.begin(&OMwifiserver::webServer);//OTA
+  OMwifiserver::webServer.begin();
   Serial.println("HTTP server started");
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -111,13 +111,13 @@ var xhttp = new XMLHttpRequest();
    xhttp.send();
 */
 
-void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
+void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   #ifdef DEBUG
   Serial.println("handleRoot :");
   #endif
 
   //update activity
-  Mosfetv2wifiserver::lastActivityTimeMs = millis();
+  OMwifiserver::lastActivityTimeMs = millis();
   replica.updateLastActive();
 
   if (request->method() != HTTP_POST) {
@@ -157,15 +157,15 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
         switch(currentBurstModeValue.toInt())
         {
           case 0 :
-            OMConfiguration::fireModes[i].setBurstMode(AAMFiringSettings::burstModeNormal);
+            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeNormal);
           break;
     
           case 1 :
-            OMConfiguration::fireModes[i].setBurstMode(AAMFiringSettings::burstModeInterruptible);
+            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeInterruptible);
           break;
           
           case 2 :
-            OMConfiguration::fireModes[i].setBurstMode(AAMFiringSettings::burstModeExtendible);
+            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeExtendible);
           break;
         }
       }
@@ -320,28 +320,28 @@ void Mosfetv2wifiserver::handleRoot(AsyncWebServerRequest *request) {
   }
 }
 
-void Mosfetv2wifiserver::update() {
+void OMwifiserver::update() {
   if(
-    Mosfetv2wifiserver::wifiIsOn
+    OMwifiserver::wifiIsOn
     &&
-    ( millis() - Mosfetv2wifiserver::lastActivityTimeMs > OMConfiguration::wifiShutdownDelayMinutes * 60000 )
+    ( millis() - OMwifiserver::lastActivityTimeMs > OMConfiguration::wifiShutdownDelayMinutes * 60000 )
     )
   {
     #ifdef DEBUG
     Serial.print("wifi disabled after ");
-    Serial.print( float(millis() - Mosfetv2wifiserver::lastActivityTimeMs) / 60000 );
+    Serial.print( float(millis() - OMwifiserver::lastActivityTimeMs) / 60000 );
     Serial.println(" minutes.");
     #endif
     //esp_bt_controller_disable();
     esp_wifi_stop();
     //esp_light_sleep_start();
     
-    Mosfetv2wifiserver::wifiIsOn = false;
+    OMwifiserver::wifiIsOn = false;
   }else{
-    Mosfetv2wifiserver::dnsServer.processNextRequest();
+    OMwifiserver::dnsServer.processNextRequest();
   }
   
   AsyncElegantOTA.loop();
   
-  //Mosfetv2wifiserver::webServer.handleClient();
+  //OMwifiserver::webServer.handleClient();
 }

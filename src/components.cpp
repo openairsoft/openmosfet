@@ -9,22 +9,22 @@
 
 
 
-void AAMVirtualTrigger::pull(void)
+void OMVirtualTrigger::pull(void)
 {
   #ifdef DEBUG
-  Serial.println("AAMVirtualTrigger::pull");
+  Serial.println("OMVirtualTrigger::pull");
   #endif
-  _state = AAMVirtualTrigger::statePulled;
+  _state = OMVirtualTrigger::statePulled;
   this->_replica->triggerPulled();
   this->_replica->updateLastActive();
 }
 
-void AAMVirtualTrigger::release(void)
+void OMVirtualTrigger::release(void)
 {  
   #ifdef DEBUG
-  Serial.println("AAMVirtualTrigger::release");
+  Serial.println("OMVirtualTrigger::release");
   #endif
-  _state = AAMVirtualTrigger::stateReleased;
+  _state = OMVirtualTrigger::stateReleased;
   this->_replica->triggerReleased();
   this->_replica->updateLastActive();
 }
@@ -37,48 +37,48 @@ void AAMVirtualTrigger::release(void)
 
 
 
-void AAMVirtualGearbox::cycle(unsigned int precockDuration_ms)
+void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
 {
   #ifdef DEBUG
-  Serial.println("AAMVirtualGearbox::cycle");
+  Serial.println("OMVirtualGearbox::cycle");
   #endif
   OMInputsInterface::motorOn();
   this->_precockDuration_ms = precockDuration_ms;
-  this->_state = AAMVirtualGearbox::stateCycling;
-  this->_cycleState = AAMVirtualGearbox::stateCocking;
+  this->_state = OMVirtualGearbox::stateCycling;
+  this->_cycleState = OMVirtualGearbox::stateCocking;
 }
 
-void AAMVirtualGearbox::cycleEndDetected(void)
+void OMVirtualGearbox::cycleEndDetected(void)
 {
   #ifdef DEBUG
   Serial.println("cycleEndDetected");
   #endif
   if(this->_precockDuration_ms <= 0)
   {
-    this->endCycle(AAMVirtualGearbox::stateResting);
+    this->endCycle(OMVirtualGearbox::stateResting);
   }else
   {
     this->_precockEndTime_ms = millis() + _precockDuration_ms;
-    this->_cycleState = AAMVirtualGearbox::statePrecocking;
+    this->_cycleState = OMVirtualGearbox::statePrecocking;
   }
 }
 
-void AAMVirtualGearbox::update(void)
+void OMVirtualGearbox::update(void)
 {
   if(
-      this->_state == AAMVirtualGearbox::stateCycling
+      this->_state == OMVirtualGearbox::stateCycling
       &&
-      this->_cycleState == AAMVirtualGearbox::statePrecocking
+      this->_cycleState == OMVirtualGearbox::statePrecocking
     )
   {
     if(millis() >= this->_precockEndTime_ms)
     {
-      AAMVirtualGearbox::endCycle(AAMVirtualGearbox::statePrecocked);
+      OMVirtualGearbox::endCycle(OMVirtualGearbox::statePrecocked);
     }
   }
 }
 
-void AAMVirtualGearbox::endCycle(AAMVirtualGearbox::GearboxState state)
+void OMVirtualGearbox::endCycle(OMVirtualGearbox::GearboxState state)
 {
   #ifdef DEBUG
   Serial.println("endCycle");
@@ -97,10 +97,10 @@ void AAMVirtualGearbox::endCycle(AAMVirtualGearbox::GearboxState state)
 
 
 
-void AAMVirtualSelector::setState(AAMVirtualSelector::SelectorState state)
+void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 {
   #ifdef DEBUG
-  Serial.println("AAMVirtualSelector::setState");
+  Serial.println("OMVirtualSelector::setState");
   #endif
   _state = state;
   this->_replica->updateLastActive();
@@ -114,7 +114,7 @@ void AAMVirtualSelector::setState(AAMVirtualSelector::SelectorState state)
 
 
 
-void AAMVirtualReplica::update(void)
+void OMVirtualReplica::update(void)
 {
   if( millis() - this->_lastActiveTimeMs > OMConfiguration::deepSleepDelayMinutes * 60000 )
   {
@@ -131,12 +131,12 @@ void AAMVirtualReplica::update(void)
   }
 }
 
-void AAMVirtualReplica::updateLastActive(void)
+void OMVirtualReplica::updateLastActive(void)
 {
   this->_lastActiveTimeMs = millis();
 }
 
-void AAMVirtualReplica::triggerPulled(void)
+void OMVirtualReplica::triggerPulled(void)
 {
   #ifdef DEBUG
   Serial.println("triggerPulled");
@@ -145,23 +145,23 @@ void AAMVirtualReplica::triggerPulled(void)
   this->startFiringCycle();
 }
 
-void AAMVirtualReplica::triggerReleased(void)
+void OMVirtualReplica::triggerReleased(void)
 {
   #ifdef DEBUG
   Serial.println("triggerReleased");
   #endif
-  this->_state = AAMVirtualReplica::stateIdle;
+  this->_state = OMVirtualReplica::stateIdle;
 }
 
 
-#define COND_SAFETY_OFF this->_selector.getState() != AAMVirtualSelector::stateSafe
-#define COND_GEARBOX_NOT_CYCLING this->_gearbox.getState() != AAMVirtualGearbox::stateCycling
-#define COND_TRIGGER_PULLED this->_trigger.getState() == AAMVirtualTrigger::statePulled
-#define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() != AAMFiringSettings::burstModeInterruptible
+#define COND_SAFETY_OFF this->_selector.getState() != OMVirtualSelector::stateSafe
+#define COND_GEARBOX_NOT_CYCLING this->_gearbox.getState() != OMVirtualGearbox::stateCycling
+#define COND_TRIGGER_PULLED this->_trigger.getState() == OMVirtualTrigger::statePulled
+#define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() != OMFiringSettings::burstModeInterruptible
 #define COND_BURST_NOT_FINISHED this->_bbs_fired < OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstLength()
-#define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() == AAMFiringSettings::burstModeExtendible
+#define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getBurstMode() == OMFiringSettings::burstModeExtendible
 
-void AAMVirtualReplica::startFiringCycle(void)
+void OMVirtualReplica::startFiringCycle(void)
 {
   #ifdef DEBUG
   Serial.println("startFiringCycle");
@@ -189,13 +189,13 @@ void AAMVirtualReplica::startFiringCycle(void)
       Serial.println(COND_BURST_NOT_FINISHED);
       #endif
         
-        this->_state = AAMVirtualReplica::stateFiring;
+        this->_state = OMVirtualReplica::stateFiring;
         this->_gearbox.cycle(OMInputsInterface::getCurrentFiringSetting(this->getSelector()).getPrecockDurationMs());
       }
   }
 }
 
-void AAMVirtualReplica::endFiringCycle(void)
+void OMVirtualReplica::endFiringCycle(void)
 {
   #ifdef DEBUG
   Serial.println("endFiringCycle");

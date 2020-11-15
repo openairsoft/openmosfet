@@ -5,9 +5,9 @@
 #include "inputsInterface.h"
 #include "components.h"
 #include "configuration.h"
-#include "Mosfetv2wifiserver.h"
+#include "wifiServer.h"
 
-AAMVirtualReplica replica;
+OMVirtualReplica replica;
 
 void setup();
 void loop();
@@ -45,12 +45,12 @@ void setup() {
 
   OMConfiguration::load();
   
-  Mosfetv2wifiserver::begin();
+  OMwifiserver::begin();
 }
 
 void loop() {
   
-  Mosfetv2wifiserver::update();
+  OMwifiserver::update();
   replica.update();
   OMInputsInterface::update(replica);
   

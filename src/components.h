@@ -4,13 +4,13 @@
 #include <Arduino.h>
 #include "config.h"
 
-class AAMFiringSettings;
-class AAMVirtualTrigger;
-class AAMVirtualReplica;
-class AAMVirtualSelector;
+class OMFiringSettings;
+class OMVirtualTrigger;
+class OMVirtualReplica;
+class OMVirtualSelector;
 
 //----------------------------- FIRING SETTINGS -----------------------------
-class AAMFiringSettings
+class OMFiringSettings
 {
   public:
   
@@ -21,28 +21,28 @@ class AAMFiringSettings
       burstModeExtendible,
     };
 
-    AAMFiringSettings(AAMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+    OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
     :_burstMode(burstMode),_burstLength(burstLength),_precockDuration_ms(_precockDuration_ms),_motorPower(motorPower),_timeBetweenShots_ms(timeBetweenShots_ms)
     {};
 
-    AAMFiringSettings()
-    :AAMFiringSettings(AAMFiringSettings::burstModeNormal, 1, 0, 255, 0)//Note those are kind of arbitrary default values
+    OMFiringSettings()
+    :OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0)//Note those are kind of arbitrary default values
     {};
 
-    AAMFiringSettings::BurstMode getBurstMode(){ return this->_burstMode; }
+    OMFiringSettings::BurstMode getBurstMode(){ return this->_burstMode; }
     uint8_t getBurstLength(){ return this->_burstLength; }
     unsigned int getPrecockDurationMs(){ return this->_precockDuration_ms; }
     uint8_t getMotorPower(){ return this->_motorPower; }
     unsigned int getTimeBetweenShotsMs(){ return this->_timeBetweenShots_ms; }
 
-    void setBurstMode(AAMFiringSettings::BurstMode burstMode){this->_burstMode = burstMode;}
+    void setBurstMode(OMFiringSettings::BurstMode burstMode){this->_burstMode = burstMode;}
     void setBurstLength(uint8_t burstLength){this->_burstLength = burstLength;}
     void setPrecockDuration_ms(unsigned int precockDuration_ms){this->_precockDuration_ms = precockDuration_ms;}
     void setMotorPower(uint8_t motorPower){this->_motorPower = motorPower;}
     void setTimeBetweenShots_ms(unsigned int timeBetweenShots_ms){this->_timeBetweenShots_ms = timeBetweenShots_ms;}
     
   private:
-    AAMFiringSettings::BurstMode _burstMode;
+    OMFiringSettings::BurstMode _burstMode;
     uint8_t _burstLength;
     unsigned int _precockDuration_ms;
     uint8_t _motorPower;
@@ -56,7 +56,7 @@ class AAMFiringSettings
 
 
 
-class AAMVirtualTrigger
+class OMVirtualTrigger
 {
   public:
     enum TriggerState
@@ -66,19 +66,19 @@ class AAMVirtualTrigger
     };
 
   private:    
-    AAMVirtualReplica *_replica;
-    AAMVirtualTrigger::TriggerState _state;
+    OMVirtualReplica *_replica;
+    OMVirtualTrigger::TriggerState _state;
     
   public:
-    AAMVirtualTrigger(AAMVirtualReplica *replica)
-    :_replica(replica),_state(AAMVirtualTrigger::stateReleased)
+    OMVirtualTrigger(OMVirtualReplica *replica)
+    :_replica(replica),_state(OMVirtualTrigger::stateReleased)
     {};
     
     void pull(void);
     
     void release(void);
     
-    AAMVirtualTrigger::TriggerState getState(void){ return this->_state; }
+    OMVirtualTrigger::TriggerState getState(void){ return this->_state; }
 
 
     
@@ -92,7 +92,7 @@ class AAMVirtualTrigger
 
 
 
-class AAMVirtualGearbox
+class OMVirtualGearbox
 {
   public:
     enum GearboxState
@@ -112,23 +112,23 @@ class AAMVirtualGearbox
     uint8_t _motorPin;
     unsigned int _precockDuration_ms;
     unsigned long _precockEndTime_ms;
-    AAMVirtualReplica *_replica;
-    AAMVirtualGearbox::GearboxState _state;
-    AAMVirtualGearbox::GearboxCycleState _cycleState;
+    OMVirtualReplica *_replica;
+    OMVirtualGearbox::GearboxState _state;
+    OMVirtualGearbox::GearboxCycleState _cycleState;
 
   public:
 
-    AAMVirtualGearbox(AAMVirtualReplica *replica)
-    :_replica(replica),_state(AAMVirtualGearbox::stateResting),_cycleState(AAMVirtualGearbox::stateCocking)
+    OMVirtualGearbox(OMVirtualReplica *replica)
+    :_replica(replica),_state(OMVirtualGearbox::stateResting),_cycleState(OMVirtualGearbox::stateCocking)
     {};
 
     void cycle(unsigned int precockDuration_ms);
     
-    AAMVirtualGearbox::GearboxState getState(void){ return this->_state; }
+    OMVirtualGearbox::GearboxState getState(void){ return this->_state; }
 
     void cycleEndDetected(void);
     
-    void endCycle(AAMVirtualGearbox::GearboxState state);
+    void endCycle(OMVirtualGearbox::GearboxState state);
 
     void update(void);
     
@@ -144,7 +144,7 @@ class AAMVirtualGearbox
 
 
 
-class AAMVirtualSelector
+class OMVirtualSelector
 {
   public:    
     enum SelectorState
@@ -155,28 +155,28 @@ class AAMVirtualSelector
     };
 
   private:
-    AAMVirtualReplica *_replica;
-    AAMVirtualSelector::SelectorState _state;
+    OMVirtualReplica *_replica;
+    OMVirtualSelector::SelectorState _state;
     
-    AAMFiringSettings firingSettingsSemi;
-    AAMFiringSettings firingSettingsFull;
+    OMFiringSettings firingSettingsSemi;
+    OMFiringSettings firingSettingsFull;
     
   public:
-    AAMVirtualSelector(AAMVirtualReplica *replica)
-    :_replica(replica),_state(AAMVirtualSelector::stateSafe)
+    OMVirtualSelector(OMVirtualReplica *replica)
+    :_replica(replica),_state(OMVirtualSelector::stateSafe)
     {};
     
-    AAMVirtualSelector(AAMVirtualReplica *replica, SelectorState state)
-    :AAMVirtualSelector(replica)
+    OMVirtualSelector(OMVirtualReplica *replica, SelectorState state)
+    :OMVirtualSelector(replica)
     {
       this->_state = state;
     };
     
-    void setState(AAMVirtualSelector::SelectorState state);
+    void setState(OMVirtualSelector::SelectorState state);
     
-    AAMVirtualSelector::SelectorState getState(void){ return this->_state; }
+    OMVirtualSelector::SelectorState getState(void){ return this->_state; }
   
-    AAMFiringSettings *currentFiringSettings;
+    OMFiringSettings *currentFiringSettings;
 };
 
 
@@ -187,7 +187,7 @@ class AAMVirtualSelector
 
 
 
-class AAMVirtualReplica
+class OMVirtualReplica
 {  
   public:
     enum ReplicaState
@@ -197,15 +197,15 @@ class AAMVirtualReplica
     };
 
   private:
-    AAMVirtualGearbox _gearbox;
-    AAMVirtualTrigger _trigger;
-    AAMVirtualSelector _selector;
+    OMVirtualGearbox _gearbox;
+    OMVirtualTrigger _trigger;
+    OMVirtualSelector _selector;
 
   public:
     uint8_t _bbs_fired;
 
   private:
-    AAMVirtualReplica::ReplicaState _state;
+    OMVirtualReplica::ReplicaState _state;
     uint8_t _currentBurstBBCount;
     unsigned long _lastActiveTimeMs;
     
@@ -213,12 +213,12 @@ class AAMVirtualReplica
     void endFiringCycle();
     
   public:
-    AAMVirtualReplica()
-    :_gearbox(this), _trigger(this), _selector(this), _bbs_fired(0), _state(AAMVirtualReplica::stateIdle), _currentBurstBBCount(0), _lastActiveTimeMs(millis())
+    OMVirtualReplica()
+    :_gearbox(this), _trigger(this), _selector(this), _bbs_fired(0), _state(OMVirtualReplica::stateIdle), _currentBurstBBCount(0), _lastActiveTimeMs(millis())
     {}
 
-    AAMVirtualReplica(AAMVirtualSelector::SelectorState selectorState)
-    :AAMVirtualReplica()
+    OMVirtualReplica(OMVirtualSelector::SelectorState selectorState)
+    :OMVirtualReplica()
     {
       _selector.setState(selectorState);
     }
@@ -231,15 +231,15 @@ class AAMVirtualReplica
 
     void gearboxCycleEndDetected(void);
     
-    void setSelectorState(AAMVirtualSelector::SelectorState state);
+    void setSelectorState(OMVirtualSelector::SelectorState state);
 
     void update(void);
 
 
-    AAMVirtualTrigger &getTrigger(){ return this->_trigger; }
-    AAMVirtualGearbox &getGearbox(){ return this->_gearbox; }
-    AAMVirtualSelector &getSelector(){ return this->_selector; }
+    OMVirtualTrigger &getTrigger(){ return this->_trigger; }
+    OMVirtualGearbox &getGearbox(){ return this->_gearbox; }
+    OMVirtualSelector &getSelector(){ return this->_selector; }
 
-  friend class AAMVirtualGearbox;
+  friend class OMVirtualGearbox;
 };
 #endif

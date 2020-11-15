@@ -16,7 +16,7 @@
 #include <AsyncJson.h>
 
 
-class Mosfetv2wifiserver
+class OMwifiserver
 {
     public:
         static void begin();
