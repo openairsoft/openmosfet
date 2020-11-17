@@ -21,7 +21,7 @@ The team is composed of a programmer ([Simon](https://github.com/simonjamain)) a
 ## hardware
 
 ## contribute
-Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/ppGzhn).
+Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/XuzSSbgE).
 We are french but we can chat in english no prob.
 
 ## TODO
