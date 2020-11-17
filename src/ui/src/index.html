@@ -139,6 +139,13 @@
                             <small id="inputDeepSleepDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du système après inactivité de la réplique.</small>
                         </div>
 
+                        <div class="form-group col-md-12">
+                            <label for="autoUpdateFromGithub">Mise à jour depuis le web</label>
+                            <button id="autoUpdateFromGithub" type="submit" class="btn mt-3 btn-primary btn-block" aria-describedby="autoUpdateFromGithubHelp">
+                                <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
+                                <span class="buttonText">Mise à jour</span>
+                            </button>
+                        </div>
 
                         <div class="form-group col-md-12">
                             <!-- <label for="inputUseBatteryProtection">Protection de la batterie</label><br> -->
@@ -375,6 +382,19 @@
                 populateWithJsonData(response);
                 $("#mainSubmit .spinner-border").hide();
                 $("#mainSubmit .buttonText").show();
+                });
+            });
+
+            document.querySelector("#autoUpdateFromGithub").addEventListener("click" , function(event){
+                event.preventDefault(); //prevent default action
+                document.querySelector("#autoUpdateFromGithub .spinner-border").style.display='inline-block';
+                document.querySelector("#autoUpdateFromGithub .buttonText").style.display='none';
+                fetch('/api/core', { method: 'PATCH' })
+                .then(response => response.json())
+                .then(jsonResponse => {
+                    document.querySelector("#autoUpdateFromGithub .spinner-border").style.display='none';
+                    document.querySelector("#autoUpdateFromGithub .buttonText").style.display='inline-block';
+                    console.log(jsonResponse)
                 });
             });
 

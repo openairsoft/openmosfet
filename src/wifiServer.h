@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "configuration.h"
+#include "autoUpdater.h"
 
 #include <WiFi.h>
 #include <esp_wifi.h>
@@ -26,6 +27,7 @@ class OMwifiserver
         static unsigned long lastActivityTimeMs;
         static boolean queryHasParameter(String parameterName);
         static void handleRoot(AsyncWebServerRequest *request);
+        static void handleUpdate(AsyncWebServerRequest *request);
         static AsyncWebServer webServer;
         static DNSServer dnsServer;
         static IPAddress ip;

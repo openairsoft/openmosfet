@@ -75,6 +75,7 @@ void OMwifiserver::begin()
 
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
   OMwifiserver::webServer.on("/json", OMwifiserver::handleRoot);//update and send back as json (if POST)
+  OMwifiserver::webServer.on("/api/core", OMwifiserver::handleUpdate);
 
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
  
@@ -99,17 +100,16 @@ void OMwifiserver::begin()
   Serial.println(myIP);
 }
 
-/*
-var xhttp = new XMLHttpRequest();
-   xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        console.log(this.responseText);
-       }
-     };
-
-   xhttp.open("POST", "/", true);
-   xhttp.send();
-*/
+void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
+  switch (request->method())
+  {
+    case HTTP_PATCH:
+      Serial.println("patch");
+      OMAutoUpdater::updateFromGit();
+      request->send(FILESYSTEM, "/cfg.json");//for ajax
+    break;
+  }
+}
 
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   #ifdef DEBUG
