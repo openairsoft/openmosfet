@@ -9,13 +9,16 @@ The hardware provides all the electronics needed and allows different boards to 
 ## the current team
 The team is composed of a programmer ([Simon](https://github.com/simonjamain)) and two electronitians (Romain & Marcellin), all french airsofters.
 
-## installation
+## installation and build
 - Install platformio
 - "open" the project
 - for building the ui (mandatory) :
   - install node.js
   - inside the `ui` folder, run `npm install`
   - *Note : `ui.h` is recompiled by running the command `npm run build` inside the `ui` folder. this is done automaticaly before each platformio build (see platformio.ini and build_ui.py)*
+- OTA upload is enabled by default, if your board hasnt ota enabled or you want to upload with serial, uncomment that following parameters in `platformio.ini`
+  - `upload_protocol`
+  - `upload_port`
 - I think thats about it...
 
 ## hardware

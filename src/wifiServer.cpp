@@ -52,9 +52,6 @@ void OMwifiserver::begin()
       }
     }
     
-    if(!MDNS.begin("openmosfet")) {
-      Serial.println("Error starting mDNS");
-    }
   }
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);

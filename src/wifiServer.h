@@ -10,7 +10,6 @@
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 #include <DNSServer.h>
-#include <ESPmDNS.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncJson.h>
