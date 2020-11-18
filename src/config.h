@@ -8,10 +8,8 @@
 //---------- X : Global default parameters ---------------------------------------------------------------------------------------
 
 #define OM_CONFIGFILE_NAME "/cfg.json"
-#define OM_DEFAULT_APSSID "OpenMosfet"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character (exluding '\0') in order to work
-#define OM_DEFAULT_APP_PASSWD  "password"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work
-//#define OM_DEFAULT_APSSID {'o','p','e','n','M','o','s','f','e','t','\0'}//Note : must be [8-32] character (exluding '\0') in order to work
-//#define OM_DEFAULT_APP_PASSWD  {'p','a','s','s','w','o','r','d','\0'}//Note : must be [8-16] character (exluding '\0') in order to work
+#define OM_DEFAULT_APSSID "OpenMosfet"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character  in order to work
+#define OM_DEFAULT_APP_PASSWD  "password"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character in order to work
 
 #define OM_DEFAULT_AVAILABLE_NETWORK_APSSID "externalssid"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character (exluding '\0') in order to work
 #define OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD  "externalpassword"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work

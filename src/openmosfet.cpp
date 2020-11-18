@@ -6,6 +6,7 @@
 #include "components.h"
 #include "configuration.h"
 #include "wifiServer.h"
+#include "otaUploader.h"
 
 OMVirtualReplica replica;
 
@@ -46,12 +47,12 @@ void setup() {
   OMConfiguration::load();
   
   OMwifiserver::begin();
+  OMOtaUploader::begin();
 }
 
 void loop() {
-  
   OMwifiserver::update();
-  replica.update();
+  OMOtaUploader::update();
   OMInputsInterface::update(replica);
-  
+  replica.update();
 }
