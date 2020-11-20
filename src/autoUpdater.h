@@ -4,9 +4,19 @@
 #include <Arduino.h>
 
 class OMAutoUpdater {
+
+  private:
+
+    static boolean isUpdateRequested;
+    static void updateFromGit();
+
   public:
 
-    static void updateFromGit();
+    /**
+     * This method does not update the chip, it is used for the loop, same as other components
+     **/
+    static void update();
+    static void requestUpdate();
 };
 
 #endif 

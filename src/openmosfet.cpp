@@ -15,7 +15,7 @@ void loop();
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Bonjour");
+  Serial.println("Bonjour2");
 
   OMInputsInterface::begin(replica);
   

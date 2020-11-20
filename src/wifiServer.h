@@ -2,19 +2,8 @@
 #define MOSFETV2WIFISERVER_HPP
 
 #include <Arduino.h>
-#include "config.h"
-#include "configuration.h"
-#include "autoUpdater.h"
-
-#include <WiFi.h>
-#include <esp_wifi.h>
-#include <WiFiClient.h>
-#include <WiFiAP.h>
-#include <DNSServer.h>
-#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncJson.h>
-
+#include <DNSServer.h>
 
 class OMwifiserver
 {

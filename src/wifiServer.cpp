@@ -1,9 +1,18 @@
 #include "wifiServer.h"
+#include "ui.h"
+#include "config.h"
 #include "utilities.h"
+#include "autoUpdater.h"
+#include "configuration.h"
 
 #include <AsyncElegantOTA.h>
+#include <esp_wifi.h>
+// #include <WiFi.h>
+// #include <WiFiClient.h>
+// #include <WiFiAP.h>
+// #include <AsyncTCP.h>
+// #include <AsyncJson.h>
 
-#include "ui.h"
 
 //TODO: penser à tout gzipper
 
@@ -102,7 +111,8 @@ void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
   {
     case HTTP_PATCH:
       Serial.println("patch");
-      OMAutoUpdater::updateFromGit();
+      OMwifiserver::webServer.end();
+      OMAutoUpdater::requestUpdate();
       request->send(FILESYSTEM, "/cfg.json");//for ajax
     break;
   }
@@ -295,16 +305,6 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
       OMConfiguration::printCfg();
     #endif
 
-    /*
-    AsyncResponseStream *response = request->beginResponseStream("application/json");
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["heap"] = ESP.getFreeHeap();
-    root["ssid"] = WiFi.SSID();
-    root.printTo(*response);
-    request->send(response);
-    */
-
     //send back the json
     if(request->url().equals("/json")){
       request->send(FILESYSTEM, "/cfg.json");//for ajax
@@ -339,6 +339,6 @@ void OMwifiserver::update() {
   }
   
   AsyncElegantOTA.loop();
+  OMAutoUpdater::update();
   
-  //OMwifiserver::webServer.handleClient();
 }
