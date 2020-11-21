@@ -15,7 +15,6 @@ void loop();
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Bonjour2");
 
   OMInputsInterface::begin(replica);
   
@@ -42,10 +41,11 @@ void setup() {
     Serial.println(OMConfiguration::load());
     Serial.println("config chargée :");
     OMConfiguration::printCfg();
+  #else
+    OMConfiguration::load();
   #endif
 
-  OMConfiguration::load();
-  
+
   OMwifiserver::begin();
   OMOtaUploader::begin();
 }

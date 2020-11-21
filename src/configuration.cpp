@@ -23,11 +23,13 @@ boolean OMConfiguration::useActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
 
 void OMConfiguration::loadFromJson(Stream &stream){
   DynamicJsonDocument doc(capacity);
-  
-  Serial.println(deserializeJson(doc, stream).c_str());
 
+  deserializeJson(doc, stream);
+
+  #ifdef DEBUG
   Serial.println("JSON CHARGE");
   serializeJson(doc, Serial);
+  #endif
   
   strcpy(OMConfiguration::appSsid, doc["appSsid"]);
   strcpy(OMConfiguration::appPasswd, doc["appPasswd"]);
@@ -149,8 +151,10 @@ boolean OMConfiguration::save(void){
     currentFireMode["timeBetweenShots_ms"] = OMConfiguration::fireModes[i].getTimeBetweenShotsMs();
   }
   
+  #ifdef DEBUG
   Serial.println("JSON SAUVE");
   serializeJson(doc, Serial);
+  #endif
 
   File file = FILESYSTEM.open(OM_CONFIGFILE_NAME, "w");
   serializeJson(doc, file);

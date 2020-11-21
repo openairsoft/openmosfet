@@ -1,6 +1,7 @@
 #include "config.h"
 #include "autoUpdater.h"
 #include "utilities.h"
+#include "wifiServer.h"
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -21,24 +22,21 @@ void OMAutoUpdater::requestUpdate(){
 
 void OMAutoUpdater::updateFromGit(){
 
-	HTTPClient http;
+	HTTPClient httpGithubApiClient;
 
-	Serial.print("[HTTP] begin...\n");
-	// configure traged server and url
-	//http.begin("https://www.howsmyssl.com/a/check", ca); //HTTPS
-	http.begin(OM_DEFAULT_GITHUB_API_LATEST_RELEASE_URL); //HTTP
+	httpGithubApiClient.begin(OM_DEFAULT_GITHUB_API_LATEST_RELEASE_URL); //HTTP
+	int httpCodeGithubApi = httpGithubApiClient.GET();
 
-	Serial.print("[HTTP] GET...\n");
-	// start connection and send HTTP header
-	int httpCode = http.GET();
-
-	// httpCode will be negative on error
-	if(httpCode > 0) {
+	// httpCodeGithubApi will be negative on error
+	if(httpCodeGithubApi > 0) {
 		// HTTP header has been send and Server response header has been handled
-		Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+		
+		#ifdef DEBUG
+		Serial.printf("[HTTP] GET... code: %d\n", httpCodeGithubApi);
+		#endif
 
 		// file found at server
-		if(httpCode == HTTP_CODE_OK) {
+		if(httpCodeGithubApi == HTTP_CODE_OK) {
 
 			// The filter: it contains "true" for each value we want to keep
 			StaticJsonDocument<200> filter;//200 = estimation au pifomètre
@@ -47,64 +45,127 @@ void OMAutoUpdater::updateFromGit(){
 			filter["assets"][0]["size"] = true;
 
   			DynamicJsonDocument doc(2000);//2000 = estimation au doigt mouillé
-			deserializeJson(doc, http.getStream(), DeserializationOption::Filter(filter));
-			http.end();
+			deserializeJson(doc, httpGithubApiClient.getStream(), DeserializationOption::Filter(filter));
+			httpGithubApiClient.end();
 
-			for(int i = 0; i < doc["assets"].size(); ++i){
-				if( doc["assets"][i]["name"].as<String>().equals(OM_DEFAULT_BINARY_FILE_NAME)){
+			//we go through each asset to find the right one and download it
+			String assetUrl;
+			for(int currentAssetIndex = 0; currentAssetIndex < doc["assets"].size(); ++currentAssetIndex){
+				if( doc["assets"][currentAssetIndex]["name"].as<String>().equals(OM_DEFAULT_BINARY_FILE_NAME)){
 
-					Serial.println( "Begin downloading of -> " + doc["assets"][i]["browser_download_url"].as<String>() );
+					#ifdef DEBUG
+					Serial.println( "Begin downloading of -> " + doc["assets"][currentAssetIndex]["browser_download_url"].as<String>() );
+					#endif
 
-					HTTPClient http2;
-					//http2.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS); // code 302
-					//http2.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS); // code 404
-					http2.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS); // code 404
-					http2.begin(doc["assets"][i]["browser_download_url"].as<const char*>());
+					assetUrl = doc["assets"][currentAssetIndex]["browser_download_url"].as<String>();
 
-					httpCode = http2.GET();
-					if(httpCode == HTTP_CODE_OK) {
-						if (!Update.begin(http2.getSize(), U_FLASH)) {
-							Update.printError(Serial);
+					//github api assets uses 302 redirections, we cannot just get the first page
+					//currently setFollowRedirects does'nt work for me, until it eventually does, we'll handle redirects manually
+					const int maxRedirects = 4;
+					for(int redirectCounter = 1; redirectCounter <= maxRedirects; ++redirectCounter){					
+						HTTPClient httpReleaseAssetClient;
+						//httpReleaseAssetClient.setFollowRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS); // code 302
+						//httpReleaseAssetClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS); // code 404
+						//httpReleaseAssetClient.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS); // code 404
+						httpReleaseAssetClient.begin(assetUrl);
+
+						//we declare which headers we want to keep (for redirects)
+						const char * headerKeys[] = {"Location"} ;
+						size_t headerKeysSize = sizeof(headerKeys)/sizeof(char*);
+						httpReleaseAssetClient.collectHeaders(headerKeys, headerKeysSize);
+
+						int httpCodeReleaseAsset = httpReleaseAssetClient.GET();
+
+						
+						if(httpCodeReleaseAsset == HTTP_CODE_MOVED_PERMANENTLY || httpCodeReleaseAsset == HTTP_CODE_FOUND){
+							assetUrl = httpReleaseAssetClient.header("Location");// this is a redirection, store the new url and make another round-trip
+							httpReleaseAssetClient.end();
 						}
-						int initialSize = http2.getSize();
-						Serial.println( "lets go" );
-						int finalSize = Update.writeStream(http2.getStream());
-						http2.end();
-
-						Serial.print( "initialSize : " );
-						Serial.println( initialSize );
-						Serial.print( "finalSize : " );
-						Serial.println( finalSize );
-						if (finalSize == initialSize) {
-							Serial.println("Written : " + String(finalSize) + " successfully");
-						} else {
-							Serial.println("Written only : " + String(finalSize) + "/" + String(initialSize) + ". Retry?" );
-
-						}
-						if (Update.end()) {
-							Serial.println("OTA done!");
-							if (Update.isFinished()) {
-							Serial.println("Update successfully completed. Rebooting.");
-							ESP.restart();
-							} else {
-							Serial.println("Update not finished? Something went wrong!");
+						else if(httpCodeReleaseAsset == HTTP_CODE_OK) {
+							if (!Update.begin(httpReleaseAssetClient.getSize(), U_FLASH)) {
+								#ifdef DEBUG
+								Update.printError(Serial);
+								#endif
+								break;
 							}
-						} else {
-							Serial.println("Error Occurred. Error #: " + String(Update.getError()));
+							int initialSize = httpReleaseAssetClient.getSize();
+							// int sizeLeftToUpdate = initialSize;
+      						OMwifiserver::events.send("","updateStarted",millis());
+							#ifdef DEBUG
+							Serial.println( "Starting update" );
+							#endif
+							int finalSize = 0;
+							
+							finalSize = Update.writeStream(httpReleaseAssetClient.getStream());
+							httpReleaseAssetClient.end();
+							//I would like to show progress with this and https://github.com/me-no-dev/ESPAsyncWebServer#async-event-source-plugin
+							/*
+							WiFiClient* stream = httpReleaseAssetClient.getStreamPtr();
+							
+							// inspired by https://github.com/esp8266/Arduino/issues/4010
+							uint8_t buff[1024] = { 0 };
+  							size_t sizePack;
+							while(httpReleaseAssetClient.connected() && sizeLeftToUpdate > 0 && stream->available() > 0){
+								sizePack = stream->available();
+								if (sizePack) {
+								int c = stream->readBytes(buff, ((sizePack > sizeof(buff)) ? sizeof(buff) : sizePack));
+								int bytesWritten = Update.write(buff, c);
+								if (sizeLeftToUpdate > 0)
+									sizeLeftToUpdate -= c;
+									finalSize += bytesWritten;
+								}
+
+								
+								//n'envoyer la notif de progression (ou la stocker) que tout les x secondes et/ou pourcents
+								// if (progress != int(Update.progress() * 100 / httpClient.getSize())) {
+								// 	progress = int(Update.progress() * 100 / httpClient.getSize());
+								// }
+
+								Serial.print("sizeof(buff): ");
+								Serial.println(sizeof(buff));
+								Serial.print("sizePack: ");
+								Serial.println(sizePack);
+								Serial.print("Update.progress(): ");
+								Serial.println(finalSize);
+							}
+							*/
+
+							if (Update.end() && finalSize == initialSize) {
+								if (Update.isFinished()) {
+									#ifdef DEBUG
+									Serial.println("Update successfully completed. Rebooting.");
+									#endif
+									OMwifiserver::events.send("","updateSuccessful",millis());
+									delay(500);//"ensure" that event is fully sent
+									ESP.restart();
+								} else {
+									#ifdef DEBUG
+									Serial.println("Update not finished? Something went wrong!");
+									#endif
+								}
+							} else {
+      							OMwifiserver::events.send("","updateFailed",millis());
+								#ifdef DEBUG
+								Serial.println("Error Occurred. Error #: " + String(Update.getError()));
+								#endif
+								break;
+							}
+							break;
+						}else{
+      						OMwifiserver::events.send("","updateFailed",millis());
+							break;
 						}
-
-					}else{
-						Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 					}
-
-					break;
 				}
 			}
 
 
 		}
 	} else {
-		Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+		#ifdef DEBUG
+		Serial.printf("[HTTP] GET... failed, error: %s\n", httpGithubApiClient.errorToString(httpCodeGithubApi).c_str());
+		#endif
+      	OMwifiserver::events.send("","updateFailed",millis());
 	}
 	OMAutoUpdater::isUpdateRequested = false;
 }

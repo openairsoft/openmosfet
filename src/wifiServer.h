@@ -10,6 +10,7 @@ class OMwifiserver
     public:
         static void begin();
         static void update();
+        static AsyncEventSource events;
     private:
         static boolean wifiIsOn;//Note this may be replaced by doing proper status tests on the esp wifi module
         static unsigned long lastActivityTimeMs;

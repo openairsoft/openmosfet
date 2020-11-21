@@ -21,6 +21,7 @@ extern OMVirtualReplica replica;
 unsigned long OMwifiserver::lastActivityTimeMs = millis();
 boolean OMwifiserver::wifiIsOn = false;
 AsyncWebServer OMwifiserver::webServer(80);
+AsyncEventSource OMwifiserver::events("/events");
 IPAddress OMwifiserver::ip(APPIP);
 DNSServer OMwifiserver::dnsServer;
 
@@ -31,15 +32,17 @@ void OMwifiserver::begin()
 {
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
   //WiFi.setHostname("openmosfet");
+  
+  OMwifiserver::webServer.addHandler(&OMwifiserver::events);
 
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
     WiFi.mode(WIFI_AP_STA);
     WiFi.begin(OMConfiguration::availableNetworkAppSsid, OMConfiguration::availableNetworkAppPasswd);
     OMwifiserver::wifiIsOn = true;
-  
+    #ifdef DEBUG
     Serial.println("");
-    
+    #endif
     // Wait for connection for OM_DEFAULT_WIFI_SEARCH_TIMEOUT_SECONDS
     unsigned long searchStartTime = millis();
     #ifdef DEBUG
@@ -74,10 +77,8 @@ void OMwifiserver::begin()
   // provided IP to all DNS request
   OMwifiserver::dnsServer.start(OM_DNS_PORT, "*", OMwifiserver::ip);
 
-  #ifdef DEBUG
-    Serial.print("AP IP address: ");
-    Serial.println(WiFi.localIP());
-  #endif
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.localIP());
 
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
   OMwifiserver::webServer.on("/json", OMwifiserver::handleRoot);//update and send back as json (if POST)
@@ -87,16 +88,14 @@ void OMwifiserver::begin()
  
   // relay all unknown requests to root
   OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
+    #ifdef DEBUG
     Serial.print("webServer.onNotFound : ");
-  
+    #endif
+
     const char *metaRefreshStr = "<head><meta http-equiv=\"refresh\" content=\"0; url=http://openmosfet.local/\" /></head><body><p>redirecting...</p></body>";
     request->send(200, "text/html", metaRefreshStr);//using this redirect method allows to send a 200 status and it helps with captive portal detection
       
   });
-  /*
-  OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
-    request->send(404);
-  });*/
 
   AsyncElegantOTA.begin(&OMwifiserver::webServer);//OTA
   OMwifiserver::webServer.begin();
@@ -110,7 +109,9 @@ void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
   switch (request->method())
   {
     case HTTP_PATCH:
+      #ifdef DEBUG
       Serial.println("patch");
+      #endif
       OMwifiserver::webServer.end();
       OMAutoUpdater::requestUpdate();
       request->send(FILESYSTEM, "/cfg.json");//for ajax
@@ -133,7 +134,9 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   } else {
+
     #ifdef DEBUG
+    //print received params
     int params = request->params();
     for(int i=0;i<params;i++){
       AsyncWebParameter* p = request->getParam(i);
@@ -145,14 +148,9 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
         Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
       }
     }
-
-    
-      Serial.println("config initiale :");
-      OMConfiguration::printCfg();
+    Serial.println("config initiale :");
+    OMConfiguration::printCfg();
     #endif
-    //we will check each parameters individually
-
-    
 
     //-------------------- fireModes -------------------------
     int i = 0;
@@ -192,9 +190,7 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
 
     //-------------------- batteryNominalVoltage -------------------------
     if(request->hasParam("batteryNominalVoltage", true)) {
-        Serial.print("batteryNominalVoltage : ");
       float batteryNominalVoltage = request->getParam("batteryNominalVoltage", true)->value().toFloat();
-        Serial.println(batteryNominalVoltage);
       if(OM_MIN_NOMINAL_VOLTAGE < batteryNominalVoltage && batteryNominalVoltage < OM_MAX_NOMINAL_VOLTAGE) {
         OMConfiguration::batteryNominalVoltage = batteryNominalVoltage;
       }

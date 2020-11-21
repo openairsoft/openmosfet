@@ -143,8 +143,8 @@
                     <div class="form-group col-md-12">
                         <label for="autoUpdateFromGithub">Mise à jour depuis le web</label>
                         <button id="autoUpdateFromGithub" type="submit" class="btn mt-3 btn-primary btn-block" aria-describedby="autoUpdateFromGithubHelp">
-                            <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
                             <span class="buttonText">Mise à jour</span>
+                            <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
                         </button>
                     </div>
                     
@@ -255,6 +255,47 @@
     <!-- custom script -->
     <script>
         (function ($) {
+
+            document.querySelector("#autoUpdateFromGithub").addEventListener("click" , function(event){
+                event.preventDefault(); //prevent default action
+                document.querySelector("#autoUpdateFromGithub .buttonText").textContent = "Récupération des informations";
+                document.querySelector("#autoUpdateFromGithub .spinner-border").style.display='inline-block';
+                    document.querySelector("#autoUpdateFromGithub").disabled = true;
+                fetch('/api/core', { method: 'PATCH' })
+                .then(response => response.json())
+                .then(jsonResponse => {
+                });
+            });
+                
+            if (!!window.EventSource) {
+                var source = new EventSource('/events');
+
+                source.addEventListener('open', function(e) {
+                    console.log("Events Connected");
+                }, false);
+
+                source.addEventListener('error', function(e) {
+                    if (e.target.readyState != EventSource.OPEN) {
+                    console.log("Events Disconnected");
+                    }
+                }, false);
+
+                source.addEventListener('updateStarted', function(e) {
+                    document.querySelector("#autoUpdateFromGithub .buttonText").textContent = "Mise à jour en cours";
+                }, false);
+
+                source.addEventListener('updateSuccessful', function(e) {
+                    document.querySelector("#autoUpdateFromGithub .buttonText").textContent = "Mise à jour terminée, redémarrage";
+                    new Promise(resolve => setTimeout(resolve, 4000)).then(() => document.location.reload());
+                }, false);
+
+                source.addEventListener('updateFailed', function(e) {
+                    document.querySelector("#autoUpdateFromGithub .buttonText").textContent = "Echec de la mise à jour, réessayer";
+                    document.querySelector("#autoUpdateFromGithub .buttonText").style.display='inline-block';
+                    document.querySelector("#autoUpdateFromGithub .buttonText").disabled = false;
+                }, false);
+            }
+
             $("[data-toggle='collapse-show']").click(function () {
                 $($(this).attr("data-target")).addClass("show");
                 //$($(this).attr("data-target")).collapse("show");//this don't work well because not interuptible
@@ -370,15 +411,6 @@
                 $("#panel-firemodes").html(fireModesHtml);
             }
 
-            function getLatestRelease(){
-                fetch("https://api.github.com/repos/simonjamain/openmosfet/releases/latest")
-                .then(data => {
-                    console.log(data)
-                }).catch(error => {
-                    // Handle error
-                });
-            }
-            getLatestRelease();
 
             $("#mainForm").submit(function(event){
                 event.preventDefault(); //prevent default action
@@ -396,18 +428,6 @@
                 });
             });
 
-            document.querySelector("#autoUpdateFromGithub").addEventListener("click" , function(event){
-                event.preventDefault(); //prevent default action
-                document.querySelector("#autoUpdateFromGithub .spinner-border").style.display='inline-block';
-                document.querySelector("#autoUpdateFromGithub .buttonText").style.display='none';
-                fetch('/api/core', { method: 'PATCH' })
-                .then(response => response.json())
-                .then(jsonResponse => {
-                    document.querySelector("#autoUpdateFromGithub .spinner-border").style.display='none';
-                    document.querySelector("#autoUpdateFromGithub .buttonText").style.display='inline-block';
-                    console.log(jsonResponse)
-                });
-            });
 
             //initialize values
             jQuery.getJSON("/cfg.json", function (data) {
