@@ -21,6 +21,32 @@ The team is composed of a programmer ([Simon](https://github.com/simonjamain)) a
   - `upload_port`
 - I think thats about it...
 
+### replica interface types
+Depending on your replica and the way you connect the mosfet, the signals received are not the same.
+
+ex : the original input plate on the G&G TR 16 can be used but the signals are very specific.
+- You only know if the safety is disengaged (and mag not empty) when you get a signal from the trigger
+- You only know if selector is on full auto or not before firing
+
+You have to choose which behavior you want by specify the value of the `REPLICA_TYPE` preprocessor flag (see platformio.ini).
+
+Here is a table (work in progress) listing the different configuration available :
+
+`REPLICA_TYPE` value | pins behavior | examples
+---------------------|---------------|--------------
+1 | `OM_DEFAULT_FIRINGGROUP_PIN` grounded when : trigger is pressed AND safety is off AND mag is not empty<br>`OM_DEFAULT_CUTOFF_PIN` grounded when cutoff is pressed<br>`OM_DEFAULT_SELECTOR_PIN` grounded when selector is on full auto position | G&G tr16 original input plate
+
+### custom replica interface pinout
+For developpement reasons or other, you can change the default settings for the replica interface with the following flags :
+
+- `OM_DEFAULT_MOTOR_PIN`
+- `OM_DEFAULT_FIRINGGROUP_PIN`
+- `OM_DEFAULT_CUTOFF_PIN`
+- `OM_DEFAULT_SELECTOR_PIN`
+
+*Note: it is not recommended that you change this value in the source file, but rather as a build flag in platformio.ini for example.*  
+*Note: for example, the ESP32DEVKIT V1 doesnt have the pin 10 exposed, which is the default pin used on the board for the selector input.*
+
 ## hardware
 
 ## contribute

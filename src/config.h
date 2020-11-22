@@ -15,7 +15,9 @@
 #define OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD  "externalpassword"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work
 
 #define OM_DEFAULT_GITHUB_API_LATEST_RELEASE_URL "https://api.github.com/repos/simonjamain/openmosfet/releases/latest"
-#define OM_DEFAULT_BINARY_FILE_NAME "openmosfet.esp32.bin"//TODO: if enabling esp8266 compatibility, lets update that and define two options
+#ifndef OM_DEFAULT_BINARY_FILE_NAME
+	#define OM_DEFAULT_BINARY_FILE_NAME "openmosfet.espressif32.1.bin"
+#endif
 
 #define OM_DEFAULT_WIFI_SEARCH_TIMEOUT_SECONDS 5
 #define OM_DEFAULT_WIFI_SHUTDOWN_DELAY_MINUTES 15
@@ -64,14 +66,26 @@
 // the information.
 #define MAX_CONTINUOUS_TRIGGER_PULL_DURATION_MS 3000
 
-//This constant specify the replica used
-//#define REPLICA_TYPE_GGTR16
-#define REPLICA_TYPE_CYMACGP90
-
 //This specify the max number of config modes stored
 #define OM_MAX_NB_STORED_MODES 2
 
+//--------------- REPLICA INTERFACE --------------
+#ifndef OM_DEFAULT_MOTOR_PIN
+	#define OM_DEFAULT_MOTOR_PIN 32
+#endif
+#ifndef OM_DEFAULT_FIRINGGROUP_PIN
+	#define OM_DEFAULT_FIRINGGROUP_PIN 27
+#endif
+#ifndef OM_DEFAULT_CUTOFF_PIN
+	#define OM_DEFAULT_CUTOFF_PIN 12
+#endif
+#ifndef OM_DEFAULT_SELECTOR_PIN
+	#define OM_DEFAULT_SELECTOR_PIN 10
+#endif
 
-//---------- X : Global variables ------------------------------------------------------------------------------------------------
+//This constant specify the replica used (better used with compiler flags)
+// #define REPLICA_TYPE_GGTR16
+// #define REPLICA_TYPE_CYMACGP90
+// #define REPLICA_TYPE_TESTING
 
 #endif
