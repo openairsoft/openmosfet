@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"array": "cpp",
+		"bitset": "cpp",
+		"deque": "cpp",
+		"string": "cpp",
+		"vector": "cpp",
+		"unordered_map": "cpp",
+		"regex": "cpp"
+	}
+}
