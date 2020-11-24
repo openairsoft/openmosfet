@@ -165,8 +165,10 @@ boolean OMConfiguration::save(void){
 
 #ifdef DEBUG
   void OMConfiguration::printCfg(void){
-    
+
     Serial.println(" ");
+    Serial.println("---------------");
+    Serial.println("Mémoire SPIFFS : " + String(SPIFFS.usedBytes()) + "/" + String(SPIFFS.totalBytes()) + " (" + String(((float)SPIFFS.usedBytes()/(float)SPIFFS.totalBytes())*100) + "%)");
     Serial.println("---------------");
     Serial.println(" ");
 

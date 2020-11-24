@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
+#include <AsyncJson.h>
 
 class OMwifiserver
 {
@@ -12,9 +13,11 @@ class OMwifiserver
         static void update();
         static AsyncEventSource events;
     private:
+        static AsyncCallbackJsonWebHandler jsonApiHandler;
         static boolean wifiIsOn;//Note this may be replaced by doing proper status tests on the esp wifi module
         static unsigned long lastActivityTimeMs;
         static boolean queryHasParameter(String parameterName);
+        static void handleConfigApi(AsyncWebServerRequest *request, JsonVariant &json);
         static void handleRoot(AsyncWebServerRequest *request);
         static void handleUpdate(AsyncWebServerRequest *request);
         static AsyncWebServer webServer;

@@ -22,6 +22,7 @@ unsigned long OMwifiserver::lastActivityTimeMs = millis();
 boolean OMwifiserver::wifiIsOn = false;
 AsyncWebServer OMwifiserver::webServer(80);
 AsyncEventSource OMwifiserver::events("/events");
+AsyncCallbackJsonWebHandler OMwifiserver::jsonApiHandler("/api/config", OMwifiserver::handleConfigApi);
 IPAddress OMwifiserver::ip(APPIP);
 DNSServer OMwifiserver::dnsServer;
 
@@ -32,8 +33,6 @@ void OMwifiserver::begin()
 {
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
   //WiFi.setHostname("openmosfet");
-  
-  OMwifiserver::webServer.addHandler(&OMwifiserver::events);
 
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
@@ -83,7 +82,8 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
   OMwifiserver::webServer.on("/json", OMwifiserver::handleRoot);//update and send back as json (if POST)
   OMwifiserver::webServer.on("/api/core", OMwifiserver::handleUpdate);
-
+  OMwifiserver::webServer.addHandler(&OMwifiserver::events);
+  OMwifiserver::webServer.addHandler(&OMwifiserver::jsonApiHandler);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
  
   // relay all unknown requests to root
@@ -119,6 +119,174 @@ void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
   }
 }
 
+void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request, JsonVariant &json) {
+  #ifdef DEBUG
+  Serial.println("handleConfigApi :");
+  Serial.println("json reçu :");
+  serializeJson(json, Serial);
+  Serial.println("");
+  #endif
+
+  #ifdef DEBUG  
+  Serial.println("config initiale :");
+  // OMConfiguration::printCfg();
+  #endif
+
+  //-------------------- fireModes -------------------------
+  if(json.containsKey("fireModes")){
+    for(int currentFiremodeIndex = 0; currentFiremodeIndex < json["fireModes"].size() || currentFiremodeIndex < OM_MAX_NB_STORED_MODES; ++currentFiremodeIndex){
+
+      Serial.print("currentFiremodeIndex :");
+      Serial.println(currentFiremodeIndex);
+
+      if (json["fireModes"][currentFiremodeIndex].containsKey("burstMode")) {
+        switch(json["fireModes"][currentFiremodeIndex]["burstMode"].as<int>())
+        {
+          case 0 :
+            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeNormal);
+          break;
+    
+          case 1 :
+            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeInterruptible);
+          break;
+          
+          case 2 :
+            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeExtendible);
+          break;
+        }
+      }
+      if (json["fireModes"][currentFiremodeIndex].containsKey("burstLength")) {//todo compare to max burst length
+        OMConfiguration::fireModes[currentFiremodeIndex].setBurstLength( json["fireModes"][currentFiremodeIndex]["burstLength"].as<uint8_t>() );
+      }
+      if (json["fireModes"][currentFiremodeIndex].containsKey("precockDuration_ms")) {//todo compare to max burst length
+        OMConfiguration::fireModes[currentFiremodeIndex].setPrecockDuration_ms( json["fireModes"][currentFiremodeIndex]["precockDuration_ms"].as<unsigned int>() );
+      }
+      if (json["fireModes"][currentFiremodeIndex].containsKey("motorPower")) {//todo compare to max / min motor power
+        OMConfiguration::fireModes[currentFiremodeIndex].setMotorPower( json["fireModes"][currentFiremodeIndex]["motorPower"].as<uint8_t>() );
+      }
+      if (json["fireModes"][currentFiremodeIndex].containsKey("timeBetweenShots_ms")) {//todo compare to max timeBetweenShots
+        OMConfiguration::fireModes[currentFiremodeIndex].setTimeBetweenShots_ms( json["fireModes"][currentFiremodeIndex]["timeBetweenShots_ms"].as<unsigned int>() );
+      }
+    }
+  }
+
+  //-------------------- batteryNominalVoltage -------------------------
+  if(json.containsKey("batteryNominalVoltage")) {
+    float batteryNominalVoltage = json["batteryNominalVoltage"].as<float>();
+    if(OM_MIN_NOMINAL_VOLTAGE < batteryNominalVoltage && batteryNominalVoltage < OM_MAX_NOMINAL_VOLTAGE) {
+      OMConfiguration::batteryNominalVoltage = batteryNominalVoltage;
+    }
+  }
+  
+  //-------------------- wifiShutdownDelayMinutes -------------------------
+  if(json.containsKey("wifiShutdownDelayMinutes")) {
+    int wifiShutdownDelayMinutes = json["wifiShutdownDelayMinutes"].as<int>();
+    if(OM_MIN_WIFI_SHUTDOWN_DELAY_MINUTES <= wifiShutdownDelayMinutes) {
+      OMConfiguration::wifiShutdownDelayMinutes = wifiShutdownDelayMinutes;
+    }
+  }
+  
+  //-------------------- deepSleepDelayMinutes -------------------------
+  if(json.containsKey("deepSleepDelayMinutes")) {
+    int deepSleepDelayMinutes = json["deepSleepDelayMinutes"].as<int>();
+    if(OM_MIN_DEEP_SLEEP_DELAY_MINUTES <= deepSleepDelayMinutes) {
+      OMConfiguration::deepSleepDelayMinutes = deepSleepDelayMinutes;
+    }
+  }
+  
+  //-------------------- batteryLowVoltage -------------------------
+  if(json.containsKey("batteryLowVoltage")) {
+    float batteryLowVoltage = json["batteryLowVoltage"].as<float>();
+    if(OM_MIN_LOW_VOLTAGE < batteryLowVoltage && batteryLowVoltage < OM_MAX_LOW_VOLTAGE) {
+      OMConfiguration::batteryLowVoltage = batteryLowVoltage;
+    }
+  }
+      
+  //-------------------- batteryShutdownVoltage -------------------------
+  if(json.containsKey("batteryShutdownVoltage")) {
+    float batteryShutdownVoltage = json["batteryShutdownVoltage"].as<float>();
+    if(OM_MIN_SHUTDOWN_VOLTAGE < batteryShutdownVoltage && batteryShutdownVoltage < OM_MAX_SHUTDOWN_VOLTAGE) {
+      OMConfiguration::batteryShutdownVoltage = batteryShutdownVoltage;
+    }
+  }  
+
+  //-------------------- connectToNetworkIfAvailable -------------------------
+  if(json.containsKey("connectToNetworkIfAvailable")) {
+    boolean connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
+    OMConfiguration::connectToNetworkIfAvailable = connectToNetworkIfAvailable;
+  }
+  
+  //-------------------- useBatteryProtection -------------------------
+  if(json.containsKey("useBatteryProtection")) {
+    boolean useBatteryProtection = json["useBatteryProtection"].as<boolean>();
+    OMConfiguration::useBatteryProtection = useBatteryProtection;
+  }
+  
+  //-------------------- useActiveBreaking -------------------------
+  if(json.containsKey("useActiveBreaking")) {
+    boolean useActiveBreaking = json["useActiveBreaking"].as<boolean>();
+    OMConfiguration::useActiveBreaking = useActiveBreaking;
+  }
+  
+  //-------------------- appSsid -------------------------
+  if(json.containsKey("appSsid")) {
+    String appSsid = json["appSsid"].as<String>();//compairing to false for safety reasons
+    unsigned int appSsidLength = (unsigned int) appSsid.length();
+    //TODO: '=' or '\r' are forbidden. validate
+    if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= appSsidLength && appSsidLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
+      appSsid.toCharArray(OMConfiguration::appSsid, appSsidLength+1);
+    }
+  }
+
+  //-------------------- appPasswd -------------------------
+  if(json.containsKey("appPasswd")) {
+    String appPasswd = json["appPasswd"].as<String>();//compairing to false for safety reasons
+    unsigned int appPasswdLength = (unsigned int) appPasswd.length();
+    //TODO: '=' or '\r' are forbidden. validate
+    if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= appPasswdLength && appPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
+      appPasswd.toCharArray(OMConfiguration::appPasswd, appPasswdLength+1);
+    }
+  }
+
+  
+  //-------------------- availableNetworkAppSsid -------------------------
+  if(json.containsKey("availableNetworkAppSsid")) {
+    String availableNetworkAppSsid = json["availableNetworkAppSsid"].as<String>();//compairing to false for safety reasons
+    unsigned int availableNetworkAppSsidLength = (unsigned int) availableNetworkAppSsid.length();
+    //TODO: '=' or '\r' are forbidden. validate
+    if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= availableNetworkAppSsidLength && availableNetworkAppSsidLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
+      availableNetworkAppSsid.toCharArray(OMConfiguration::availableNetworkAppSsid, availableNetworkAppSsidLength+1);
+    }
+  }
+
+  //-------------------- availableNetworkAppPasswd -------------------------
+  if(json.containsKey("availableNetworkAppPasswd")) {
+    String availableNetworkAppPasswd = json["availableNetworkAppPasswd"].as<String>();//compairing to false for safety reasons
+    unsigned int availableNetworkAppPasswdLength = (unsigned int) availableNetworkAppPasswd.length();
+    //TODO: '=' or '\r' are forbidden. validate
+    if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= availableNetworkAppPasswdLength && availableNetworkAppPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
+      availableNetworkAppPasswd.toCharArray(OMConfiguration::availableNetworkAppPasswd, availableNetworkAppPasswdLength+1);
+    }
+  }
+
+
+
+  
+  #ifdef DEBUG
+    Serial.print("current status before save: ");
+    OMConfiguration::printCfg();
+    Serial.print("save status: ");
+  #endif
+    Serial.println(OMConfiguration::save());
+  #ifdef DEBUG
+    Serial.println("config finale :");
+    OMConfiguration::printCfg();
+  #endif
+
+  //send back the json
+  request->send(FILESYSTEM, "/cfg.json");//for ajax
+}
+
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   #ifdef DEBUG
   Serial.println("handleRoot :");
@@ -133,183 +301,6 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
     AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", UI_HTML, UI_HTML_SIZE);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
-  } else {
-
-    #ifdef DEBUG
-    //print received params
-    int params = request->params();
-    for(int i=0;i<params;i++){
-      AsyncWebParameter* p = request->getParam(i);
-      if(p->isFile()){ //p->isPost() is also true
-        Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
-      } else if(p->isPost()){
-        Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-      } else {
-        Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
-      }
-    }
-    Serial.println("config initiale :");
-    OMConfiguration::printCfg();
-    #endif
-
-    //-------------------- fireModes -------------------------
-    int i = 0;
-    for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
-    {
-      if (request->hasParam(String("burstMode") + i, true)) {
-        String currentBurstModeValue = request->getParam(String("burstMode") + i, true)->value();
-        
-        switch(currentBurstModeValue.toInt())
-        {
-          case 0 :
-            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeNormal);
-          break;
-    
-          case 1 :
-            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeInterruptible);
-          break;
-          
-          case 2 :
-            OMConfiguration::fireModes[i].setBurstMode(OMFiringSettings::burstModeExtendible);
-          break;
-        }
-      }
-      if (request->hasParam(String("burstLength") + i, true)) {
-        OMConfiguration::fireModes[i].setBurstLength( (uint8_t)(request->getParam(String("burstLength") + i, true)->value().toInt()) );
-      }
-      if (request->hasParam(String("precockDuration_ms") + i, true)) {
-        OMConfiguration::fireModes[i].setPrecockDuration_ms( (unsigned int)(request->getParam(String("precockDuration_ms") + i, true)->value().toInt()) );
-      }
-      if (request->hasParam(String("motorPower") + i, true)) {
-        OMConfiguration::fireModes[i].setMotorPower( (uint8_t)(request->getParam(String("motorPower") + i, true)->value().toInt()) );
-      }
-      if (request->hasParam(String("timeBetweenShots_ms") + i, true)) {
-        OMConfiguration::fireModes[i].setTimeBetweenShots_ms( (unsigned int)(request->getParam(String("timeBetweenShots_ms") + i, true)->value().toInt()) );
-      }
-    } 
-
-    //-------------------- batteryNominalVoltage -------------------------
-    if(request->hasParam("batteryNominalVoltage", true)) {
-      float batteryNominalVoltage = request->getParam("batteryNominalVoltage", true)->value().toFloat();
-      if(OM_MIN_NOMINAL_VOLTAGE < batteryNominalVoltage && batteryNominalVoltage < OM_MAX_NOMINAL_VOLTAGE) {
-        OMConfiguration::batteryNominalVoltage = batteryNominalVoltage;
-      }
-    }
-    
-    //-------------------- wifiShutdownDelayMinutes -------------------------
-    if(request->hasParam("wifiShutdownDelayMinutes", true)) {
-      int wifiShutdownDelayMinutes = request->getParam("wifiShutdownDelayMinutes", true)->value().toInt();
-      if(OM_MIN_WIFI_SHUTDOWN_DELAY_MINUTES <= wifiShutdownDelayMinutes) {
-        OMConfiguration::wifiShutdownDelayMinutes = wifiShutdownDelayMinutes;
-      }
-    }
-    
-    //-------------------- deepSleepDelayMinutes -------------------------
-    if(request->hasParam("deepSleepDelayMinutes", true)) {
-      int deepSleepDelayMinutes = request->getParam("deepSleepDelayMinutes", true)->value().toInt();
-      if(OM_MIN_DEEP_SLEEP_DELAY_MINUTES <= deepSleepDelayMinutes) {
-        OMConfiguration::deepSleepDelayMinutes = deepSleepDelayMinutes;
-      }
-    }
-    
-    //-------------------- batteryLowVoltage -------------------------
-    if(request->hasParam("batteryLowVoltage", true)) {
-      float batteryLowVoltage = request->getParam("batteryLowVoltage", true)->value().toFloat();
-      if(OM_MIN_LOW_VOLTAGE < batteryLowVoltage && batteryLowVoltage < OM_MAX_LOW_VOLTAGE) {
-        OMConfiguration::batteryLowVoltage = batteryLowVoltage;
-      }
-    }
-       
-    //-------------------- batteryShutdownVoltage -------------------------
-    if(request->hasParam("batteryShutdownVoltage", true)) {
-      float batteryShutdownVoltage = request->getParam("batteryShutdownVoltage", true)->value().toFloat();
-      if(OM_MIN_SHUTDOWN_VOLTAGE < batteryShutdownVoltage && batteryShutdownVoltage < OM_MAX_SHUTDOWN_VOLTAGE) {
-        OMConfiguration::batteryShutdownVoltage = batteryShutdownVoltage;
-      }
-    }  
-
-    //-------------------- connectToNetworkIfAvailable -------------------------
-    if(request->hasParam("connectToNetworkIfAvailable", true)) {
-      boolean connectToNetworkIfAvailable = request->getParam("connectToNetworkIfAvailable", true)->value().equals("true");//compairing to true : failsafe to default value
-      OMConfiguration::connectToNetworkIfAvailable = connectToNetworkIfAvailable;
-    }
-    
-    //-------------------- useBatteryProtection -------------------------
-    if(request->hasParam("useBatteryProtection", true)) {
-      boolean useBatteryProtection = ! request->getParam("useBatteryProtection", true)->value().equals("false");//compairing to false for safety reasons : failsafe to default value
-      OMConfiguration::useBatteryProtection = useBatteryProtection;
-    }
-    
-    //-------------------- useActiveBreaking -------------------------
-    if(request->hasParam("useActiveBreaking", true)) {
-      boolean useActiveBreaking = request->getParam("useActiveBreaking", true)->value().equals("true");
-      OMConfiguration::useActiveBreaking = useActiveBreaking;
-    }
-    
-    //-------------------- appSsid -------------------------
-    if(request->hasParam("appSsid", true)) {
-      String appSsid = request->getParam("appSsid", true)->value();//compairing to false for safety reasons
-      unsigned int appSsidLength = (unsigned int) appSsid.length();
-      //TODO: '=' or '\r' are forbidden. validate
-      if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= appSsidLength && appSsidLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
-        appSsid.toCharArray(OMConfiguration::appSsid, appSsidLength+1);
-      }
-    }
-
-    //-------------------- appPasswd -------------------------
-    if(request->hasParam("appPasswd", true)) {
-      String appPasswd = request->getParam("appPasswd", true)->value();//compairing to false for safety reasons
-      unsigned int appPasswdLength = (unsigned int) appPasswd.length();
-      //TODO: '=' or '\r' are forbidden. validate
-      if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= appPasswdLength && appPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
-        appPasswd.toCharArray(OMConfiguration::appPasswd, appPasswdLength+1);
-      }
-    }
-
-    
-    //-------------------- availableNetworkAppSsid -------------------------
-    if(request->hasParam("availableNetworkAppSsid", true)) {
-      String availableNetworkAppSsid = request->getParam("availableNetworkAppSsid", true)->value();//compairing to false for safety reasons
-      unsigned int availableNetworkAppSsidLength = (unsigned int) availableNetworkAppSsid.length();
-      //TODO: '=' or '\r' are forbidden. validate
-      if( ((unsigned int)OM_WIFI_SSID_MIN_SIZE) <= availableNetworkAppSsidLength && availableNetworkAppSsidLength <= ((unsigned int) OM_WIFI_SSID_MAX_SIZE) ) {
-        availableNetworkAppSsid.toCharArray(OMConfiguration::availableNetworkAppSsid, availableNetworkAppSsidLength+1);
-      }
-    }
-
-    //-------------------- availableNetworkAppPasswd -------------------------
-    if(request->hasParam("availableNetworkAppPasswd", true)) {
-      String availableNetworkAppPasswd = request->getParam("availableNetworkAppPasswd", true)->value();//compairing to false for safety reasons
-      unsigned int availableNetworkAppPasswdLength = (unsigned int) availableNetworkAppPasswd.length();
-      //TODO: '=' or '\r' are forbidden. validate
-      if( ((unsigned int)OM_WIFI_PSSWD_MIN_SIZE) <= availableNetworkAppPasswdLength && availableNetworkAppPasswdLength <= ((unsigned int) OM_WIFI_PSSWD_MAX_SIZE) ) {
-        availableNetworkAppPasswd.toCharArray(OMConfiguration::availableNetworkAppPasswd, availableNetworkAppPasswdLength+1);
-      }
-    }
-
-
-
-    
-    #ifdef DEBUG
-      Serial.print("current status before save: ");
-      OMConfiguration::printCfg();
-      Serial.print("save status: ");
-    #endif
-      Serial.println(OMConfiguration::save());
-    #ifdef DEBUG
-      Serial.println("config finale :");
-      OMConfiguration::printCfg();
-    #endif
-
-    //send back the json
-    if(request->url().equals("/json")){
-      request->send(FILESYSTEM, "/cfg.json");//for ajax
-    }else{
-      //thank you https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
-      AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", UI_HTML, UI_HTML_SIZE);
-      response->addHeader("Content-Encoding", "gzip");
-      request->send(response);
-    }
   }
 }
 

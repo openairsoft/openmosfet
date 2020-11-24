@@ -4,7 +4,8 @@
   "description": "ui for OpenMosfet",
   "main": "index.js",
   "scripts": {
-    "build": "html-inline src/index.html | html-minifier > build/out.html && node compress.js"
+    "build": "html-inline src/index.html | html-minifier > build/out.html && node compress.js",
+    "build-dev": "html-inline src/index.html > build/out.html && node compress.js"
   },
   "author": "",
   "license": "ISC",
