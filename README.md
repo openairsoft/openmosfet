@@ -7,7 +7,7 @@ The software is meant to be modular and to allow different sensors configuration
 The hardware provides all the electronics needed and allows different boards to be created.
 
 ## the current team
-The team is composed of a programmer ([Simon](https://github.com/simonjamain)) and two electronitians (Romain & Marcellin), all french airsofters.
+The team is composed of two programmer ([Simon](https://github.com/simonjamain) & [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain & Marcellin), all french airsofters.
 
 ## installation and build
 - Install platformio
@@ -47,7 +47,20 @@ For developpement reasons or other, you can change the default settings for the 
 *Note: it is not recommended that you change this value in the source file, but rather as a build flag in platformio.ini for example.*  
 *Note: for example, the ESP32DEVKIT V1 doesnt have the pin 10 exposed, which is the default pin used on the board for the selector input.*
 
-## hardware
+## Development
+
+### Local UI (without board)
+To serve the UI locally on your computer, we provide a fake server to simulate the board behavior
+#### Install and  serve
+  - inside the `/src/ui/` folder, run `npm install`
+  - run `npm run serve-dev`
+  - open http://localhost:3000/ in your browser
+  - you can now edit ``src/`` without having to re-launch the server
+
+*Note: The configuration is loaded from ``defaultConf.json`` and can be updated as long as the server is running.
+Once it stops the updated configuration is lost*
+
+
 
 ## contribute
 Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/XuzSSbgE).
