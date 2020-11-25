@@ -16,13 +16,15 @@ class OMwifiserver
         static AsyncCallbackJsonWebHandler jsonApiHandler;
         static boolean wifiIsOn;//Note this may be replaced by doing proper status tests on the esp wifi module
         static unsigned long lastActivityTimeMs;
-        static boolean queryHasParameter(String parameterName);
-        static void handleConfigApi(AsyncWebServerRequest *request, JsonVariant &json);
+        static void handleRedirectToRoot(AsyncWebServerRequest *request);
+        static void handleConfigApi(AsyncWebServerRequest *request);
+        static void handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
         static void handleRoot(AsyncWebServerRequest *request);
         static void handleUpdate(AsyncWebServerRequest *request);
         static AsyncWebServer webServer;
         static DNSServer dnsServer;
         static IPAddress ip;
+        static void refreshActivity();
 };
 
 #endif

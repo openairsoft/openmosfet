@@ -22,7 +22,6 @@ unsigned long OMwifiserver::lastActivityTimeMs = millis();
 boolean OMwifiserver::wifiIsOn = false;
 AsyncWebServer OMwifiserver::webServer(80);
 AsyncEventSource OMwifiserver::events("/events");
-AsyncCallbackJsonWebHandler OMwifiserver::jsonApiHandler("/api/config", OMwifiserver::handleConfigApi);
 IPAddress OMwifiserver::ip(APPIP);
 DNSServer OMwifiserver::dnsServer;
 
@@ -34,11 +33,13 @@ void OMwifiserver::begin()
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
 
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
-  OMwifiserver::webServer.on("/api/core", OMwifiserver::handleUpdate);
+  OMwifiserver::webServer.on("/api/core/update", OMwifiserver::handleUpdate);
+  OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
+  OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
-  OMwifiserver::webServer.addHandler(&OMwifiserver::jsonApiHandler);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
- 
+  OMwifiserver::webServer.onNotFound(OMwifiserver::handleRedirectToRoot);
+
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
     WiFi.mode(WIFI_AP_STA);
@@ -83,40 +84,48 @@ void OMwifiserver::begin()
   Serial.print("AP IP address: ");
   Serial.println(WiFi.localIP());
 
-  // relay all unknown requests to root
-  OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
+  AsyncElegantOTA.begin(&OMwifiserver::webServer);//OTA
+  OMwifiserver::webServer.begin();
+  IPAddress myIP = WiFi.softAPIP();
+  #ifdef DEBUG
+  Serial.println("HTTP server started");
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  #endif
+}
+void OMwifiserver::handleRedirectToRoot(AsyncWebServerRequest *request) {
     #ifdef DEBUG
     Serial.print("webServer.onNotFound : ");
     #endif
 
     const char *metaRefreshStr = "<head><meta http-equiv=\"refresh\" content=\"0; url=http://openmosfet.local/\" /></head><body><p>redirecting...</p></body>";
     request->send(200, "text/html", metaRefreshStr);//using this redirect method allows to send a 200 status and it helps with captive portal detection
-      
-  });
-
-  AsyncElegantOTA.begin(&OMwifiserver::webServer);//OTA
-  OMwifiserver::webServer.begin();
-  Serial.println("HTTP server started");
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
+     
 }
 
 void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
   switch (request->method())
   {
-    case HTTP_PATCH:
+    case HTTP_GET:
       #ifdef DEBUG
       Serial.println("patch");
       #endif
       OMwifiserver::webServer.end();
       OMAutoUpdater::requestUpdate();
-      request->send(FILESYSTEM, "/cfg.json");//for ajax
     break;
   }
 }
 
-void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request, JsonVariant &json) {
+void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request) {
+  request->send(FILESYSTEM, "/cfg.json");
+}
+
+void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
+  
+  DynamicJsonDocument json(OM_JSON_DOCUMENT_SIZE);
+                
+  deserializeJson(json, (const char*)bodyData);
+
   #ifdef DEBUG
   Serial.println("handleConfigApi :");
   Serial.println("json reçu :");
@@ -126,9 +135,8 @@ void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request, JsonVariant &
 
   #ifdef DEBUG  
   Serial.println("config initiale :");
-  // OMConfiguration::printCfg();
+  OMConfiguration::printCfg();
   #endif
-
   //-------------------- fireModes -------------------------
   if(json.containsKey("fireModes")){
     for(int currentFiremodeIndex = 0; currentFiremodeIndex < json["fireModes"].size() || currentFiremodeIndex < OM_MAX_NB_STORED_MODES; ++currentFiremodeIndex){
@@ -266,23 +274,21 @@ void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request, JsonVariant &
     }
   }
 
-
-
-  
   #ifdef DEBUG
-    Serial.print("current status before save: ");
-    OMConfiguration::printCfg();
-    Serial.print("save status: ");
+  Serial.print("current status before save: ");
+  OMConfiguration::printCfg();
   #endif
-    Serial.println(OMConfiguration::save());
+  OMConfiguration::save();
   #ifdef DEBUG
-    Serial.println("config finale :");
-    OMConfiguration::printCfg();
+  Serial.println("config finale :");
+  OMConfiguration::printCfg();
   #endif
 
-  //send back the json
-  request->send(FILESYSTEM, "/cfg.json");//for ajax
+  //just return the conf as in the get handler
+  OMwifiserver::handleConfigApi(request);
 }
+
+
 
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   #ifdef DEBUG

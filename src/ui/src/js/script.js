@@ -8,7 +8,7 @@
 		document.querySelector("#autoUpdateFromGithub").disabled = true;
 		
 		//todo: something if fail or something
-		fetch('/api/core', { method: 'PATCH' })
+		fetch('/api/core/update', { method: 'GET' })
 		.then(response => response.json())
 		.then(jsonResponse => {
 		});
@@ -61,7 +61,7 @@
 	// });
 
 	//initialize values
-	fetch('/cfg.json')
+	fetch('/api/config')
 	.then(response => response.json())
 	.then(data => {
 		populateWithJsonData(data);

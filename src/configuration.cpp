@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "utilities.h"
 
-const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_MODES*JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(13) + 535 + 2000;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
+const int capacity = OM_JSON_DOCUMENT_SIZE;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
 //StaticJsonDocument<capacity> doc;
 
 

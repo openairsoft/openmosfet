@@ -35,6 +35,8 @@
 // shut down the motor and report the error.
 #define MAX_TIME_BETWEEN_CYCLES_MS 500
 
+#define OM_JSON_DOCUMENT_SIZE 3000
+
 #ifdef DEBUG
 #define OM_MIN_WIFI_SHUTDOWN_DELAY_MINUTES 0
 #define OM_MIN_DEEP_SLEEP_DELAY_MINUTES 0
