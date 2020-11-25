@@ -32,8 +32,13 @@ const String postForms = "yolo";
 void OMwifiserver::begin()
 {
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
-  //WiFi.setHostname("openmosfet");
 
+  OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
+  OMwifiserver::webServer.on("/api/core", OMwifiserver::handleUpdate);
+  OMwifiserver::webServer.addHandler(&OMwifiserver::events);
+  OMwifiserver::webServer.addHandler(&OMwifiserver::jsonApiHandler);
+  OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
+ 
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
     WiFi.mode(WIFI_AP_STA);
@@ -62,7 +67,6 @@ void OMwifiserver::begin()
         break;
       }
     }
-    
   }
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);
@@ -79,13 +83,6 @@ void OMwifiserver::begin()
   Serial.print("AP IP address: ");
   Serial.println(WiFi.localIP());
 
-  OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
-  OMwifiserver::webServer.on("/json", OMwifiserver::handleRoot);//update and send back as json (if POST)
-  OMwifiserver::webServer.on("/api/core", OMwifiserver::handleUpdate);
-  OMwifiserver::webServer.addHandler(&OMwifiserver::events);
-  OMwifiserver::webServer.addHandler(&OMwifiserver::jsonApiHandler);
-  OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
- 
   // relay all unknown requests to root
   OMwifiserver::webServer.onNotFound([](AsyncWebServerRequest *request) {
     #ifdef DEBUG

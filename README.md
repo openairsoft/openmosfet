@@ -47,6 +47,10 @@ For developpement reasons or other, you can change the default settings for the 
 *Note: it is not recommended that you change this value in the source file, but rather as a build flag in platformio.ini for example.*  
 *Note: for example, the ESP32DEVKIT V1 doesnt have the pin 10 exposed, which is the default pin used on the board for the selector input.*
 
+## http rest-like API
+
+Got to the [API documentation](/doc/api).
+
 ## hardware
 
 ## contribute
