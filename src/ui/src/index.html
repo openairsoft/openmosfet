@@ -106,6 +106,12 @@
                         <small id="inputWifiShutdownDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du wifi après inutilisation de l'interface.</small>
                     </div>
 
+                    <form action="/api/core/update" enctype="multipart/form-data" method="POST">
+                        update
+                        <input type="file" name="firmware" accept=".bin">
+                        <button>go</button>
+                    </form>
+
                     <div class="form-group col-md-6">
                         <label for="inputDeepSleepDelayMinutes">Coupure inactivité</label>
 

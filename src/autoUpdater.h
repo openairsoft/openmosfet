@@ -5,18 +5,27 @@
 
 class OMAutoUpdater {
 
-  private:
+  public:
+    enum AutoUpdaterState
+    {
+      stateIdle,
+      stateUpdateRequested,
+      stateUpdating,
+      stateSucceeded,
+      stateFailed
+    };
 
-    static boolean isUpdateRequested;
+  private:
+    static OMAutoUpdater::AutoUpdaterState _state;
     static void updateFromGit();
 
   public:
-
     /**
      * This method does not update the chip, it is used for the loop, same as other components
      **/
     static void update();
     static void requestUpdate();
+    static OMAutoUpdater::AutoUpdaterState getState(void){ return OMAutoUpdater::_state; }
 };
 
 #endif 

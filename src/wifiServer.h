@@ -20,7 +20,9 @@ class OMwifiserver
         static void handleConfigApi(AsyncWebServerRequest *request);
         static void handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
         static void handleRoot(AsyncWebServerRequest *request);
-        static void handleUpdate(AsyncWebServerRequest *request);
+        static void handleAutoUpdate(AsyncWebServerRequest *request);
+        static void handleManualUpdate(AsyncWebServerRequest *request);
+        static void handleManualUpdateFile(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
         static AsyncWebServer webServer;
         static DNSServer dnsServer;
         static IPAddress ip;

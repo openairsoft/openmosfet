@@ -1,23 +1,22 @@
 #include "config.h"
 #include "autoUpdater.h"
-#include "utilities.h"
 #include "wifiServer.h"
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <Update.h>
 
-boolean OMAutoUpdater::isUpdateRequested = false;
+OMAutoUpdater::AutoUpdaterState OMAutoUpdater::_state = OMAutoUpdater::stateIdle;
 
 void OMAutoUpdater::update(){
-	if(OMAutoUpdater::isUpdateRequested == true){
+	if(OMAutoUpdater::_state == OMAutoUpdater::stateUpdateRequested){
 		OMAutoUpdater::updateFromGit();
 	}
 }
 
 void OMAutoUpdater::requestUpdate(){
 	//change the status
-	OMAutoUpdater::isUpdateRequested = true;
+	OMAutoUpdater::_state = OMAutoUpdater::stateUpdateRequested;
 }
 
 void OMAutoUpdater::updateFromGit(){
@@ -167,5 +166,6 @@ void OMAutoUpdater::updateFromGit(){
 		#endif
       	OMwifiserver::events.send("","updateFailed",millis());
 	}
-	OMAutoUpdater::isUpdateRequested = false;
+	
+	OMAutoUpdater::_state = OMAutoUpdater::stateFailed;
 }

@@ -62,7 +62,7 @@ class OMVirtualTrigger
     enum TriggerState
     {
       stateReleased,
-      statePulled,
+      statePulled
     };
 
   private:    

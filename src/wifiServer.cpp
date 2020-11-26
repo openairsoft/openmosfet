@@ -5,7 +5,7 @@
 #include "autoUpdater.h"
 #include "configuration.h"
 
-#include <AsyncElegantOTA.h>
+#include <Update.h>
 #include <esp_wifi.h>
 // #include <WiFi.h>
 // #include <WiFiClient.h>
@@ -33,7 +33,8 @@ void OMwifiserver::begin()
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
 
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
-  OMwifiserver::webServer.on("/api/core/update", OMwifiserver::handleUpdate);
+  OMwifiserver::webServer.on("/api/core/update", HTTP_GET, OMwifiserver::handleAutoUpdate);
+  OMwifiserver::webServer.on("/api/core/update", HTTP_POST, OMwifiserver::handleManualUpdate, OMwifiserver::handleManualUpdateFile);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
@@ -84,7 +85,6 @@ void OMwifiserver::begin()
   Serial.print("AP IP address: ");
   Serial.println(WiFi.localIP());
 
-  AsyncElegantOTA.begin(&OMwifiserver::webServer);//OTA
   OMwifiserver::webServer.begin();
   IPAddress myIP = WiFi.softAPIP();
   #ifdef DEBUG
@@ -103,17 +103,64 @@ void OMwifiserver::handleRedirectToRoot(AsyncWebServerRequest *request) {
      
 }
 
-void OMwifiserver::handleUpdate(AsyncWebServerRequest *request) {
-  switch (request->method())
-  {
-    case HTTP_GET:
+void OMwifiserver::handleManualUpdate(AsyncWebServerRequest *request) {
+  #ifdef DEBUG
+    Serial.print("OMwifiserver::handleManualUpdate :");
+  #endif
+  AsyncWebServerResponse *response = request->beginResponse((Update.hasError())?500:200, "text/plain", (Update.hasError())?"FAIL":"OK");
+  response->addHeader("Connection", "close");
+  response->addHeader("Access-Control-Allow-Origin", "*");
+  request->send(response);
+}
+
+// some inspiration : https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
+void OMwifiserver::handleManualUpdateFile(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+  if (!index) {
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) { // Start with max available size
       #ifdef DEBUG
-      Serial.println("patch");
+        Update.printError(Serial);
       #endif
-      OMwifiserver::webServer.end();
-      OMAutoUpdater::requestUpdate();
-    break;
+      request->send(400, "text/plain", "OTA could not begin1");
+    }else{
+      #ifdef DEBUG
+        Serial.println("OMwifiserver::handleManualUpdateFile : begin ota");
+        Serial.print("filename : ");
+        Serial.println(filename);
+      #endif
+    }
   }
+
+  if(len){
+    if (Update.write(data, len) != len) {
+        request->send(400, "text/plain", "OTA could not begin2");
+    }
+  }
+  if (final) { // if the final flag is set then this is the last frame of data
+    if (!Update.end(true)) { //true to set the size to the current progress
+      #ifdef DEBUG
+        Update.printError(Serial);
+      #endif
+      return request->send(400, "text/plain", "Could not end OTA");
+    }else{
+      #ifdef DEBUG
+        Serial.println("ota ok");
+      #endif
+    }
+  }else{
+      return;
+  }
+}
+
+void OMwifiserver::handleAutoUpdate(AsyncWebServerRequest *request) {
+
+  #ifdef DEBUG
+  Serial.println("patch");
+  #endif
+  OMwifiserver::webServer.end();
+  OMAutoUpdater::requestUpdate();
+  while(OMAutoUpdater::stateUpdating){
+  }
+  request->send(200, "text/html", "ok");
 }
 
 void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request) {
@@ -283,9 +330,6 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   Serial.println("config finale :");
   OMConfiguration::printCfg();
   #endif
-
-  //just return the conf as in the get handler
-  OMwifiserver::handleConfigApi(request);
 }
 
 
@@ -300,7 +344,6 @@ void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   replica.updateLastActive();
 
   if (request->method() != HTTP_POST) {
-    //thank you https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
     AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", UI_HTML, UI_HTML_SIZE);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
@@ -328,7 +371,6 @@ void OMwifiserver::update() {
     OMwifiserver::dnsServer.processNextRequest();
   }
   
-  AsyncElegantOTA.loop();
   OMAutoUpdater::update();
   
 }

@@ -6,9 +6,6 @@
 
 //----------------------------- TRIGGER -------------------------------------
 
-
-
-
 void OMVirtualTrigger::pull(void)
 {
   #ifdef DEBUG
