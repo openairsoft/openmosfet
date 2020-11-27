@@ -46,9 +46,20 @@ This is closely linked to [configuration.h](/src/configuration.h)
 This is closely linked to [components.h](/src/components.h)
 
 **WORK IN PROGRESS**
-- **Trigger** : `[GET,POST] /api/components/trigger/`
-- **Selector** : `[GET,POST] /api/components/selector/`
-- **Gearbox** : `[GET,POST] /api/components/gearbox/`
+- **Trigger state** : `/api/components/trigger/`
+  - `GET,POST` : set/read the trigger state
+    - parameters *application/json*
+      - `state` *string* : [`pulled`, `released`]
+- **Trigger short pull** : `/api/components/trigger/bump`
+  - `POST` : pull and release the trigger after a moment
+    - parameters *application/json*
+      - `duration_ms` *int* (optional) : the time after the trigger will be released, default `1` (ms)
+- **Selector state** : `/api/components/selector/`
+  - `GET,POST` : set/read the selector state
+    - parameters *application/json*
+      - `state` *string* : [`safe`, `semi`, `auto`]
+- **Gearbox uncocking** : `/api/components/gearbox/uncock`
+  - `POST` : uncock the piston (if cocked) ⚠Be careful, this will eventully fire a BB⚠
 
 --------------
 
