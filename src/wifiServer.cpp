@@ -66,6 +66,7 @@ void OMwifiserver::begin()
   }
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(OMConfiguration::appSsid, OMConfiguration::appPasswd);
+  delay(2000);
   WiFi.softAPConfig(OMwifiserver::ip, OMwifiserver::ip, IPAddress(255, 255, 255, 0));   // subnet FF FF FF 00
 
   #ifdef DEBUG
