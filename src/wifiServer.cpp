@@ -37,6 +37,7 @@ void OMwifiserver::begin()
   if(OMConfiguration::connectToNetworkIfAvailable)
   {
     WiFi.mode(WIFI_AP_STA);
+    WiFi.persistent(false);
     WiFi.begin(OMConfiguration::availableNetworkAppSsid, OMConfiguration::availableNetworkAppPasswd);
     OMwifiserver::wifiIsOn = true;
     #ifdef DEBUG
