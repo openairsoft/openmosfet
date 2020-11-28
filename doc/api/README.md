@@ -5,11 +5,16 @@ For now, all endpoints doesn't require any Authentication.
 ### Firmware
 
 - **Updates** : `/api/core/update/`
-  - `GET` : auto-update replica from the github releases  
+  - `POST` : auto-update replica from the github releases  
   *Note: be carefull of timeout, this usually take 70-80 secs*
-  - `POST` : upload a .bin to update the firmware
+  - `PUT` : upload a .bin to update the firmware
     - parameters *multipart/form-data*
       - `firmware` *application/octet-stream* : the binary file
+- **Firmware version** : `/api/core/version/`
+  - `GET` : 
+    - parameters *application/json*
+      - *string* : the current version (semver, see [releases](https://github.com/simonjamain/openmosfet/releases))
+
 ### Configuration
 
 This is closely linked to [configuration.h](/src/configuration.h)
@@ -17,7 +22,6 @@ This is closely linked to [configuration.h](/src/configuration.h)
 - **global configuration** : `/api/config/`
   - `GET` : reads the global configuration 
     - parameters *application/json*
-      - `version` *string* : the current version (semver, see [releases](https://github.com/simonjamain/openmosfet/releases))
       - `appSsid` *string [8-32]* : Access point ssid
       - `appPasswd` *string [8-16]* : Access point password
       - `connectToNetworkIfAvailable` *boolean* : Will try to connect at startup
@@ -46,18 +50,18 @@ This is closely linked to [configuration.h](/src/configuration.h)
 This is closely linked to [components.h](/src/components.h)
 
 **WORK IN PROGRESS**
-- **Trigger state** : `/api/components/trigger/`
+- **Trigger state** : `/api/components/trigger/state`
   - `GET,POST` : set/read the trigger state
     - parameters *application/json*
-      - `state` *string* : [`pulled`, `released`]
+      - *string* : [`pulled`, `released`]
 - **Trigger short pull** : `/api/components/trigger/bump`
   - `POST` : pull and release the trigger after a moment
     - parameters *application/json*
       - `duration_ms` *int* (optional) : the time after the trigger will be released, default `1` (ms)
-- **Selector state** : `/api/components/selector/`
+- **Selector state** : `/api/components/selector/state`
   - `GET,POST` : set/read the selector state
     - parameters *application/json*
-      - `state` *string* : [`safe`, `semi`, `auto`]
+      - *string* : [`safe`, `semi`, `auto`]
 - **Gearbox uncocking** : `/api/components/gearbox/uncock`
   - `POST` : uncock the piston (if cocked) ⚠Be careful, this will eventully fire a BB⚠
 

@@ -7,14 +7,10 @@
 
 #include <Update.h>
 #include <esp_wifi.h>
-// #include <WiFi.h>
-// #include <WiFiClient.h>
-// #include <WiFiAP.h>
-// #include <AsyncTCP.h>
-// #include <AsyncJson.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
 
-
-//TODO: penser à tout gzipper
+//TODO: penser à tout gzipper (ah ?)
 
 extern OMVirtualReplica replica;
 
@@ -35,6 +31,7 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
   OMwifiserver::webServer.on("/api/core/update", HTTP_GET, OMwifiserver::handleAutoUpdate);
   OMwifiserver::webServer.on("/api/core/update", HTTP_POST, OMwifiserver::handleManualUpdate, OMwifiserver::handleManualUpdateFile);
+  OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersion);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
@@ -164,7 +161,9 @@ void OMwifiserver::handleAutoUpdate(AsyncWebServerRequest *request) {
 }
 
 void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request) {
-  request->send(FILESYSTEM, "/cfg.json");
+  AsyncResponseStream *response = request->beginResponseStream("application/json");
+  serializeJson(OMConfiguration::toJson(), *response);
+  request->send(response);
 }
 
 void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
@@ -332,6 +331,9 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   #endif
 }
 
+void OMwifiserver::handleVersion(AsyncWebServerRequest *request) {
+  request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
+}
 
 
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {

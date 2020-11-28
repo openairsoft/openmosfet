@@ -103,11 +103,7 @@ boolean OMConfiguration::load(void){
   return true;
 }
 
-
-boolean OMConfiguration::save(void){
-  #ifdef DEBUG
-    Serial.println(F("Saving config"));
-  #endif
+DynamicJsonDocument OMConfiguration::toJson(){
   DynamicJsonDocument doc(capacity);
   
   doc["appSsid"] = OMConfiguration::appSsid;
@@ -150,7 +146,18 @@ boolean OMConfiguration::save(void){
     currentFireMode["motorPower"] = OMConfiguration::fireModes[i].getMotorPower();
     currentFireMode["timeBetweenShots_ms"] = OMConfiguration::fireModes[i].getTimeBetweenShotsMs();
   }
+
+  return doc;
+}
+
+boolean OMConfiguration::save(void){
+
+  #ifdef DEBUG
+    Serial.println(F("Saving config"));
+  #endif
   
+  DynamicJsonDocument doc = OMConfiguration::toJson();
+
   #ifdef DEBUG
   Serial.println("JSON SAUVE");
   serializeJson(doc, Serial);
