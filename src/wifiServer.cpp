@@ -126,7 +126,7 @@ void OMwifiserver::handleManualUpdateApiFile(AsyncWebServerRequest *request, con
       #ifdef DEBUG
         Update.printError(Serial);
       #endif
-      request->send(400, "text/plain", "OTA could not begin1");
+      request->send(500, "text/plain", "OTA could not begin1");
     }else{
       #ifdef DEBUG
         Serial.println("OMwifiserver::handleManualUpdateFile : begin ota");
@@ -138,7 +138,7 @@ void OMwifiserver::handleManualUpdateApiFile(AsyncWebServerRequest *request, con
 
   if(len){
     if (Update.write(data, len) != len) {
-        request->send(400, "text/plain", "OTA could not begin2");
+        request->send(500, "text/plain", "OTA could not begin2");
     }
   }
   if (final) { // if the final flag is set then this is the last frame of data
@@ -146,7 +146,7 @@ void OMwifiserver::handleManualUpdateApiFile(AsyncWebServerRequest *request, con
       #ifdef DEBUG
         Update.printError(Serial);
       #endif
-      return request->send(400, "text/plain", "Could not end OTA");
+      return request->send(500, "text/plain", "Could not end OTA");
     }else{
       #ifdef DEBUG
         Serial.println("ota ok");
@@ -352,7 +352,7 @@ void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
       request->send(200, "application/json", (OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled) ? "true":"false");
     break;
     default:
-      request->send(400, "application/json", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST or GET only");
     break;
   }
 }
@@ -368,7 +368,7 @@ void OMwifiserver::handleTriggerStateApiBody(AsyncWebServerRequest *request, uin
         OMVirtualTrigger::release();
       }
   }else{
-      request->send(400, "application/json", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST or GET only");
   }
 }
   
@@ -388,7 +388,7 @@ void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
       request->send(200, "application/json", String(OMVirtualSelector::getState()));
     break;
     default:
-      request->send(400, "application/json", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST or GET only");
     break;
   }
 }
@@ -398,10 +398,21 @@ void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, ui
       DynamicJsonDocument selectorStateJson(0);
       deserializeJson(selectorStateJson, (const char*)bodyData);
 
-      OMVirtualSelector::setState(selectorStateJson.as<OMVirtualSelector::SelectorState>());//no value control... meh
+      OMVirtualSelector::SelectorState receivedState =  selectorStateJson.as<OMVirtualSelector::SelectorState>();
+
+      switch(receivedState){
+        case OMVirtualSelector::stateSafe:
+        case OMVirtualSelector::stateSemi:
+        case OMVirtualSelector::stateAuto:
+          OMVirtualSelector::setState(receivedState);
+        break;
+        default:
+          request->send(400, "text/html", "unknown selctor state value");
+        break;
+      }
 
   }else{
-      request->send(400, "application/json", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST or GET only");
   }
 }
 
