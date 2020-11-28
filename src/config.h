@@ -57,8 +57,8 @@
 #define OM_WIFI_SSID_MAX_SIZE 32
 #define OM_WIFI_SSID_REAL_MAX_SIZE 33 //NOTE: must be equal to OM_WIFI_SSID_MAX_SIZE+1
 #define OM_WIFI_PSSWD_MIN_SIZE 8
-#define OM_WIFI_PSSWD_MAX_SIZE 16
-#define OM_WIFI_PSSWD_REAL_MAX_SIZE 17 //NOTE: must be equal to OM_WIFI_PSSWD_MAX_SIZE+1
+#define OM_WIFI_PSSWD_MAX_SIZE 40
+#define OM_WIFI_PSSWD_REAL_MAX_SIZE 41 //NOTE: must be equal to OM_WIFI_PSSWD_MAX_SIZE+1
 
 // If motor is spinning and no cycle has been detected in this time interval, then somethings wrong
 // shut down the motor and report the error.
