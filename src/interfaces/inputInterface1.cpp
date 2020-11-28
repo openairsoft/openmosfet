@@ -23,7 +23,7 @@ Bounce triggerDebouncer = Bounce();
 Bounce cutoffDebouncer = Bounce();
 Bounce selectorDebouncer = Bounce();
 
-void OMInputsInterface::begin(OMVirtualReplica &replica)
+void OMInputsInterface::begin()
 {
   // motor pwm setup
   ledcAttachPin(motorPin, GGTR16_MOTOR_LEDC_CHANNEL);
@@ -43,40 +43,40 @@ void OMInputsInterface::begin(OMVirtualReplica &replica)
 
   if(digitalRead(selectorPin) == LOW)
   {
-    replica.getSelector().setState(OMVirtualSelector::stateAuto);
+    OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
   }else
   {
-    replica.getSelector().setState(OMVirtualSelector::stateSemi);//NOTE: here we have no mean to know when selector is on safe, it just physicaly disable the firing group, so we have to initialize on semi.
+    OMVirtualSelector::setState(OMVirtualSelector::stateSemi);//NOTE: here we have no mean to know when selector is on safe, it just physicaly disable the firing group, so we have to initialize on semi.
   }
 
 }
 
-void OMInputsInterface::update(OMVirtualReplica &replica)
+void OMInputsInterface::update()
 {
   triggerDebouncer.update();
   cutoffDebouncer.update();
   selectorDebouncer.update();
    
   if( triggerDebouncer.fell()) {
-    replica.getTrigger().pull();
+    OMVirtualTrigger::pull();
   }else if( triggerDebouncer.rose()) {
-    replica.getTrigger().release();
+    OMVirtualTrigger::release();
   }
    
   if( cutoffDebouncer.fell()) {
-    replica.getGearbox().cycleEndDetected();
+    OMVirtualGearbox::cycleEndDetected();
   }
 
   if( selectorDebouncer.fell()) {
-    replica.getSelector().setState(OMVirtualSelector::stateAuto);
+    OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
   }else if( selectorDebouncer.rose()) {
-    replica.getSelector().setState(OMVirtualSelector::stateSemi);
+    OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
   }
 }
 
-OMFiringSettings &OMInputsInterface::getCurrentFiringSetting(OMVirtualSelector &selector)
+OMFiringSettings &OMInputsInterface::getCurrentFiringSetting()
 {
-  switch(selector.getState())
+  switch(OMVirtualSelector::getState())
   {
     case OMVirtualSelector::stateAuto:
       return OMConfiguration::fireModes[1];

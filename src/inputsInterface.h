@@ -8,9 +8,9 @@ class OMInputsInterface
 {
   public:
   
-    static void begin(OMVirtualReplica &replica);
-    static void update(OMVirtualReplica &replica);
-    static OMFiringSettings &getCurrentFiringSetting(OMVirtualSelector &selector);
+    static void begin();
+    static void update();
+    static OMFiringSettings &getCurrentFiringSetting();
     static void motorOn();
     static void motorOff();
 };

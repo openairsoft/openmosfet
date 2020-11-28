@@ -4,7 +4,6 @@
 #include "utilities.h"
 #include "autoUpdater.h"
 #include "configuration.h"
-#include "openmosfet.cpp"
 
 #include <Update.h>
 #include <esp_wifi.h>
@@ -343,7 +342,7 @@ void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
 }
 
 
-void handleTriggerStateApi(AsyncWebServerRequest *request) {
+void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
       //TODO : pull/release the trigger
@@ -357,11 +356,11 @@ void handleTriggerStateApi(AsyncWebServerRequest *request) {
   }
 }
 
-void handleTriggerBumpApi(AsyncWebServerRequest *request) {
+void OMwifiserver::handleTriggerBumpApi(AsyncWebServerRequest *request) {
   //TODO : pull/release the trigger
 }
 
-void handleSelectorStateApi(AsyncWebServerRequest *request) {
+void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
       //TODO : set the selector switch state
@@ -375,7 +374,7 @@ void handleSelectorStateApi(AsyncWebServerRequest *request) {
   }
 }
 
-void handleGearboxUncockingApi(AsyncWebServerRequest *request) {
+void OMwifiserver::handleGearboxUncockingApi(AsyncWebServerRequest *request) {
   //TODO : uncock the gearbox
 }
 
