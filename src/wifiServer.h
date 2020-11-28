@@ -19,14 +19,23 @@ class OMwifiserver
         static void handleRedirectToRoot(AsyncWebServerRequest *request);
         static void handleRoot(AsyncWebServerRequest *request);
         static void handleAutoUpdateApi(AsyncWebServerRequest *request);
+
         static void handleManualUpdateApi(AsyncWebServerRequest *request);
         static void handleManualUpdateApiFile(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
+
         static void handleVersionApi(AsyncWebServerRequest *request);
+
         static void handleConfigApi(AsyncWebServerRequest *request);
         static void handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
+
         static void handleTriggerStateApi(AsyncWebServerRequest *request);
+        static void handleTriggerStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
+
         static void handleTriggerBumpApi(AsyncWebServerRequest *request);
+
         static void handleSelectorStateApi(AsyncWebServerRequest *request);
+        static void handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
+
         static void handleGearboxUncockingApi(AsyncWebServerRequest *request);
         static AsyncWebServer webServer;
         static DNSServer dnsServer;

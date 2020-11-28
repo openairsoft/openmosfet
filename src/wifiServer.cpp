@@ -4,6 +4,7 @@
 #include "utilities.h"
 #include "autoUpdater.h"
 #include "configuration.h"
+#include "components.h"
 
 #include <Update.h>
 #include <esp_wifi.h>
@@ -34,9 +35,11 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersionApi);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
-  OMwifiserver::webServer.on("/api/components/trigger/state", OMwifiserver::handleTriggerStateApi);
+  OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_GET, OMwifiserver::handleTriggerStateApi);
+  OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_POST, OMwifiserver::handleTriggerStateApi, NULL, OMwifiserver::handleTriggerStateApiBody);
   OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
-  OMwifiserver::webServer.on("/api/components/selector/state", OMwifiserver::handleSelectorStateApi);
+  OMwifiserver::webServer.on("/api/components/selector/state", HTTP_GET, OMwifiserver::handleSelectorStateApi);
+  OMwifiserver::webServer.on("/api/components/selector/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
   OMwifiserver::webServer.on("/api/components/gearbox/uncock", OMwifiserver::handleGearboxUncockingApi);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
@@ -345,10 +348,8 @@ void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
 void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
-      //TODO : pull/release the trigger
     case HTTP_GET:
-      //TODO : send trigger state
-      // request->send(200, "application/json", /* trigger status */);
+      request->send(200, "application/json", (OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled) ? "true":"false");
     break;
     default:
       request->send(400, "application/json", "bad method, POST or GET only");
@@ -356,17 +357,35 @@ void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
   }
 }
 
-void OMwifiserver::handleTriggerBumpApi(AsyncWebServerRequest *request) {
-  //TODO : pull/release the trigger
+void OMwifiserver::handleTriggerStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
+  if(request->method() == HTTP_POST) {
+      DynamicJsonDocument pulledStateJson(0);
+      deserializeJson(pulledStateJson, (const char*)bodyData);
+
+      if(pulledStateJson.as<boolean>()) {
+        OMVirtualTrigger::pull();
+      }else{
+        OMVirtualTrigger::release();
+      }
+  }else{
+      request->send(400, "application/json", "bad method, POST or GET only");
+  }
 }
+  
+
+void OMwifiserver::handleTriggerBumpApi(AsyncWebServerRequest *request) {
+  OMVirtualTrigger::pull();
+  OMVirtualTrigger::release();
+  request->send(200);
+}
+
+
 
 void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
-      //TODO : set the selector switch state
     case HTTP_GET:
-      //TODO : send the selector switch state
-      // request->send(200, "application/json", /* trigger status */);
+      request->send(200, "application/json", String(OMVirtualSelector::getState()));
     break;
     default:
       request->send(400, "application/json", "bad method, POST or GET only");
@@ -374,8 +393,31 @@ void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
   }
 }
 
+void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
+  if(request->method() == HTTP_POST) {
+      DynamicJsonDocument selectorStateJson(0);
+      deserializeJson(selectorStateJson, (const char*)bodyData);
+
+      OMVirtualSelector::setState(selectorStateJson.as<OMVirtualSelector::SelectorState>());//no value control... meh
+
+  }else{
+      request->send(400, "application/json", "bad method, POST or GET only");
+  }
+}
+
 void OMwifiserver::handleGearboxUncockingApi(AsyncWebServerRequest *request) {
-  //TODO : uncock the gearbox
+  switch(OMVirtualGearbox::getState()){
+    case OMVirtualGearbox::statePrecocked:
+      OMVirtualGearbox::cycle(0);
+      request->send(200);
+    break;
+    case OMVirtualGearbox::stateResting:
+      request->send(503, "text/html", "already uncocked");
+    break;
+    default:
+      request->send(503, "text/html", "icompatible gearbox state at the moment");
+    break;
+  }
 }
 
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {

@@ -103,9 +103,9 @@ class OMVirtualSelector
 public:
   enum SelectorState
   {
-    stateSafe,
-    stateSemi,
-    stateAuto,
+    stateSafe = 0,
+    stateSemi = 1,
+    stateAuto = 2,
   };
   static void setState(OMVirtualSelector::SelectorState state);
   static OMVirtualSelector::SelectorState getState(void) { return OMVirtualSelector::_state; }
