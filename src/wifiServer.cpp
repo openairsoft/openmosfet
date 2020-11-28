@@ -4,6 +4,7 @@
 #include "utilities.h"
 #include "autoUpdater.h"
 #include "configuration.h"
+#include "openmosfet.cpp"
 
 #include <Update.h>
 #include <esp_wifi.h>
@@ -29,11 +30,15 @@ void OMwifiserver::begin()
   delay(1000);//Note: I don't remember why I did that, I'll just let it there in case it is important #prophesional
 
   OMwifiserver::webServer.on("/", OMwifiserver::handleRoot);//send back as web page
-  OMwifiserver::webServer.on("/api/core/update", HTTP_GET, OMwifiserver::handleAutoUpdate);
-  OMwifiserver::webServer.on("/api/core/update", HTTP_POST, OMwifiserver::handleManualUpdate, OMwifiserver::handleManualUpdateFile);
-  OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersion);
+  OMwifiserver::webServer.on("/api/core/update", HTTP_GET, OMwifiserver::handleAutoUpdateApi);
+  OMwifiserver::webServer.on("/api/core/update", HTTP_POST, OMwifiserver::handleManualUpdateApi, OMwifiserver::handleManualUpdateApiFile);
+  OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersionApi);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
+  OMwifiserver::webServer.on("/api/components/trigger/state", OMwifiserver::handleTriggerStateApi);
+  OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
+  OMwifiserver::webServer.on("/api/components/selector/state", OMwifiserver::handleSelectorStateApi);
+  OMwifiserver::webServer.on("/api/components/gearbox/uncock", OMwifiserver::handleGearboxUncockingApi);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
   OMwifiserver::webServer.onNotFound(OMwifiserver::handleRedirectToRoot);
@@ -102,7 +107,7 @@ void OMwifiserver::handleRedirectToRoot(AsyncWebServerRequest *request) {
      
 }
 
-void OMwifiserver::handleManualUpdate(AsyncWebServerRequest *request) {
+void OMwifiserver::handleManualUpdateApi(AsyncWebServerRequest *request) {
   #ifdef DEBUG
     Serial.print("OMwifiserver::handleManualUpdate :");
   #endif
@@ -113,7 +118,7 @@ void OMwifiserver::handleManualUpdate(AsyncWebServerRequest *request) {
 }
 
 // some inspiration : https://github.com/ayushsharma82/AsyncElegantOTA/blob/master/src/AsyncElegantOTA.h
-void OMwifiserver::handleManualUpdateFile(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+void OMwifiserver::handleManualUpdateApiFile(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
   if (!index) {
     if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) { // Start with max available size
       #ifdef DEBUG
@@ -150,7 +155,7 @@ void OMwifiserver::handleManualUpdateFile(AsyncWebServerRequest *request, const 
   }
 }
 
-void OMwifiserver::handleAutoUpdate(AsyncWebServerRequest *request) {
+void OMwifiserver::handleAutoUpdateApi(AsyncWebServerRequest *request) {
 
   #ifdef DEBUG
   Serial.println("patch");
@@ -333,10 +338,46 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   #endif
 }
 
-void OMwifiserver::handleVersion(AsyncWebServerRequest *request) {
+void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
   request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
 }
 
+
+void handleTriggerStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_POST:
+      //TODO : pull/release the trigger
+    case HTTP_GET:
+      //TODO : send trigger state
+      // request->send(200, "application/json", /* trigger status */);
+    break;
+    default:
+      request->send(400, "application/json", "bad method, POST or GET only");
+    break;
+  }
+}
+
+void handleTriggerBumpApi(AsyncWebServerRequest *request) {
+  //TODO : pull/release the trigger
+}
+
+void handleSelectorStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_POST:
+      //TODO : set the selector switch state
+    case HTTP_GET:
+      //TODO : send the selector switch state
+      // request->send(200, "application/json", /* trigger status */);
+    break;
+    default:
+      request->send(400, "application/json", "bad method, POST or GET only");
+    break;
+  }
+}
+
+void handleGearboxUncockingApi(AsyncWebServerRequest *request) {
+  //TODO : uncock the gearbox
+}
 
 void OMwifiserver::handleRoot(AsyncWebServerRequest *request) {
   #ifdef DEBUG
