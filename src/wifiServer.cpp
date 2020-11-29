@@ -217,7 +217,7 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
         OMConfiguration::fireModes[currentFiremodeIndex].setPrecockDuration_ms( json["fireModes"][currentFiremodeIndex]["precockDuration_ms"].as<unsigned int>() );
       }
       if (json["fireModes"][currentFiremodeIndex].containsKey("motorPower")) {//todo compare to max / min motor power
-        OMConfiguration::fireModes[currentFiremodeIndex].setMotorPower( json["fireModes"][currentFiremodeIndex]["motorPower"].as<uint8_t>() );
+        OMConfiguration::fireModes[currentFiremodeIndex].setMotorPower( json["fireModes"][currentFiremodeIndex]["motorPower"].as<float>() );
       }
       if (json["fireModes"][currentFiremodeIndex].containsKey("timeBetweenShots_ms")) {//todo compare to max timeBetweenShots
         OMConfiguration::fireModes[currentFiremodeIndex].setTimeBetweenShots_ms( json["fireModes"][currentFiremodeIndex]["timeBetweenShots_ms"].as<unsigned int>() );

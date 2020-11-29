@@ -56,7 +56,7 @@ void OMConfiguration::loadFromJson(Stream &stream){
     OMFiringSettings::BurstMode currentBurstMode =  currentFireMode["burstMode"].as<OMFiringSettings::BurstMode>();
     uint8_t currentBurstLength = currentFireMode["burstLength"].as<uint8_t>();
     unsigned int currentPrecockDuration = currentFireMode["precockDuration_ms"].as<unsigned int>();
-    uint8_t currentMotorPower = currentFireMode["motorPower"].as<uint8_t>();
+    float currentMotorPower = currentFireMode["motorPower"].as<float>();
     unsigned int currentTimeBetweenShots = currentFireMode["timeBetweenShots_ms"].as<unsigned int>();
     
     OMConfiguration::fireModes[i] = OMFiringSettings(currentBurstMode, currentBurstLength, currentPrecockDuration, currentMotorPower, currentTimeBetweenShots);
@@ -114,7 +114,7 @@ DynamicJsonDocument OMConfiguration::toJson(){
   int i = 0;
   for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
-    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
     JsonObject currentFireMode = fireModes.createNestedObject();
     
     currentFireMode["burstMode"] = OMConfiguration::fireModes[i].getBurstMode();
@@ -159,10 +159,10 @@ boolean OMConfiguration::save(void){
     int i = 0;
     for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
     {
-      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
       Serial.print(F("fireMode"));
       Serial.printf(
-        "%i,%i,%i,%i,%i",
+        "%i,%i,%i,%f,%i",
         OMConfiguration::fireModes[i].getBurstMode(),
         OMConfiguration::fireModes[i].getBurstLength(),
         OMConfiguration::fireModes[i].getPrecockDurationMs(),

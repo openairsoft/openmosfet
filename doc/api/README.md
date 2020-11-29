@@ -35,7 +35,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
       - `useActiveBreaking` *float* : Duh.
       - `firemodes` *object array* :
-        - `burstMode` *int [0-2]* : Burst mode, 0=normal, 1=interruptible, 2=extendible
+        - `burstMode` *int [0-2]* : Burst mode, 0=interruptible, 1=normal, 2=extendible
         - `burstLength` *int* :  
           normal burstmode : Number of shot fired when trigger pulled  
           interruptible burstmode : Maximum number of shot fired during trigger pull  

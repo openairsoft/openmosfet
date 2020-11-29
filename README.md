@@ -1,15 +1,93 @@
-# openmosfet
 
-OpenMosfet is a high quality open source airsoft mosfet based on arduino (currently esp32 board).
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/green?icon=github)](https://github.com/simonjamain/openmosfet)
+[![Maintenance](https://badgen.net/badge/Maintained%20%3F/Yes%21/green?icon=github)](https://github.com/simonjamain/openmosfet/graphs/commit-activity)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/simonjamain/openmosfet)
+
+<br/>
+<p align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="doc/assets/images/logo.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">OpenMosfet</h3>
+
+  <p align="center">
+    An high quality open source <strong>airsoft mosfet</strong><br> based on arduino.
+    <br/><br/>
+    <a href="#"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/simonjamain/openmosfet/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/simonjamain/openmosfet/issues">Request Feature</a>
+  </p>
+</p>
+
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li>
+          <a href="#the-team">The team</a>
+          <ul>
+            <li><a href="#developers">Developers</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#installation-and-build">Installation and build</a></li>
+        <li><a href="#replica-interface-types">Replica interface types</a></li>
+        <li><a href="#custom-replica-interface-pinout">Custom replica interface pinout</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#development">Development</a>
+      <ul>
+        <li>
+          <a href="#local-ui-without-board">Local UI (without board)</a>
+          <ul>
+            <li><a href="#install-and-serve">Install and serve</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#usage">Development</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#todo">To-Do</a></li>
+  </ol>
+</details>
+
+## About the project
+
+
+OpenMosfet is an high quality open source airsoft mosfet based on arduino (currently esp32 board).
 
 The software is meant to be modular and to allow different sensors configurations.
 
 The hardware provides all the electronics needed and allows different boards to be created.
 
-## the current team
-The team is composed of a programmer ([Simon](https://github.com/simonjamain)) and two electronitians (Romain & Marcellin), all french airsofters.
+The web dashboard allows full and easy controls over every settings as well an update manager.
 
-## installation and build
+![OpenMosfet Web Dashboard](doc/assets/images/ui.png)
+
+### The team
+
+
+The team is composed of two developers ([Simon](https://github.com/simonjamain) and [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain and Marcellin), all french airsofters.
+
+#### Developers
+
+<img src="doc/assets/images/developers.svg" alt="Logo" width="100%">
+
+
+## Getting started
+### Installation and build
 - Install platformio
 - "open" the project
 - for building the ui (mandatory) :
@@ -22,7 +100,7 @@ The team is composed of a programmer ([Simon](https://github.com/simonjamain)) a
 - default password for access point is "password"
 - I think thats about it...
 
-### replica interface types
+### Replica interface types
 Depending on your replica and the way you connect the mosfet, the signals received are not the same.
 
 ex : the original input plate on the G&G TR 16 can be used but the signals are very specific.
@@ -37,7 +115,7 @@ Here is a table (work in progress) listing the different configuration available
 ---------------------|---------------|--------------
 1 | `OM_DEFAULT_FIRINGGROUP_PIN` grounded when : trigger is pressed AND safety is off AND mag is not empty<br>`OM_DEFAULT_CUTOFF_PIN` grounded when cutoff is pressed<br>`OM_DEFAULT_SELECTOR_PIN` grounded when selector is on full auto position | G&G tr16 original input plate
 
-### custom replica interface pinout
+### Custom replica interface pinout
 For developpement reasons or other, you can change the default settings for the replica interface with the following flags :
 
 - `OM_DEFAULT_MOTOR_PIN`
@@ -54,6 +132,21 @@ Got to the [API documentation](/doc/api).
 
 ## hardware
 
-## contribute
+## Development
+
+### Local UI (without board)
+To serve the UI locally on your computer, we provide a fake server to simulate the board behavior.
+
+#### Install and serve
+  - inside the `/src/ui/` folder, run `npm install`
+  - run `npm run serve-dev`
+  - open http://localhost:3000/ in your browser
+  - you can now edit ``src/`` without having to re-launch the server
+
+*Note: The configuration is loaded from ``defaultConf.json`` and can be updated as long as the server is running.
+Once it stops the updated configuration is lost*
+
+## Contributing
 Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/XuzSSbgE).
-We are french but we can chat in english no prob.
+
+We are french but we can chat in english without problems.

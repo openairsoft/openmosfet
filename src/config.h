@@ -74,6 +74,8 @@
 #define OM_MAX_NB_STORED_MODES 2
 
 //--------------- REPLICA INTERFACE --------------
+#define OM_DEBOUNCE_TIME_MS 2
+
 #ifndef OM_DEFAULT_MOTOR_PIN
 	#define OM_DEFAULT_MOTOR_PIN 32
 #endif
