@@ -46,6 +46,7 @@ private:
   unsigned int _precockDuration_ms;
   uint8_t _motorPower;
   unsigned int _timeBetweenShots_ms;
+  float _decockAfter_s;
 };
 
 //----------------------------- TRIGGER -------------------------------------
@@ -142,6 +143,8 @@ class OMVirtualReplica
     static OMVirtualReplica::ReplicaState _state;
     static uint8_t _currentBurstBBCount;
     static unsigned long _lastActiveTimeMs;
+    static unsigned long _lastTriggerReleaseMs;
+    static unsigned long _lastEndCycleMs;
 
     static void startFiringCycle();
     static void endFiringCycle();

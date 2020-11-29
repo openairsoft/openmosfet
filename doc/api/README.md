@@ -43,6 +43,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
         - `precockDuration_ms` *int* : Amount of precocking time after cycle in milliseconds (may be replaced with a %)
         - `motorPower` *float [0-1]* : Percentage of battery power delivered to the motor (with pwm)
         - `timeBetweenShots_ms` : Time between each shots, can be used for RoF control or dmr setup
+        - `decockAfter_s` *float* : If the trigger is maintained pressed for set ammount of time after end of burst, cycle and decock ⚠this fires a bb⚠. (0 = no decocking)
   - `POST` : Set the global configuration and retrieve the saved values in response
     - parameters *application/json*  
     same data format as `GET`
