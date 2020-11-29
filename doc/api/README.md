@@ -25,8 +25,10 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `appSsid` *string [8-32]* : Access point ssid
       - `appPasswd` *string [8-16]* : Access point password
       - `connectToNetworkIfAvailable` *boolean* : Will try to connect at startup
-      - `availableNetworkAppSsid` : *string [8-32]* : External network ssid
+      - `availableNetworkAppSsid` *string [8-32]* : External network ssid
       - `availableNetworkAppPasswd` *string [8-16]* : External network password
+      - `wifiShutdownDelayMinutes` *int* : delay for wifi shutdown after last network activity (0 = never shuts down)
+      - `deepSleepDelayMinutes` *int* : delay for sleep mode after replica inactivity
       - `useBatteryProtection` *boolean* : Will monitor battery voltage
       - `batteryNominalVoltage` *float* : Honestly I don't precisely know yet what to do with that
       - `batteryLowVoltage` *float* : Will alert the user below this voltage

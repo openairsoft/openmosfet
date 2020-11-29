@@ -451,6 +451,8 @@ void OMwifiserver::update() {
   if(
     OMwifiserver::wifiIsOn
     &&
+    OMConfiguration::wifiShutdownDelayMinutes > 0
+    &&
     ( millis() - OMwifiserver::lastActivityTimeMs > OMConfiguration::wifiShutdownDelayMinutes * 60000 )
     )
   {
