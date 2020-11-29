@@ -29,7 +29,12 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#the-team">The team</a></li>
+        <li>
+          <a href="#the-team">The team</a>
+          <ul>
+            <li><a href="#developers">Developers</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li>
@@ -72,7 +77,25 @@ The web dashboard allows full and easy controls over every settings as well an u
 ![OpenMosfet Web Dashboard](doc/assets/images/ui.png)
 
 ### The team
-The team is composed of two programmer ([Simon](https://github.com/simonjamain) & [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain & Marcellin), all french airsofters.
+
+
+The team is composed of two developers ([Simon](https://github.com/simonjamain) and [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain and Marcellin), all french airsofters.
+
+#### Developers
+<div style="display: flex; justify-content: space-around">
+  <div align="center">
+    <a href="https://github.com/simonjamain">
+      <img src="https://avatars1.githubusercontent.com/u/6118295?v=4?s=100" width="100px;" alt=""/>
+    <br /><sub><b>simonjamain</b></sub></a>
+    </div>
+    <div align="center">
+      <a href="https://www.zaosoula.fr/">
+        <img src="https://avatars2.githubusercontent.com/u/1884246?v=4?s=100" width="100px;" alt=""/>
+        <br /><sub><b>Zao Soula</b></sub>
+        </a>
+    </div>
+</div>
+
 
 ## Getting started
 ### Installation and build
@@ -147,4 +170,3 @@ We are french but we can chat in english without problems.
 - ~~change max ssid and password length to 32 chars instead of 16 : https://serverfault.com/questions/45439/what-is-the-maximum-length-of-a-wifi-access-points-ssid~~
 - add "try to connect now" button next to external wifi settings
 - check if wifi cutoff current saving is reliable
-
