@@ -82,6 +82,8 @@ The web dashboard allows full and easy controls over every settings as well an u
 The team is composed of two developers ([Simon](https://github.com/simonjamain) and [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain and Marcellin), all french airsofters.
 
 #### Developers
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
 <div style="display: flex; justify-content: space-around">
   <div align="center">
     <a href="https://github.com/simonjamain">
@@ -95,6 +97,8 @@ The team is composed of two developers ([Simon](https://github.com/simonjamain) 
         </a>
     </div>
 </div>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
 
 
 ## Getting started
