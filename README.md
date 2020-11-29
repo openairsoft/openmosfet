@@ -82,23 +82,8 @@ The web dashboard allows full and easy controls over every settings as well an u
 The team is composed of two developers ([Simon](https://github.com/simonjamain) and [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain and Marcellin), all french airsofters.
 
 #### Developers
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<div style="display: flex; justify-content: space-around">
-  <div align="center">
-    <a href="https://github.com/simonjamain">
-      <img src="https://avatars1.githubusercontent.com/u/6118295?v=4?s=100" width="100px;" alt=""/>
-    <br /><sub><b>simonjamain</b></sub></a>
-    </div>
-    <div align="center">
-      <a href="https://www.zaosoula.fr/">
-        <img src="https://avatars2.githubusercontent.com/u/1884246?v=4?s=100" width="100px;" alt=""/>
-        <br /><sub><b>Zao Soula</b></sub>
-        </a>
-    </div>
-</div>
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
+
+<img src="doc/assets/images/developers.svg" alt="Logo" width="100%">
 
 
 ## Getting started
