@@ -12,7 +12,6 @@ uint8_t firingGroupPin = OM_DEFAULT_FIRINGGROUP_PIN;
 uint8_t cutoffPin = OM_DEFAULT_CUTOFF_PIN;
 uint8_t selectorPin = OM_DEFAULT_SELECTOR_PIN;
 
-#define GGTR16_DEBOUNCE_TIME_MS 3
 
 //channels
 #define GGTR16_MOTOR_LEDC_CHANNEL 1
@@ -33,13 +32,13 @@ void OMInputsInterface::begin()
   pinMode(motorPin, OUTPUT);
 
   triggerDebouncer.attach(firingGroupPin,INPUT_PULLUP);
-  triggerDebouncer.interval(GGTR16_DEBOUNCE_TIME_MS);
+  triggerDebouncer.interval(OM_DEBOUNCE_TIME_MS);
   
   cutoffDebouncer.attach(cutoffPin,INPUT_PULLUP);
-  cutoffDebouncer.interval(GGTR16_DEBOUNCE_TIME_MS);
+  cutoffDebouncer.interval(OM_DEBOUNCE_TIME_MS);
 
   selectorDebouncer.attach(selectorPin,INPUT_PULLUP);
-  selectorDebouncer.interval(GGTR16_DEBOUNCE_TIME_MS);
+  selectorDebouncer.interval(OM_DEBOUNCE_TIME_MS);
 
   if(digitalRead(selectorPin) == LOW)
   {

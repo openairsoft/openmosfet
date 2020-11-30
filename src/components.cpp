@@ -34,13 +34,16 @@ unsigned long OMVirtualGearbox::_precockEndTime_ms = 0;
 
 void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
 {
-#ifdef DEBUG
-  Serial.println("OMVirtualGearbox::cycle");
-#endif
-  OMInputsInterface::motorOn();
-  OMVirtualGearbox::_precockDuration_ms = precockDuration_ms;
-  OMVirtualGearbox::_state = OMVirtualGearbox::stateCycling;
-  OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;
+  if(OMVirtualGearbox::_state != OMVirtualGearbox::stateCycling)
+  {
+    #ifdef DEBUG
+      Serial.println("OMVirtualGearbox::cycle");
+    #endif
+    OMInputsInterface::motorOn();
+    OMVirtualGearbox::_precockDuration_ms = precockDuration_ms;
+    OMVirtualGearbox::_state = OMVirtualGearbox::stateCycling;
+    OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;
+  }
 }
 
 void OMVirtualGearbox::cycleEndDetected(void)
@@ -48,7 +51,7 @@ void OMVirtualGearbox::cycleEndDetected(void)
 #ifdef DEBUG
   Serial.println("cycleEndDetected");
 #endif
-  if (OMVirtualGearbox::_precockDuration_ms <= 0)
+  if (OMVirtualGearbox::_precockDuration_ms <= 0 || !OMConfiguration::enablePrecocking)
   {
     OMVirtualGearbox::endCycle(OMVirtualGearbox::stateResting);
   }
@@ -97,16 +100,48 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 
 //----------------------------- REPLICA -------------------------------------
 
+#define COND_SAFETY_OFF OMVirtualSelector::getState() != OMVirtualSelector::stateSafe
+#define COND_GEARBOX_NOT_CYCLING OMVirtualGearbox::getState() != OMVirtualGearbox::stateCycling
+#define COND_TRIGGER_PULLED OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
+#define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() != OMFiringSettings::burstModeInterruptible
+#define COND_BURST_NOT_FINISHED OMVirtualReplica::_bbs_fired < OMInputsInterface::getCurrentFiringSetting().getBurstLength()
+#define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() == OMFiringSettings::burstModeExtendible
+#define COND_TRIGGER_AS_BEEN_MAINTAINED_AFTER_LAST_END_CYCLE OMVirtualReplica::_lastTriggerReleaseMs < OMVirtualReplica::_lastEndCycleMs && OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
+
 uint8_t OMVirtualReplica::_bbs_fired = 0;
 OMVirtualReplica::ReplicaState OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
 uint8_t OMVirtualReplica::_currentBurstBBCount = 0;
 unsigned long OMVirtualReplica::_lastActiveTimeMs = 0;
+unsigned long OMVirtualReplica::_lastTriggerReleaseMs = 0;
+unsigned long OMVirtualReplica::_lastEndCycleMs = 0;
+
 void OMVirtualReplica::begin(void)
 {
   OMVirtualReplica::_lastActiveTimeMs = millis();
+  OMVirtualReplica::_lastTriggerReleaseMs = millis();
+  OMVirtualReplica::_lastEndCycleMs = millis();
 }
+
+
+
 void OMVirtualReplica::update(void)
 {
+  // uncock if trigger is maintained after a set amount of time
+  if(
+    OMVirtualReplica::_state == OMVirtualReplica::stateIdle
+    &&
+    OMVirtualGearbox::getState() == OMVirtualGearbox::statePrecocked
+    &&
+    OMConfiguration::decockAfter_s > 0
+    &&
+    COND_TRIGGER_AS_BEEN_MAINTAINED_AFTER_LAST_END_CYCLE
+    &&
+    OMVirtualReplica::_lastEndCycleMs + (unsigned long)(OMConfiguration::decockAfter_s * 1000) < millis()
+    )
+  {
+    OMVirtualGearbox::cycle(0);
+  }
+
   if (millis() - OMVirtualReplica::_lastActiveTimeMs > OMConfiguration::deepSleepDelayMinutes * 60000)
   {
 #ifdef DEBUG
@@ -131,9 +166,9 @@ void OMVirtualReplica::updateLastActive(void)
 
 void OMVirtualReplica::triggerPulled(void)
 {
-#ifdef DEBUG
-  Serial.println("triggerPulled");
-#endif
+  #ifdef DEBUG
+    Serial.println("triggerPulled");
+  #endif
   OMVirtualReplica::_bbs_fired = 0;
   OMVirtualReplica::startFiringCycle();
 }
@@ -143,15 +178,12 @@ void OMVirtualReplica::triggerReleased(void)
 #ifdef DEBUG
   Serial.println("triggerReleased");
 #endif
+  OMVirtualReplica::_lastTriggerReleaseMs = millis();
+  #ifdef DEBUG
+    printf("OMVirtualReplica::_lastTriggerReleaseMs : %lu\n", OMVirtualReplica::_lastTriggerReleaseMs);
+  #endif
   OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
 }
-
-#define COND_SAFETY_OFF OMVirtualSelector::getState() != OMVirtualSelector::stateSafe
-#define COND_GEARBOX_NOT_CYCLING OMVirtualGearbox::getState() != OMVirtualGearbox::stateCycling
-#define COND_TRIGGER_PULLED OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
-#define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() != OMFiringSettings::burstModeInterruptible
-#define COND_BURST_NOT_FINISHED OMVirtualReplica::_bbs_fired < OMInputsInterface::getCurrentFiringSetting().getBurstLength()
-#define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() == OMFiringSettings::burstModeExtendible
 
 void OMVirtualReplica::startFiringCycle(void)
 {
@@ -159,37 +191,43 @@ void OMVirtualReplica::startFiringCycle(void)
   Serial.println("startFiringCycle");
 #endif
 
-  if (COND_SAFETY_OFF && COND_GEARBOX_NOT_CYCLING)
+  if
+  (
+    COND_SAFETY_OFF
+    &&
+    COND_GEARBOX_NOT_CYCLING
+    &&
+    (
+      (
+        COND_TRIGGER_PULLED
+        &&
+        (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE)
+      )
+      ||
+      (COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED)
+    )
+  )
   {
-    if (
-        (COND_TRIGGER_PULLED && (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE)) ||
-        (COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED))
-    {
-#ifdef DEBUG
-      Serial.println("\nCOND_TRIGGER_PULLED");
-      Serial.println(COND_TRIGGER_PULLED);
-      Serial.println("COND_BURST_NOT_FINISHED");
-      Serial.println(COND_BURST_NOT_FINISHED);
-      Serial.println("\nCOND_BURST_EXTENDIBLE");
-      Serial.println(COND_BURST_EXTENDIBLE);
-      Serial.println("\nCOND_BURST_NOT_INTERRUPTIBLE");
-      Serial.println(COND_BURST_NOT_INTERRUPTIBLE);
-      Serial.println("\nCOND_BURST_NOT_FINISHED");
-      Serial.println(COND_BURST_NOT_FINISHED);
-#endif
-
-      OMVirtualReplica::_state = OMVirtualReplica::stateFiring;
-      OMVirtualGearbox::cycle(OMInputsInterface::getCurrentFiringSetting().getPrecockDurationMs());
-    }
+    OMVirtualReplica::_state = OMVirtualReplica::stateFiring;
+    OMVirtualGearbox::cycle(OMInputsInterface::getCurrentFiringSetting().getPrecockDurationMs());
+  }else{
+    OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
+    #ifdef DEBUG
+      Serial.println("stateIdle");
+    #endif
   }
 }
 
 void OMVirtualReplica::endFiringCycle(void)
 {
-#ifdef DEBUG
-  Serial.println("endFiringCycle");
-#endif
+  #ifdef DEBUG
+    Serial.println("endFiringCycle");
+  #endif
 
+  OMVirtualReplica::_lastEndCycleMs = millis();
+  #ifdef DEBUG
+    printf("OMVirtualReplica::_lastEndCycleMs : %lu\n", OMVirtualReplica::_lastEndCycleMs);
+  #endif
   OMVirtualReplica::_bbs_fired++;
   OMVirtualReplica::startFiringCycle();
 }

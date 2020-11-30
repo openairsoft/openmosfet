@@ -200,18 +200,13 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
       Serial.println(currentFiremodeIndex);
 
       if (json["fireModes"][currentFiremodeIndex].containsKey("burstMode")) {
-        switch(json["fireModes"][currentFiremodeIndex]["burstMode"].as<int>())
-        {
-          case 0 :
-            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeNormal);
-          break;
-    
-          case 1 :
-            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeInterruptible);
-          break;
-          
-          case 2 :
-            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(OMFiringSettings::burstModeExtendible);
+
+        OMFiringSettings::BurstMode receivedBurstMode = json["fireModes"][currentFiremodeIndex]["burstMode"].as<OMFiringSettings::BurstMode>();
+        switch(receivedBurstMode){
+          case OMFiringSettings::burstModeNormal:
+          case OMFiringSettings::burstModeInterruptible:
+          case OMFiringSettings::burstModeExtendible:
+            OMConfiguration::fireModes[currentFiremodeIndex].setBurstMode(receivedBurstMode);
           break;
         }
       }
@@ -222,7 +217,7 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
         OMConfiguration::fireModes[currentFiremodeIndex].setPrecockDuration_ms( json["fireModes"][currentFiremodeIndex]["precockDuration_ms"].as<unsigned int>() );
       }
       if (json["fireModes"][currentFiremodeIndex].containsKey("motorPower")) {//todo compare to max / min motor power
-        OMConfiguration::fireModes[currentFiremodeIndex].setMotorPower( json["fireModes"][currentFiremodeIndex]["motorPower"].as<uint8_t>() );
+        OMConfiguration::fireModes[currentFiremodeIndex].setMotorPower( json["fireModes"][currentFiremodeIndex]["motorPower"].as<float>() );
       }
       if (json["fireModes"][currentFiremodeIndex].containsKey("timeBetweenShots_ms")) {//todo compare to max timeBetweenShots
         OMConfiguration::fireModes[currentFiremodeIndex].setTimeBetweenShots_ms( json["fireModes"][currentFiremodeIndex]["timeBetweenShots_ms"].as<unsigned int>() );
@@ -272,22 +267,28 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
 
   //-------------------- connectToNetworkIfAvailable -------------------------
   if(json.containsKey("connectToNetworkIfAvailable")) {
-    boolean connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
-    OMConfiguration::connectToNetworkIfAvailable = connectToNetworkIfAvailable;
+    OMConfiguration::connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
   }
   
   //-------------------- useBatteryProtection -------------------------
   if(json.containsKey("useBatteryProtection")) {
-    boolean useBatteryProtection = json["useBatteryProtection"].as<boolean>();
-    OMConfiguration::useBatteryProtection = useBatteryProtection;
+    OMConfiguration::useBatteryProtection = json["useBatteryProtection"].as<boolean>();
   }
   
   //-------------------- useActiveBreaking -------------------------
   if(json.containsKey("useActiveBreaking")) {
-    boolean useActiveBreaking = json["useActiveBreaking"].as<boolean>();
-    OMConfiguration::useActiveBreaking = useActiveBreaking;
+    OMConfiguration::useActiveBreaking = json["useActiveBreaking"].as<boolean>();
   }
   
+  //-------------------- decockAfter_s -------------------------
+  if(json.containsKey("decockAfter_s")) {
+    OMConfiguration::decockAfter_s = json["decockAfter_s"].as<float>();
+  }
+
+  //-------------------- enablePrecocking -------------------------
+  if(json.containsKey("enablePrecocking")) {
+    OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
+  }
   //-------------------- appSsid -------------------------
   if(json.containsKey("appSsid")) {
     String appSsid = json["appSsid"].as<String>();//compairing to false for safety reasons

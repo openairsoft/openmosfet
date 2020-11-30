@@ -38,12 +38,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     var newConfig = {};
 
-    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach(module => ({
-      ...newConfig,
-      ...extractInputs(module)
-    }))
+    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach(module => {
+      Object.assign(newConfig, extractInputs(module))
+    })
 
-    newConfig.firemodes = [];
+    newConfig.fireModes = [];
 
     document.querySelector('#config').querySelectorAll('#SHOOTMODE [data-firemode-index]').forEach(module => {
       let modeindex = parseInt(module.getAttribute('data-firemode-index'));
@@ -57,7 +56,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
       });
 
-      newConfig.firemodes[modeindex] = mode;
+      newConfig.fireModes[modeindex] = mode;
     });
 
     document.getElementById('loader').classList.remove('hide');
@@ -164,7 +163,7 @@ function renderConfig(config) {
   var container = document.querySelector('#shootmode_container');
 
   container.innerHTML = ""
-  config.firemodes.forEach((mode, index) => {
+  config.fireModes.forEach((mode, index) => {
     var clone = document.importNode(template.content, true);
 
     fillInputs(clone, mode);

@@ -97,12 +97,12 @@
 
                 <div class="form-group">
                     <div>
-                        <label for="appSsid">SSID</label>
+                        <label>SSID</label>
                         <input type="text" name="appSsid" minlength="8" maxlength="32">
                     </div>
 
                     <div>
-                        <label for="appSsid">Mot de passe</label>
+                        <label>Mot de passe</label>
                         <input type="text" name="appPasswd" minlength="8" maxlength="16">
                     </div>
                 </div>
@@ -118,12 +118,12 @@
                 </div>
                 <div class="form-group">
                     <div>
-                        <label for="appSsid">SSID</label>
+                        <label>SSID</label>
                         <input type="text" name="availableNetworkAppSsid" minlength="8" maxlength="32">
                     </div>
 
                     <div>
-                        <label for="appSsid">Mot de passe</label>
+                        <label>Mot de passe</label>
                         <input type="text" name="availableNetworkAppPasswd" minlength="8" maxlength="16">
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                 </h3>
                 <div class="form-group">
                     <div>
-                        <label for="appSsid">Délais WIFI</label>
+                        <label>Délais WIFI</label>
                         <div class="input-group">
                             <input type="number" name="wifiShutdownDelayMinutes" step="1">
                             <span>Minutes</span>
@@ -146,9 +146,9 @@
                         <p class="help">Désactive les fonctionnalités wifi après un certain temps d’unutilisation de
                             l’interface.</p>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="inputDeepSleepDelayMinutes">Coupure inactivité</label>
 
+                    <div>
+                        <label>Délais système</label>
                         <div class="input-group">
                             <input type="number" name="deepSleepDelayMinutes" step="1">
                             <span>Minutes</span>
@@ -234,7 +234,7 @@
 
             <div class="form-group form-group-3">
                 <div>
-                    <label for="appSsid">Nombres de coups</label>
+                    <label>Nombres de coups</label>
                     <input type="number" name="burstLength" min="0">
                 </div>
             </div>
@@ -249,7 +249,7 @@
                 <div>
                     <div class="form-group form-group-3">
                         <div>
-                            <label for="appSsid">Délai minimum entre chaque coup</label>
+                            <label>Délai minimum entre chaque coup</label>
                             <div class="input-group">
                                 <input type="number" name="timeBetweenShots_ms" step="1" min="0">
                                 <span>Millisecondes</span>
@@ -257,7 +257,7 @@
                             <p class="help">Limite la cadence ou pour une réplique DMR (n’affecte pas la réactivité du tir)</p>
                         </div>
                         <div>
-                            <label for="appSsid">Durée de précocking</label>
+                            <label>Durée de précocking</label>
                             <div class="input-group">
                                 <input type="number" name="precockDuration_ms" step="1" min="0">
                                 <span>Millisecondes</span>
@@ -265,21 +265,13 @@
                             <p class="help">0 = pas de précocking</p>
                         </div>
                         <div>
-                            <label for="appSsid">Puissance du moteur</label>
+                            <label>Puissance du moteur</label>
                             <div class="input-group">
                                 <input type="number" name="motorPower" step="1" min="1" max="100">
                                 <span>%</span>
                             </div>
                             <p class="help">Peut affecter la réactivité</p>
                         </div>
-                    </div>
-                    
-                    <div class="form-group col-md-12">
-                        <form action="/api/core/update" enctype="multipart/form-data" method="POST">
-                            update
-                            <input type="file" name="firmware" accept=".bin">
-                            <button>go</button>
-                        </form>
                     </div>
                 </div>
             </div>
