@@ -8,15 +8,13 @@
 #include "wifiServer.h"
 #include "otaUploader.h"
 
-OMVirtualReplica replica;
-
 void setup();
 void loop();
 
 void setup() {
   Serial.begin(115200);
 
-  OMInputsInterface::begin(replica);
+  OMInputsInterface::begin();
   
   if (!FILESYSTEM.begin()) {
     #ifdef DEBUGM
@@ -48,11 +46,12 @@ void setup() {
 
   OMwifiserver::begin();
   OMOtaUploader::begin();
+  OMVirtualReplica::begin();
 }
 
 void loop() {
   OMwifiserver::update();
   OMOtaUploader::update();
-  OMInputsInterface::update(replica);
-  replica.update();
+  OMInputsInterface::update();
+  OMVirtualReplica::update();
 }

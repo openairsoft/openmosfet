@@ -146,9 +146,9 @@
                         <p class="help">Désactive les fonctionnalités wifi après un certain temps d’unutilisation de
                             l’interface.</p>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputDeepSleepDelayMinutes">Coupure inactivité</label>
 
-                    <div>
-                        <label for="appSsid">Délais système</label>
                         <div class="input-group">
                             <input type="number" name="deepSleepDelayMinutes" step="1">
                             <span>Minutes</span>
@@ -272,6 +272,14 @@
                             </div>
                             <p class="help">Peut affecter la réactivité</p>
                         </div>
+                    </div>
+                    
+                    <div class="form-group col-md-12">
+                        <form action="/api/core/update" enctype="multipart/form-data" method="POST">
+                            update
+                            <input type="file" name="firmware" accept=".bin">
+                            <button>go</button>
+                        </form>
                     </div>
                 </div>
             </div>

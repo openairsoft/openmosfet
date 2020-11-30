@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "utilities.h"
 
-const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_MODES*JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(13) + 535 + 2000;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
+const int capacity = OM_JSON_DOCUMENT_SIZE;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
 //StaticJsonDocument<capacity> doc;
 
 
@@ -103,11 +103,7 @@ boolean OMConfiguration::load(void){
   return true;
 }
 
-
-boolean OMConfiguration::save(void){
-  #ifdef DEBUG
-    Serial.println(F("Saving config"));
-  #endif
+DynamicJsonDocument OMConfiguration::toJson(){
   DynamicJsonDocument doc(capacity);
   
   doc["appSsid"] = OMConfiguration::appSsid;
@@ -150,7 +146,18 @@ boolean OMConfiguration::save(void){
     currentFireMode["motorPower"] = OMConfiguration::fireModes[i].getMotorPower();
     currentFireMode["timeBetweenShots_ms"] = OMConfiguration::fireModes[i].getTimeBetweenShotsMs();
   }
+
+  return doc;
+}
+
+boolean OMConfiguration::save(void){
+
+  #ifdef DEBUG
+    Serial.println(F("Saving config"));
+  #endif
   
+  DynamicJsonDocument doc = OMConfiguration::toJson();
+
   #ifdef DEBUG
   Serial.println("JSON SAUVE");
   serializeJson(doc, Serial);

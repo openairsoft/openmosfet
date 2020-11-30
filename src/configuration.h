@@ -23,13 +23,14 @@ class OMConfiguration {
   public:
 
     #ifdef DEBUG
-      static void printCfg(void);
+      static void printCfg();
     #endif
     
     // NOTE: usefull ressource here: https://arduino.stackexchange.com/questions/60112/value-of-uninitialized-eeprom-in-esp8266
     static void loadFromJson(Stream &stream);
-    static boolean load(void);
-    static boolean save(void);
+    static boolean load();
+    static DynamicJsonDocument toJson();
+    static boolean save();
 
 
     byte versionNumber;
