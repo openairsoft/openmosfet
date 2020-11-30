@@ -34,6 +34,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `batteryLowVoltage` *float* : Will alert the user below this voltage
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
       - `useActiveBreaking` *float* : Duh.
+      - `enablePrecocking` *boolean* : Enable precocking based on values specified for each firemode
       - `fireModes` *object array* :
         - `burstMode` *int [0-2]* : Burst mode, 0=interruptible, 1=normal, 2=extendible
         - `burstLength` *int* :  
