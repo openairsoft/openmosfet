@@ -34,8 +34,8 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `batteryLowVoltage` *float* : Will alert the user below this voltage
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
       - `useActiveBreaking` *float* : Duh.
-      - `firemodes` *object array* :
-        - `burstMode` *int [0-2]* : Burst mode, 0=normal, 1=interruptible, 2=extendible
+      - `fireModes` *object array* :
+        - `burstMode` *int [0-2]* : Burst mode, 0=interruptible, 1=normal, 2=extendible
         - `burstLength` *int* :  
           normal burstmode : Number of shot fired when trigger pulled  
           interruptible burstmode : Maximum number of shot fired during trigger pull  
@@ -43,6 +43,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
         - `precockDuration_ms` *int* : Amount of precocking time after cycle in milliseconds (may be replaced with a %)
         - `motorPower` *float [0-1]* : Percentage of battery power delivered to the motor (with pwm)
         - `timeBetweenShots_ms` : Time between each shots, can be used for RoF control or dmr setup
+        - `decockAfter_s` *float* : If the trigger is maintained pressed for set ammount of time after end of burst, cycle and decock ⚠this fires a bb⚠. (0 = no decocking)
   - `POST` : Set the global configuration and retrieve the saved values in response
     - parameters *application/json*  
     same data format as `GET`

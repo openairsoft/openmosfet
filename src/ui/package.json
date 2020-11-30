@@ -4,8 +4,8 @@
   "description": "ui for OpenMosfet",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir build && html-inline src/index.html | html-minifier > build/out.html && node compress.js",
-    "build-dev": "mkdir build && html-inline src/index.html > build/out.html && node compress.js",
+    "build": "(mkdir build || echo '') && html-inline src/index.html | html-minifier > build/out.html && node compress.js",
+    "build-dev": "(mkdir build || echo '') && html-inline src/index.html > build/out.html && node compress.js",
     "serve-dev": "node ./dev/api/server.js"
   },
   "author": "",

@@ -16,7 +16,7 @@
 
 
 /** Le nombre magique et le numéro de version actuelle */
-#define OM_CFG_VERSION 4 //NOTE: change this value if you modify the data structure ?
+#define OM_CFG_VERSION 5 //NOTE: change this value if you modify the data structure ?
 
 /** La structure qui contient les données */
 class OMConfiguration {
@@ -49,6 +49,8 @@ class OMConfiguration {
     static float batteryLowVoltage; // since OM_CFG_VERSION = 1
     static float batteryShutdownVoltage; // since OM_CFG_VERSION = 1
     static boolean useActiveBreaking; // since OM_CFG_VERSION = 1
+    static float decockAfter_s; // since OM_CFG_VERSION = 5
+    static boolean enablePrecocking; // since OM_CFG_VERSION = 5
 };
 
 #endif

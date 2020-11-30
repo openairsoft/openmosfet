@@ -16,12 +16,12 @@ class OMFiringSettings
 public:
   enum BurstMode
   {
-    burstModeNormal,
     burstModeInterruptible,
+    burstModeNormal,
     burstModeExtendible,
   };
 
-  OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+  OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
       : _burstMode(burstMode), _burstLength(burstLength), _precockDuration_ms(_precockDuration_ms), _motorPower(motorPower), _timeBetweenShots_ms(timeBetweenShots_ms){};
 
   OMFiringSettings()
@@ -31,21 +31,22 @@ public:
   OMFiringSettings::BurstMode getBurstMode() { return this->_burstMode; }
   uint8_t getBurstLength() { return this->_burstLength; }
   unsigned int getPrecockDurationMs() { return this->_precockDuration_ms; }
-  uint8_t getMotorPower() { return this->_motorPower; }
+  float getMotorPower() { return this->_motorPower; }
   unsigned int getTimeBetweenShotsMs() { return this->_timeBetweenShots_ms; }
 
   void setBurstMode(OMFiringSettings::BurstMode burstMode) { this->_burstMode = burstMode; }
   void setBurstLength(uint8_t burstLength) { this->_burstLength = burstLength; }
   void setPrecockDuration_ms(unsigned int precockDuration_ms) { this->_precockDuration_ms = precockDuration_ms; }
-  void setMotorPower(uint8_t motorPower) { this->_motorPower = motorPower; }
+  void setMotorPower(float motorPower) { this->_motorPower = motorPower; }
   void setTimeBetweenShots_ms(unsigned int timeBetweenShots_ms) { this->_timeBetweenShots_ms = timeBetweenShots_ms; }
 
 private:
   OMFiringSettings::BurstMode _burstMode;
   uint8_t _burstLength;
   unsigned int _precockDuration_ms;
-  uint8_t _motorPower;
+  float _motorPower;
   unsigned int _timeBetweenShots_ms;
+  float _decockAfter_s;
 };
 
 //----------------------------- TRIGGER -------------------------------------
@@ -142,6 +143,8 @@ class OMVirtualReplica
     static OMVirtualReplica::ReplicaState _state;
     static uint8_t _currentBurstBBCount;
     static unsigned long _lastActiveTimeMs;
+    static unsigned long _lastTriggerReleaseMs;
+    static unsigned long _lastEndCycleMs;
 
     static void startFiringCycle();
     static void endFiringCycle();
