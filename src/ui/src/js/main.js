@@ -38,10 +38,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     var newConfig = {};
 
-    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach(module => ({
-      ...newConfig,
-      ...extractInputs(module)
-    }))
+    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach(module => {
+      Object.assign(newConfig, extractInputs(module))
+    })
 
     newConfig.fireModes = [];
 
