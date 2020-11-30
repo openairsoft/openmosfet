@@ -4,8 +4,9 @@
   "description": "ui for OpenMosfet",
   "main": "index.js",
   "scripts": {
-    "build": "html-inline src/index.html | html-minifier > build/out.html && node compress.js",
-    "build-dev": "html-inline src/index.html > build/out.html && node compress.js"
+    "build": "mkdir build && html-inline src/index.html | html-minifier > build/out.html && node compress.js",
+    "build-dev": "mkdir build && html-inline src/index.html > build/out.html && node compress.js",
+    "serve-dev": "node ./dev/api/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,9 @@
     "@gfx/zopfli": "^1.0.15",
     "html-inline": "^1.2.0",
     "html-minifier": "^4.0.0"
+  },
+  "devDependencies": {
+    "colors": "1.4.0",
+    "express": "4.17.1"
   }
 }

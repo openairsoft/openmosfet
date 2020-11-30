@@ -5,204 +5,272 @@
     <link rel="icon" href="favicon.ico" />
     <meta charset="utf-8">
     <title>OpenMosfet</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <!-- custom styling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
-        .floatingNav {
-        box-shadow: 0px 1px 10px #999;
-        }
-        #nav-menu .nav {
-        display: flex;
-        justify-content: center;
+        #loader {
+            position: fixed;
+            z-index: 1000;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            opacity: 1;
+            transition: all .5s;
+            visibility: visible;
         }
 
-        .card-header[data-toggle="collapse"] {
-        cursor: pointer;
+        #loader.hide {
+            opacity: 0;
+            visibility: hidden;
         }
     </style>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 
+    <!-- PWA MANIFEST & ICON -->
 </head>
 
-<body class="bg-dark pt-4 text-light">
-    <form id="mainForm" action="/" method="POST">
-    </form>
-
-    <div id="mainContainer" class="container">
-        <div class="tab-content" id="pills-tabContent">
-            
-            <div id="panel-instructions">
-                instructions (todo)
+<body>
+    <div id="loader">
+        <svg class="icon" width="100" height="100">
+            <use xlink:href="#icon_loader"></use>
+        </svg>
+    </div>
+    <header>
+        <nav>
+            <div class="left">
+                <svg width="50" height="50">
+                    <use xlink:href="#logo"></use>
+                </svg>
+                <div class="title">
+                    <h1>OpenMosfet</h1>
+                    <h2 id="version"></h2>
+                </div>
             </div>
-            <div id="panel-preferences">
 
-                <div class="row">
+            <div class="right">
+                <div class="status">
+                    <svg class="icon" width="27" height="19">
+                        <use xlink:href="#wifi"></use>
+                    </svg>
+                    <svg class="icon" width="19" height="19">
+                        <use id="wifistatus" xlink:href="#circle"></use>
+                    </svg>
+                </div>
+                <button id="save" form="config" class="btn" type="submit">Sauvegarder la configuration</button>
+            </div>
+        </nav>
+    </header>
+    <section>
+        <form id="config" class="container">
+            <div id="UPDATE">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_update"></use>
+                    </svg>
+                    Mise à jour
+                </h3>
 
-                    <div class="form-group col-md-6">
-                        <label for="inputAppSsid">SSID Wifi</label>
-                        <input form="mainForm" type="text" class="form-control bg-dark text-light" id="inputAppSsid" name="appSsid"
-                            aria-describedby="inputAppSsidHelp">
-                        <small id="inputAppSsidHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
-                            caractères spéciaux.</small>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="inputAppPasswd">Mot de passe Wifi</label>
-                        <input form="mainForm" type="text" class="form-control bg-dark text-light" id="inputAppPasswd"
-                            name="appPasswd" aria-describedby="inputAppPasswdHelp">
-                        <small id="inputAppPasswdHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
-                            caractères spéciaux.</small>
-                    </div>
+                <h4 class="is_updateavailable">Une mise à jour est disponible (<span data="newversion"></span>)</h4>
+                <h4 class="is_uptodate">Votre OpenMosfet est à jour (<span data="newversion"></span>)</h4>
 
-                    <div class="form-group col-md-12">
-                        <!-- <label for="inputConnectToNetworkIfAvailable">Protection de la batterie</label><br> -->
-                        <div class="btn-group btn-group-toggle d-flex" role="group" id="inputConnectToNetworkIfAvailable"
-                            data-toggle="buttons">
-                            <label class="btn btn-outline-primary active align-middle w-100"
-                                data-toggle="collapse-show" data-target="#collapseConnectToNetworkIfAvailable">
-                                <input form="mainForm" type="radio" name="connectToNetworkIfAvailable" value="true">Utiliser un réseau connu si disponible
-                            </label>
-                            <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide"
-                                data-target="#collapseConnectToNetworkIfAvailable">
-                                <input form="mainForm" type="radio" name="connectToNetworkIfAvailable" value="false">Mode hotspot uniquement
-                            </label>
-                        </div>
-                    </div>
+                <a data="newversionurl" target="_blank">
+                    <span class="is_updateavailable">Voir les details de la mise à jour</span>
+                    <span class="is_uptodate">Voir les details de la mise à jour</span>
+                </a>
+                </p>
 
+                <button class="is_updateavailable" id="update" class="btn">TODO_UPDATE</button>
 
-                    <div class="col-md-12 collapse show" id="collapseConnectToNetworkIfAvailable">
-                        <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="inputAvailableNetworkAppSsid">SSID Wifi externe</label>
-                                <input form="mainForm" type="text" class="form-control bg-dark text-light" id="inputAvailableNetworkAppSsid" name="availableNetworkAppSsid"
-                                    aria-describedby="inputAvailableNetworkAppSsidHelp">
-                                <small id="inputAvailableNetworkAppSsidHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
-                                    caractères spéciaux.</small>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="inputAvailableNetworkAppPasswd">Mot de passe Wifi externe</label>
-                                <input form="mainForm" type="text" class="form-control bg-dark text-light" id="inputAvailableNetworkAppPasswd"
-                                    name="availableNetworkAppPasswd" aria-describedby="inputAvailableNetworkAppPasswdHelp">
-                                <small id="inputAvailableNetworkAppPasswdHelp" class="form-text text-muted">Entre 8 et 16 caratères, sans
-                                    caractères spéciaux.</small>
-                            </div>
-                        </div>
+            </div>
+            <div id="WIFI">
+                <h3>
+                    <svg>
+                        <use xlink:href="#wifi"></use>
+                    </svg>
+                    WIFI
+                </h3>
+
+                <h4>Hotspot</h4>
+
+                <div class="form-group">
+                    <div>
+                        <label for="appSsid">SSID</label>
+                        <input type="text" name="appSsid" minlength="8" maxlength="32">
                     </div>
 
-                    <!-- ------------------------ WIFI SHUTDOWN AND SLEEP MODE ------------------------ -->
+                    <div>
+                        <label for="appSsid">Mot de passe</label>
+                        <input type="text" name="appPasswd" minlength="8" maxlength="16">
+                    </div>
+                </div>
+                <p class="help">
+                    Si vous êtes connecté via le hotspot, cette page est accessible via
+                    <a href="http://openmosfet.local/">openmosfet.local</a>
+                </p>
 
-                    <div class="form-group col-md-6">
-                        <label for="inputWifiShutdownDelayMinutes">Coupure wifi</label>
+                <h4>Réseau connu</h4>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="connectToNetworkIfAvailable"> Utiliser un réseau connu
+                        si disponible</label>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="appSsid">SSID</label>
+                        <input type="text" name="availableNetworkAppSsid" minlength="8" maxlength="32">
+                    </div>
 
+                    <div>
+                        <label for="appSsid">Mot de passe</label>
+                        <input type="text" name="availableNetworkAppPasswd" minlength="8" maxlength="16">
+                    </div>
+                </div>
+                <p class="help">Si le réseau connu est disponible, le hotspot sera désactivé</p>
+            </div>
+            <div id="SLEEP">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_sleep"></use>
+                    </svg>
+                    Mise en veille
+                </h3>
+                <div class="form-group">
+                    <div>
+                        <label for="appSsid">Délais WIFI</label>
                         <div class="input-group">
-                            <input form="mainForm" type="number" min="0" step="1" id="inputWifiShutdownDelayMinutes" name="wifiShutdownDelayMinutes"
-                                class="form-control bg-dark text-light" aria-label="Recipient's username"
-                                aria-describedby="inputWifiShutdownDelayMinutesHelp">
-                            <div class="input-group-append">
-                                <span class="input-group-text bg-secondary text-light"
-                                    id="inputWifiShutdownDelayMinutes-unit">Minutes</span>
-                            </div>
+                            <input type="number" name="wifiShutdownDelayMinutes" step="1">
+                            <span>Minutes</span>
                         </div>
-
-                        <small id="inputWifiShutdownDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du wifi après inutilisation de l'interface.</small>
+                        <p class="help">Désactive les fonctionnalités wifi après un certain temps d’unutilisation de
+                            l’interface.</p>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="inputDeepSleepDelayMinutes">Coupure inactivité</label>
 
                         <div class="input-group">
-                            <input form="mainForm" type="number" min="0" step="1" id="inputDeepSleepDelayMinutes" name="deepSleepDelayMinutes"
-                                class="form-control bg-dark text-light" aria-label="Recipient's username"
-                                aria-describedby="inputDeepSleepDelayMinutesHelp">
-                            <div class="input-group-append">
-                                <span class="input-group-text bg-secondary text-light"
-                                    id="inputDeepSleepDelayMinutes-unit">Minutes</span>
-                            </div>
+                            <input type="number" name="deepSleepDelayMinutes" step="1">
+                            <span>Minutes</span>
                         </div>
-                        
-                        <small id="inputDeepSleepDelayMinutesHelp" class="form-text text-muted">Délais avant coupure du système après inactivité de la réplique.</small>
+                        <p class="help">Passe le système en mode veille après un certain temps d’inactivé de la réplique
+                        </p>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group col-md-12">
-                        <label for="autoUpdateFromGithub">Mise à jour depuis le web</label>
-                        <button id="autoUpdateFromGithub" type="submit" class="btn btn-primary btn-block" aria-describedby="autoUpdateFromGithubHelp">
-                            <span class="buttonText">Mise à jour</span>
-                            <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
-                        </button>
-                    </div>
-                    
+            <div id="BATTERY">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_battery"></use>
+                    </svg>
+                    Batterie
+                </h3>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="useBatteryProtection"> Activer la protection de la
+                        batterie</label>
+                </div>
 
-                    <div class="form-group col-md-12">
-                        <!-- <label for="inputUseBatteryProtection">Protection de la batterie</label><br> -->
-                        <div class="btn-group btn-group-toggle d-flex" role="group" id="inputUseBatteryProtection"
-                            data-toggle="buttons">
-                            <label class="btn btn-outline-primary active align-middle w-100"
-                                data-toggle="collapse-show" data-target="#collapseBatteryProtection">
-                                <input form="mainForm" type="radio" name="useBatteryProtection" value="true">activer la Protection
-                                de la batterie
-                            </label>
-                            <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide"
-                                data-target="#collapseBatteryProtection">
-                                <input form="mainForm" type="radio" name="useBatteryProtection" value="false">désactiver la
-                                protection de la batterie
-                            </label>
+                <h4>Voltages</h4>
+
+                <label for="batteryNominalVoltage">Nominal</label>
+                <div class="input-group">
+                    <input type="number" name="batteryNominalVoltage" step="0.01">
+                    <span>Volts</span>
+                </div>
+
+                <label for="batteryLowVoltage">Alerte</label>
+                <div class="input-group">
+                    <input type="number" name="batteryLowVoltage" step="0.01">
+                    <span>Volts</span>
+                </div>
+
+                <label for="batteryShutdownVoltage">Coupure automatique</label>
+                <div class="input-group">
+                    <input type="number" name="batteryShutdownVoltage" step="0.01">
+                    <span>Volts</span>
+                </div>
+
+            </div>
+            <div id="SHOOTMODE">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_shoot"></use>
+                    </svg>
+                    Modes de tir
+                </h3>
+
+                <div id="shootmode_container"></div>
+
+
+            </div>
+            <div id="AB">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_ab"></use>
+                    </svg>
+                    Active Breaking
+                </h3>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="useActiveBreaking"> Activer l’Active Breaking</label>
+                </div>
+                <p class="help">Envoie un courant inverse dans le moteur pour le freiner et stopper la rotation du
+                    moteur après le tire.</p>
+            </div>
+            </div>
+
+    </section>
+
+    <template id="shootmode_template">
+        <div>
+            <h4>Mode <span data="firemode_index"></span></h4>
+
+            <label for="batteryNominalVoltage">Mode de rafale</label>
+            <div class="button-group" data="burstMode">
+                <button class="btn" type="button">Interruptible</button>
+                <button class="btn" type="button">Normal</button>
+                <button class="btn" type="button">Extensible</button>
+            </div>
+
+            <div class="form-group form-group-3">
+                <div>
+                    <label for="appSsid">Nombres de coups</label>
+                    <input type="number" name="burstLength" min="0">
+                </div>
+            </div>
+
+            <div class="collapse">
+                <a>
+                    <svg>
+                        <use xlink:href="#icon_chevron"></use>
+                    </svg>
+                    Paramètres avancés
+                </a>
+                <div>
+                    <div class="form-group form-group-3">
+                        <div>
+                            <label for="appSsid">Délai minimum entre chaque coup</label>
+                            <div class="input-group">
+                                <input type="number" name="timeBetweenShots_ms" step="1" min="0">
+                                <span>Millisecondes</span>
+                            </div>
+                            <p class="help">Limite la cadence ou pour une réplique DMR (n’affecte pas la réactivité du tir)</p>
                         </div>
-                    </div>
-
-
-                    <div class="form-group col-md-12 collapse show" id="collapseBatteryProtection">
-
-                        <label for="inputBatteryNominalVoltage">Voltage batterie</label>
-
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-secondary text-light">nominal</span>
+                        <div>
+                            <label for="appSsid">Durée de précocking</label>
+                            <div class="input-group">
+                                <input type="number" name="precockDuration_ms" step="1" min="0">
+                                <span>Millisecondes</span>
                             </div>
-                            <input form="mainForm" type="text" id="inputBatteryNominalVoltage" name="batteryNominalVoltage"
-                                class="form-control bg-dark text-light" aria-label="Recipient's username"
-                                aria-describedby="inputBatteryNominalVoltage-unit">
-                            <div class="input-group-append">
-                                <span class="input-group-text bg-secondary text-light"
-                                    id="inputBatteryNominalVoltage-unit">Volts</span>
-                            </div>
+                            <p class="help">0 = pas de précocking</p>
                         </div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-secondary text-light">alerte</span>
+                        <div>
+                            <label for="appSsid">Puissance du moteur</label>
+                            <div class="input-group">
+                                <input type="number" name="motorPower" step="1" min="1" max="100">
+                                <span>%</span>
                             </div>
-                            <input form="mainForm" type="text" id="inputBatteryLowVoltage" name="batteryLowVoltage"
-                                class="form-control bg-dark text-light" aria-label="Recipient's username"
-                                aria-describedby="inputBatteryLowVoltage-unit">
-                            <div class="input-group-append">
-                                <span class="input-group-text bg-secondary text-light"
-                                    id="inputBatteryLowVoltage-unit">Volts</span>
-                            </div>
-                        </div>
-                        
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-secondary text-light">coupure</span>
-                            </div>
-                            <input form="mainForm" type="text" id="inputBatteryShutdownVoltage" name="batteryShutdownVoltage"
-                                class="form-control bg-dark text-light" aria-label="Recipient's username"
-                                aria-describedby="inputBatteryShutdownVoltage-unit">
-                            <div class="input-group-append">
-                                <span class="input-group-text bg-secondary text-light"
-                                    id="inputBatteryShutdownVoltage-unit">Volts</span>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group col-md-12">
-                        <!-- <label for="inputUseActiveBreaking">Active breaking</label><br> -->
-                        <div class="btn-group btn-group-toggle d-flex" role="group" id="inputUseActiveBreaking"
-                            data-toggle="buttons">
-                            <label class="btn btn-outline-primary active align-middle w-100"
-                                data-toggle="collapse-show">
-                                <input form="mainForm" type="radio" name="useActiveBreaking" value="true">active breaking actif
-                            </label>
-                            <label class="btn btn-outline-danger align-middle w-100" data-toggle="collapse-hide">
-                                <input form="mainForm" type="radio" name="useActiveBreaking" value="false">active breaking inactif
-                            </label>
+                            <p class="help">Peut affecter la réactivité</p>
                         </div>
                     </div>
                     
@@ -214,27 +282,100 @@
                         </form>
                     </div>
                 </div>
-
-            </div>
-            <div id="panel-firemodes">
             </div>
         </div>
-    </div>
-    <div id="saveContainer" class="container-fluid fixed-bottom bg-dark text-light">
-        <div class="container text-center">
-            <div class="row">
-                <div class="form-group col-md-12">
-                    <button form="mainForm" id="mainSubmit" type="submit" class="btn mt-3 btn-primary btn-block">
-                        <span class="buttonText">Enregistrer</span>
-                        <span class="spinner-border spinner-border-sm" style="display: none;" role="status"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/bootstrap-native.min.js"></script>
-    <script src="js/script.js"></script>
+    </template>
+    <script src="js/main.js"></script>
 </body>
+<div hidden>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="wifi" viewBox="0 0 27.143 19">
+            <title>wifi</title>
+            <path
+                d="M26.928,37.211a19.719,19.719,0,0,0-26.711,0,.674.674,0,0,0-.015.975l1.452,1.441a.689.689,0,0,0,.95.016,16.272,16.272,0,0,1,21.937,0,.689.689,0,0,0,.95-.016l1.452-1.441a.674.674,0,0,0-.015-.975Zm-13.356,8.36a2.714,2.714,0,1,0,2.714,2.714A2.714,2.714,0,0,0,13.572,45.571Zm8.6-3.545a13.02,13.02,0,0,0-17.191,0,.67.67,0,0,0-.024.982L6.413,44.45a.692.692,0,0,0,.935.034,9.552,9.552,0,0,1,12.447,0,.692.692,0,0,0,.935-.034l1.461-1.442A.67.67,0,0,0,22.168,42.026Z"
+                transform="translate(-0.001 -32)" />
+        </symbol>
+
+        <symbol id="circle" viewBox="0 0 19 19">
+            <title>circle</title>
+            <circle cx="9.5" cy="9.5" r="9.5" />
+        </symbol>
+
+        <symbol id="icon_loader" viewBox="0 0 100 100">
+            <title>loader</title>
+            <path d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="0 50 50"
+                    to="360 50 50" repeatCount="indefinite" />
+            </path>
+        </symbol>
+
+        <symbol id="logo" viewBox="0 0 512 512">
+            <title>OpenMosfet</title>
+            <style type="text/css">
+                .st0 {
+                    stroke: #000000;
+                    stroke-width: 17px;
+                }
+            </style>
+            <path d="M368,0H144c-26.5,0-48,21.5-48,48v416c0,26.5,21.5,48,48,48h224c26.5,0,48-21.5,48-48V48C416,21.5,394.5,0,368,0z M384,464
+                c0,8.8-7.2,16-16,16H144c-8.8,0-16-7.2-16-16V48c0-8.8,7.2-16,16-16h224c8.8,0,16,7.2,16,16V464z M512,106v12c0,3.3-2.7,6-6,6h-18v6
+                c0,3.3-2.7,6-6,6h-42V88h42c3.3,0,6,2.7,6,6v6h18C509.3,100,512,102.7,512,106z M512,202v12c0,3.3-2.7,6-6,6h-18v6c0,3.3-2.7,6-6,6
+                h-42v-48h42c3.3,0,6,2.7,6,6v6h18C509.3,196,512,198.7,512,202z M512,298v12c0,3.3-2.7,6-6,6h-18v6c0,3.3-2.7,6-6,6h-42v-48h42
+                c3.3,0,6,2.7,6,6v6h18C509.3,292,512,294.7,512,298z M512,394v12c0,3.3-2.7,6-6,6h-18v6c0,3.3-2.7,6-6,6h-42v-48h42c3.3,0,6,2.7,6,6
+                v6h18C509.3,388,512,390.7,512,394z M30,376h42v48H30c-3.3,0-6-2.7-6-6v-6H6c-3.3,0-6-2.7-6-6v-12c0-3.3,2.7-6,6-6h18v-6
+                C24,378.7,26.7,376,30,376z M30,280h42v48H30c-3.3,0-6-2.7-6-6v-6H6c-3.3,0-6-2.7-6-6v-12c0-3.3,2.7-6,6-6h18v-6
+                C24,282.7,26.7,280,30,280z M30,184h42v48H30c-3.3,0-6-2.7-6-6v-6H6c-3.3,0-6-2.7-6-6v-12c0-3.3,2.7-6,6-6h18v-6
+                C24,186.7,26.7,184,30,184z M30,88h42v48H30c-3.3,0-6-2.7-6-6v-6H6c-3.3,0-6-2.7-6-6v-12c0-3.3,2.7-6,6-6h18v-6
+                C24,90.7,26.7,88,30,88z" />
+            <path class="st0"
+                d="M147.5,260.7c1-59.4,42.6-101.8,93.6-108.6c60.8-8.1,111.9,33.2,121.7,88c9.3,52-19.3,100.7-66.4,119.9
+                c-4.1,1.7-6.3,0.7-7.9-3.4c-7.8-20.3-15.6-40.6-23.4-60.8c-1.4-3.5-0.4-5.8,3.1-7.4c10.6-4.8,17.2-12.9,19-24.4
+                c2.7-17.1-9-33.1-26.1-35.7c-0.7-0.1-1.4-0.2-2.1-0.3c-17.1-1.5-31.4,10.4-33.9,26.1c-2.3,14.4,4.9,27.9,18.3,34
+                c4.2,1.9,5,3.8,3.4,8.1c-7.8,20.4-15.7,40.8-23.5,61.2c-1.1,3-3.6,4.1-6.8,2.8c-23-8.9-44.4-26.7-57.3-52.1
+                C148.3,286.8,148.2,269.9,147.5,260.7L147.5,260.7z M156.6,259.9c0.2,2.9,0.3,6.3,0.6,9.7c2.8,31.5,21.7,62.8,57.3,80.2
+                c1.4,0.7,1.9,0.4,2.5-1c6.5-17.1,13.1-34.2,19.7-51.3c0.6-1.4,0.3-2.1-1.1-2.9c-13.8-8.7-20.7-21.2-20-37.6
+                c0.4-9.5,4.1-17.7,10.4-24.6c13.1-14.3,33.7-17.4,50.6-7.7c13.9,8,21.7,23.6,19.8,39.6c-1.6,13.4-8.4,23.6-20,30.6
+                c-1.2,0.7-1.5,1.3-1,2.6c6.7,17.2,13.2,34.3,19.8,51.5c0.5,1.4,1.1,1.7,2.5,1c15.5-7.3,28.5-17.6,38.6-31.5
+                c15.2-21.1,21.5-44.6,18.5-70.5c-6-51.4-52.3-94-111.8-86.7C196.5,166.7,157.4,205.9,156.6,259.9L156.6,259.9z" />
+        </symbol>
+
+        <symbol id="icon_update" viewBox="0 0 24 24">
+            <path
+                d="M25.551,14.062a8.131,8.131,0,0,0-13.435,3.947.582.582,0,0,1-.564.443H8.779a.58.58,0,0,1-.571-.686,12,12,0,0,1,20.082-6.442L30.018,9.6A1.161,1.161,0,0,1,32,10.417V16.9a1.161,1.161,0,0,1-1.161,1.161H24.352a1.161,1.161,0,0,1-.821-1.982ZM9.161,21.935h6.487a1.161,1.161,0,0,1,.821,1.982l-2.02,2.02a8.131,8.131,0,0,0,13.435-3.947.582.582,0,0,1,.564-.443h2.773a.58.58,0,0,1,.571.686,12,12,0,0,1-20.082,6.442L9.982,30.4A1.161,1.161,0,0,1,8,29.583V23.1A1.161,1.161,0,0,1,9.161,21.935Z"
+                transform="translate(-8 -8)" />
+        </symbol>
+
+        <symbol id="icon_sleep" viewBox="0 0 24 24">
+            <path
+                d="M32,19.977a12,12,0,0,1-19.531,9.366,1.16,1.16,0,0,1-.089-1.723l.545-.545a1.163,1.163,0,0,1,1.543-.1A8.9,8.9,0,1,0,13.9,13.513l2.456,2.456a.774.774,0,0,1-.547,1.322H8.774A.774.774,0,0,1,8,16.516V9.482a.774.774,0,0,1,1.322-.547l2.389,2.389A12,12,0,0,1,32,19.977Zm-8.754,3.812.475-.611a1.161,1.161,0,0,0-.2-1.63l-1.969-1.532V14.968a1.161,1.161,0,0,0-1.161-1.161h-.774a1.161,1.161,0,0,0-1.161,1.161v6.564l3.165,2.462A1.161,1.161,0,0,0,23.246,23.789Z"
+                transform="translate(-8 -8)" />
+        </symbol>
+
+        <symbol id="icon_shoot" viewBox="0 0 24 24">
+            <path
+                d="M14.76,12.391l.8,2.4-4.383,4.383a1.161,1.161,0,1,0,1.642,1.642L17.2,16.438l2.4.8A1,1,0,0,0,20.627,17l3.081-3.081a1,1,0,0,0-.389-1.647l-2.693-.9-.9-2.693a1,1,0,0,0-1.647-.389L15,11.373a1,1,0,0,0-.24,1.018ZM12,14.968a5.007,5.007,0,0,1,1.078.123l.713-.713-.5-1.5c-.012-.035-.01-.071-.02-.107a7.462,7.462,0,1,0,5.955,5.952c-.035-.01-.072-.006-.106-.017l-1.5-.5-.713.713A5.029,5.029,0,1,1,12,14.968Zm11.44,1.408-1.718,1.718a2.508,2.508,0,0,1-.209.172,9.719,9.719,0,1,1-7.767-7.777,2.568,2.568,0,0,1,.16-.211l1.718-1.718a12,12,0,1,0,7.816,7.816Z"
+                transform="translate(0 -8)" />
+        </symbol>
+
+        <symbol id="icon_ab" viewBox="0 0 33.574 23.502">
+            <path
+                d="M5.036-851.249A11.751,11.751,0,0,1,16.787-863a11.752,11.752,0,0,1,11.751,11.751A11.75,11.75,0,0,1,16.787-839.5,11.749,11.749,0,0,1,5.036-851.249Zm2.518,0a9.242,9.242,0,0,0,9.232,9.232,9.243,9.243,0,0,0,9.233-9.232,9.243,9.243,0,0,0-9.233-9.233A9.243,9.243,0,0,0,7.555-851.249Zm21.275,10.4-.637-.551a.831.831,0,0,1-.1-1.147,14.272,14.272,0,0,0,2.962-8.706,14.264,14.264,0,0,0-2.963-8.7.833.833,0,0,1,.1-1.148l.637-.551a.846.846,0,0,1,1.215.1,16.785,16.785,0,0,1,3.529,10.3,16.787,16.787,0,0,1-3.528,10.3.821.821,0,0,1-.653.313A.86.86,0,0,1,28.83-840.846Zm-25.369-.194A16.8,16.8,0,0,1,0-851.249a16.792,16.792,0,0,1,3.461-10.211.846.846,0,0,1,1.214-.112l.64.546a.832.832,0,0,1,.107,1.147,14.271,14.271,0,0,0-2.9,8.63,14.278,14.278,0,0,0,2.9,8.63.833.833,0,0,1-.107,1.147l-.64.546a.86.86,0,0,1-.558.2A.821.821,0,0,1,3.461-841.039ZM17.159-848v-6.442h2.576a7.492,7.492,0,0,1,1.14.063,1.686,1.686,0,0,1,.672.266,1.657,1.657,0,0,1,.494.538,1.453,1.453,0,0,1,.2.753,1.5,1.5,0,0,1-.244.831,1.515,1.515,0,0,1-.661.567,1.7,1.7,0,0,1,.905.585,1.55,1.55,0,0,1,.316.971,1.9,1.9,0,0,1-.2.854,1.719,1.719,0,0,1-.558.664,1.839,1.839,0,0,1-.872.305q-.325.035-1.569.044Zm1.3-1.085h1.2a5.926,5.926,0,0,0,.893-.04.808.808,0,0,0,.472-.257.791.791,0,0,0,.182-.547.842.842,0,0,0-.14-.492.8.8,0,0,0-.407-.294,4.437,4.437,0,0,0-1.153-.092H18.46Zm0-2.8h.852q.76,0,.945-.022a.862.862,0,0,0,.525-.23.68.68,0,0,0,.191-.5.706.706,0,0,0-.165-.485.749.749,0,0,0-.49-.227q-.193-.022-1.112-.022H18.46ZM15.049-848l-.562-1.463H11.911L11.38-848H10l2.509-6.442h1.376L16.465-848Zm-2.738-2.549H14.07l-.888-2.39Z"
+                transform="translate(0 863)" />
+        </symbol>
+
+        <symbol id="icon_battery" viewBox="0 0 35.286 17.643">
+            <path
+                d="M29.993,99.529v3.529h1.764v3.529H29.993v3.529H3.529V99.529H29.993M30.875,96H2.646A2.646,2.646,0,0,0,0,98.646V111a2.646,2.646,0,0,0,2.646,2.646H30.875A2.646,2.646,0,0,0,33.521,111v-.882h.441a1.323,1.323,0,0,0,1.323-1.323v-7.939a1.323,1.323,0,0,0-1.323-1.323h-.441v-.882A2.646,2.646,0,0,0,30.875,96Zm-7.939,5.293H5.293v7.057H22.936Z"
+                transform="translate(0 -96)" />
+        </symbol>
+
+        <symbol id="icon_chevron" viewBox="0 0 6.473 10.924">
+            <path
+                d="M33.8,43.544l-4.747,4.862a.576.576,0,0,1-.829,0l-.554-.567a.611.611,0,0,1,0-.848l3.762-3.871-3.762-3.871a.611.611,0,0,1,0-.848l.554-.567a.576.576,0,0,1,.829,0L33.8,42.695A.611.611,0,0,1,33.8,43.544Z"
+                transform="translate(-27.494 -37.657)" />
+        </symbol>
+
+    </svg>
+</div>
 
 </html>

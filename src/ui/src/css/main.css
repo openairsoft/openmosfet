@@ -1,0 +1,322 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #F7F7F7;
+  color: #000000;
+}
+
+a,
+a:link,
+a:visited,
+a:hover {
+  text-decoration: underline;
+  color: #000000;
+  cursor: pointer;
+}
+
+header {
+  width: 100vw;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.3);
+  z-index: 900;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3em;
+  max-width: 1640px;
+  width: 90%;
+}
+
+nav .left,
+nav .right {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+nav div.left svg {
+  height: 50px;
+  margin-right: 1em;
+}
+
+nav .title {
+  text-align: right;
+}
+
+nav .left .title * {
+  margin: 0;
+}
+
+nav .title h2 {
+  font-size: 1em;
+  color: gray;
+}
+
+.status {
+  margin-right: 2em;
+}
+.btn {
+  border: 1px solid black;
+  border-radius: 10px;
+  background-color: transparent;
+  color: black;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all .25s;
+}
+
+.btn:focus{
+  outline: 0;
+}
+
+#save:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+section {
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+}
+
+section .container {
+  max-width: 1640px;
+  width: 90%;
+  padding: 16px 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: 16px;
+
+}
+
+
+
+section .container>div {
+  background-color: #ffffff;
+  position: relative;
+  box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.3);
+  padding: 28px;
+  border-radius: 20px;
+}
+
+section .container h3 {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  font-size: 21px;
+}
+
+section .container h3 svg {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+#AB h3 svg {
+  width: 34px;
+}
+
+#BATTERY h3 svg {
+  width: 35px;
+  height: 18px;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Chrome */
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Opéra*/
+input::-o-inner-spin-button,
+input::-o-outer-spin-button {
+  -o-appearance: none;
+  margin: 0
+}
+
+input:not([type=checkbox]):not([type=radio]) {
+  width: 100%;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  background-color: transparent;
+  color: black;
+  font-size: 16px;
+  padding: 15px;
+  transition: all .25s;
+  box-sizing: border-box;
+  margin-bottom: 1em;
+}
+
+input:not([type=checkbox]):not([type=radio]):focus{
+  outline: 0;
+}
+
+label+input,
+label+.input-group,
+label+.button-group {
+  margin-top: 6px;
+}
+
+.checkbox {
+  margin-bottom: 1em;
+}
+
+.help {
+  font-style: italic;
+  /* text-align: justify; */
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 1em;
+}
+
+.form-group input:not([type=checkbox]):not([type=radio]) {
+  margin-bottom: 0;
+}
+
+.form-group+.help {
+  margin-top: -.5em;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+}
+
+.input-group input:not([type=checkbox]):not([type=radio]) {
+  margin-bottom: 0;
+}
+
+.input-group span {
+  position: absolute;
+  right: 15px;
+  font-weight: bold;
+}
+
+.button-group {
+  display: grid;
+  margin-bottom: 1em;
+  grid-template-columns: repeat( auto-fit, minmax(0, 1fr));
+}
+
+.button-group button:first-child {
+  margin-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.button-group button:not(:first-child):not(:last-child) {
+  margin-right: 0;
+  margin-left: 0;
+  border-radius: 0;
+}
+
+.button-group button:last-child {
+  margin-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.button-group button.btn.active {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.is_updateavailable,
+.is_uptodate {
+  display: none;
+}
+
+.collapse {
+  overflow: hidden;
+  margin-bottom: 1em;
+}
+
+.collapse > a, .collapse > a:hover, .collapse > a:active{
+  text-decoration: none;
+
+}
+
+.collapse > a svg{
+  width: 6px;
+  height: 11px;
+}
+
+.collapse > div{
+  max-height: 0px;
+  transition: all 0.25s;
+  padding-top: 1em;
+}
+
+
+@media (min-width: 992px) {
+  section .container {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto auto;
+    grid-template-areas:
+      "WIFI WIFI WIFI UPDATE UPDATE UPDATE"
+      "WIFI WIFI WIFI SLEEP SLEEP SLEEP"
+      "BATTERY BATTERY SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE"
+      "AB AB SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE"
+      ". . SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE";
+  }
+
+
+  #WIFI {
+    grid-area: WIFI;
+  }
+
+  #SLEEP {
+    grid-area: SLEEP;
+  }
+
+  #UPDATE {
+    grid-area: UPDATE;
+  }
+
+  #BATTERY {
+    grid-area: BATTERY;
+  }
+
+  #SHOOTMODE {
+    grid-area: SHOOTMODE;
+    margin-bottom: 16px;
+  }
+
+  #AB {
+    grid-area: AB;
+  }
+
+
+  .form-group {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .form-group-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
