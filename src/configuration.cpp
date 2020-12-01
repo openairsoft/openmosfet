@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "utilities.h"
 
-const int capacity = JSON_ARRAY_SIZE(OM_MAX_NB_STORED_MODES) + OM_MAX_NB_STORED_MODES*JSON_OBJECT_SIZE(5) + JSON_OBJECT_SIZE(13) + 535 + 2000;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
+const int capacity = OM_JSON_DOCUMENT_SIZE;//see https://arduinojson.org/v6/assistant/ with a cfg file with maximum allowed size 
 //StaticJsonDocument<capacity> doc;
 
 
@@ -20,6 +20,8 @@ float OMConfiguration::batteryNominalVoltage = OM_DEFAULT_NOMINAL_VOLTAGE;
 float OMConfiguration::batteryLowVoltage = OM_DEFAULT_LOW_VOLTAGE;
 float OMConfiguration::batteryShutdownVoltage = OM_DEFAULT_SHUTDOWN_VOLTAGE;
 boolean OMConfiguration::useActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
+float OMConfiguration::decockAfter_s = OM_DEFAULT_DECOCK_AFTER_SECONDS;
+boolean OMConfiguration::enablePrecocking = OM_DEFAULT_ENABLE_PRECOCKING;
 
 void OMConfiguration::loadFromJson(Stream &stream){
   DynamicJsonDocument doc(capacity);
@@ -43,33 +45,19 @@ void OMConfiguration::loadFromJson(Stream &stream){
   OMConfiguration::batteryLowVoltage = doc["batteryLowVoltage"];
   OMConfiguration::batteryShutdownVoltage = doc["batteryShutdownVoltage"];
   OMConfiguration::useActiveBreaking = doc["useActiveBreaking"];
+  OMConfiguration::decockAfter_s = doc["decockAfter_s"];
+  OMConfiguration::enablePrecocking = doc["enablePrecocking"];
   
   int i = 0;
   for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
     JsonObject currentFireMode = doc["fireModes"][i];
-    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
-    OMFiringSettings::BurstMode currentBurstMode;
-    
-    switch((int)currentFireMode["burstMode"])
-    {
-      case 0 :
-        currentBurstMode = OMFiringSettings::burstModeNormal;
-      break;
 
-      case 1 :
-        currentBurstMode = OMFiringSettings::burstModeInterruptible;
-      break;
-      
-      case 2 :
-      default :
-        currentBurstMode = OMFiringSettings::burstModeExtendible;
-      break;
-    }
-    uint8_t currentBurstLength = (uint8_t)currentFireMode["burstLength"];
-    unsigned int currentPrecockDuration = (unsigned int)currentFireMode["precockDuration_ms"];
-    uint8_t currentMotorPower = (uint8_t)currentFireMode["motorPower"];
-    unsigned int currentTimeBetweenShots = (unsigned int)currentFireMode["timeBetweenShots_ms"];
+    OMFiringSettings::BurstMode currentBurstMode =  currentFireMode["burstMode"].as<OMFiringSettings::BurstMode>();
+    uint8_t currentBurstLength = currentFireMode["burstLength"].as<uint8_t>();
+    unsigned int currentPrecockDuration = currentFireMode["precockDuration_ms"].as<unsigned int>();
+    float currentMotorPower = currentFireMode["motorPower"].as<float>();
+    unsigned int currentTimeBetweenShots = currentFireMode["timeBetweenShots_ms"].as<unsigned int>();
     
     OMConfiguration::fireModes[i] = OMFiringSettings(currentBurstMode, currentBurstLength, currentPrecockDuration, currentMotorPower, currentTimeBetweenShots);
   }
@@ -103,11 +91,7 @@ boolean OMConfiguration::load(void){
   return true;
 }
 
-
-boolean OMConfiguration::save(void){
-  #ifdef DEBUG
-    Serial.println(F("Saving config"));
-  #endif
+DynamicJsonDocument OMConfiguration::toJson(){
   DynamicJsonDocument doc(capacity);
   
   doc["appSsid"] = OMConfiguration::appSsid;
@@ -122,35 +106,35 @@ boolean OMConfiguration::save(void){
   doc["batteryLowVoltage"] = OMConfiguration::batteryLowVoltage;
   doc["batteryShutdownVoltage"] = OMConfiguration::batteryShutdownVoltage;
   doc["useActiveBreaking"] = OMConfiguration::useActiveBreaking;
+  doc["decockAfter_s"] = OMConfiguration::decockAfter_s;
+  doc["enablePrecocking"] = OMConfiguration::enablePrecocking;
   
   JsonArray fireModes = doc.createNestedArray("fireModes");
   
   int i = 0;
   for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
-    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+    //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
     JsonObject currentFireMode = fireModes.createNestedObject();
     
-    switch(OMConfiguration::fireModes[i].getBurstMode())
-    {
-      case OMFiringSettings::burstModeNormal :
-        currentFireMode["burstMode"] = 0;
-      break;
-
-      case OMFiringSettings::burstModeInterruptible :
-        currentFireMode["burstMode"] = 1;
-      break;
-      
-      case OMFiringSettings::burstModeExtendible :
-        currentFireMode["burstMode"] = 2;
-      break;
-    }
+    currentFireMode["burstMode"] = OMConfiguration::fireModes[i].getBurstMode();
     currentFireMode["burstLength"] = OMConfiguration::fireModes[i].getBurstLength();
     currentFireMode["precockDuration_ms"] = OMConfiguration::fireModes[i].getPrecockDurationMs();
     currentFireMode["motorPower"] = OMConfiguration::fireModes[i].getMotorPower();
     currentFireMode["timeBetweenShots_ms"] = OMConfiguration::fireModes[i].getTimeBetweenShotsMs();
   }
+
+  return doc;
+}
+
+boolean OMConfiguration::save(void){
+
+  #ifdef DEBUG
+    Serial.println(F("Saving config"));
+  #endif
   
+  DynamicJsonDocument doc = OMConfiguration::toJson();
+
   #ifdef DEBUG
   Serial.println("JSON SAUVE");
   serializeJson(doc, Serial);
@@ -175,56 +159,45 @@ boolean OMConfiguration::save(void){
     int i = 0;
     for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
     {
-      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
+      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
       Serial.print(F("fireMode"));
-      Serial.print(i);
-      Serial.print(F("="));
-      switch(OMConfiguration::fireModes[i].getBurstMode())
-      {
-        case OMFiringSettings::burstModeNormal :
-          Serial.print(F("0,"));
-        break;
-  
-        case OMFiringSettings::burstModeInterruptible :
-          Serial.print(F("1,"));
-        break;
-        
-        case OMFiringSettings::burstModeExtendible :
-          Serial.print(F("2,"));
-        break;
-      }
-      Serial.print(OMConfiguration::fireModes[i].getBurstLength());
-      Serial.print(F(","));
-      Serial.print(OMConfiguration::fireModes[i].getPrecockDurationMs());
-      Serial.print(F(","));
-      Serial.print(OMConfiguration::fireModes[i].getMotorPower());
-      Serial.print(F(","));
-      Serial.println(OMConfiguration::fireModes[i].getTimeBetweenShotsMs());
+      Serial.printf(
+        "%i,%i,%i,%f,%i",
+        OMConfiguration::fireModes[i].getBurstMode(),
+        OMConfiguration::fireModes[i].getBurstLength(),
+        OMConfiguration::fireModes[i].getPrecockDurationMs(),
+        OMConfiguration::fireModes[i].getMotorPower(),
+        OMConfiguration::fireModes[i].getTimeBetweenShotsMs()
+        );
     }
-    Serial.print(F("appSsid="));
+    Serial.print("appSsid=");
     Serial.println(OMConfiguration::appSsid);
-    Serial.print(F("appPasswd="));
+    Serial.print("appPasswd=");
     Serial.println(OMConfiguration::appPasswd);
-    Serial.print(F("connectToNetworkIfAvailable="));
+    Serial.print("connectToNetworkIfAvailable=");
     Serial.println(OMConfiguration::connectToNetworkIfAvailable);
-    Serial.print(F("availableNetworkAppSsid="));
+    Serial.print("availableNetworkAppSsid=");
     Serial.println(OMConfiguration::availableNetworkAppSsid);
-    Serial.print(F("availableNetworkAppPasswd="));
+    Serial.print("availableNetworkAppPasswd=");
     Serial.println(OMConfiguration::availableNetworkAppPasswd);
-    Serial.print(F("useBatteryProtection="));
+    Serial.print("useBatteryProtection=");
     Serial.println(OMConfiguration::useBatteryProtection);
-    Serial.print(F("wifiShutdownDelayMinutes="));
+    Serial.print("wifiShutdownDelayMinutes=");
     Serial.println(OMConfiguration::wifiShutdownDelayMinutes);
-    Serial.print(F("deepSleepDelayMinutes="));
+    Serial.print("deepSleepDelayMinutes=");
     Serial.println(OMConfiguration::deepSleepDelayMinutes);
-    Serial.print(F("batteryNominalVoltage="));
+    Serial.print("batteryNominalVoltage=");
     Serial.println(OMConfiguration::batteryNominalVoltage);
-    Serial.print(F("batteryLowVoltage="));
+    Serial.print("batteryLowVoltage=");
     Serial.println(OMConfiguration::batteryLowVoltage);
-    Serial.print(F("batteryShutdownVoltage="));
+    Serial.print("batteryShutdownVoltage=");
     Serial.println(OMConfiguration::batteryShutdownVoltage);
-    Serial.print(F("useActiveBreaking="));
+    Serial.print("useActiveBreaking=");
     Serial.println(OMConfiguration::useActiveBreaking);
+    Serial.print("decockAfter_s=");
+    Serial.println(OMConfiguration::decockAfter_s);
+    Serial.print("enablePrecocking=");
+    Serial.println(OMConfiguration::enablePrecocking);
     
     Serial.println(" ");
     Serial.println("---------------");

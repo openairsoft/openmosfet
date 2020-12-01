@@ -10,236 +10,144 @@ class OMVirtualReplica;
 class OMVirtualSelector;
 
 //----------------------------- FIRING SETTINGS -----------------------------
+
 class OMFiringSettings
 {
-  public:
-  
-    enum BurstMode
-    {
-      burstModeNormal,
-      burstModeInterruptible,
-      burstModeExtendible,
-    };
+public:
+  enum BurstMode
+  {
+    burstModeInterruptible,
+    burstModeNormal,
+    burstModeExtendible,
+  };
 
-    OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, uint8_t motorPower, unsigned int timeBetweenShots_ms)
-    :_burstMode(burstMode),_burstLength(burstLength),_precockDuration_ms(_precockDuration_ms),_motorPower(motorPower),_timeBetweenShots_ms(timeBetweenShots_ms)
-    {};
+  OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
+      : _burstMode(burstMode), _burstLength(burstLength), _precockDuration_ms(_precockDuration_ms), _motorPower(motorPower), _timeBetweenShots_ms(timeBetweenShots_ms){};
 
-    OMFiringSettings()
-    :OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0)//Note those are kind of arbitrary default values
-    {};
+  OMFiringSettings()
+      : OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0) //Note those are kind of arbitrary default values
+        {};
 
-    OMFiringSettings::BurstMode getBurstMode(){ return this->_burstMode; }
-    uint8_t getBurstLength(){ return this->_burstLength; }
-    unsigned int getPrecockDurationMs(){ return this->_precockDuration_ms; }
-    uint8_t getMotorPower(){ return this->_motorPower; }
-    unsigned int getTimeBetweenShotsMs(){ return this->_timeBetweenShots_ms; }
+  OMFiringSettings::BurstMode getBurstMode() { return this->_burstMode; }
+  uint8_t getBurstLength() { return this->_burstLength; }
+  unsigned int getPrecockDurationMs() { return this->_precockDuration_ms; }
+  float getMotorPower() { return this->_motorPower; }
+  unsigned int getTimeBetweenShotsMs() { return this->_timeBetweenShots_ms; }
 
-    void setBurstMode(OMFiringSettings::BurstMode burstMode){this->_burstMode = burstMode;}
-    void setBurstLength(uint8_t burstLength){this->_burstLength = burstLength;}
-    void setPrecockDuration_ms(unsigned int precockDuration_ms){this->_precockDuration_ms = precockDuration_ms;}
-    void setMotorPower(uint8_t motorPower){this->_motorPower = motorPower;}
-    void setTimeBetweenShots_ms(unsigned int timeBetweenShots_ms){this->_timeBetweenShots_ms = timeBetweenShots_ms;}
-    
-  private:
-    OMFiringSettings::BurstMode _burstMode;
-    uint8_t _burstLength;
-    unsigned int _precockDuration_ms;
-    uint8_t _motorPower;
-    unsigned int _timeBetweenShots_ms;
+  void setBurstMode(OMFiringSettings::BurstMode burstMode) { this->_burstMode = burstMode; }
+  void setBurstLength(uint8_t burstLength) { this->_burstLength = burstLength; }
+  void setPrecockDuration_ms(unsigned int precockDuration_ms) { this->_precockDuration_ms = precockDuration_ms; }
+  void setMotorPower(float motorPower) { this->_motorPower = motorPower; }
+  void setTimeBetweenShots_ms(unsigned int timeBetweenShots_ms) { this->_timeBetweenShots_ms = timeBetweenShots_ms; }
 
-    
+private:
+  OMFiringSettings::BurstMode _burstMode;
+  uint8_t _burstLength;
+  unsigned int _precockDuration_ms;
+  float _motorPower;
+  unsigned int _timeBetweenShots_ms;
+  float _decockAfter_s;
 };
 
 //----------------------------- TRIGGER -------------------------------------
 
-
-
-
 class OMVirtualTrigger
 {
-  public:
-    enum TriggerState
-    {
-      stateReleased,
-      statePulled,
-    };
+public:
+  enum TriggerState
+  {
+    stateReleased,
+    statePulled
+  };
+  static void pull(void);
+  static void release(void);
+  static OMVirtualTrigger::TriggerState getState(void) { return OMVirtualTrigger::_state; }
 
-  private:    
-    OMVirtualReplica *_replica;
-    OMVirtualTrigger::TriggerState _state;
-    
-  public:
-    OMVirtualTrigger(OMVirtualReplica *replica)
-    :_replica(replica),_state(OMVirtualTrigger::stateReleased)
-    {};
-    
-    void pull(void);
-    
-    void release(void);
-    
-    OMVirtualTrigger::TriggerState getState(void){ return this->_state; }
-
-
-    
+private:
+  static OMVirtualTrigger::TriggerState _state;
 };
-
-
-
 
 //----------------------------- GEARBOX -------------------------------------
 
-
-
-
 class OMVirtualGearbox
 {
-  public:
-    enum GearboxState
-    {
-      stateResting,
-      statePrecocked,
-      stateCycling,
-    };
+public:
+  enum GearboxState
+  {
+    stateResting,
+    statePrecocked,
+    stateCycling,
+  };
 
-    enum GearboxCycleState
-    {
-      stateCocking,
-      statePrecocking,
-    };
+  enum GearboxCycleState
+  {
+    stateCocking,
+    statePrecocking,
+  };
+  static void cycle(unsigned int precockDuration_ms);
+  static OMVirtualGearbox::GearboxState getState(void) { return OMVirtualGearbox::_state; }
+  static void cycleEndDetected(void);
+  static void endCycle(OMVirtualGearbox::GearboxState state);
+  static void update(void);
 
-  private:
-    uint8_t _motorPin;
-    unsigned int _precockDuration_ms;
-    unsigned long _precockEndTime_ms;
-    OMVirtualReplica *_replica;
-    OMVirtualGearbox::GearboxState _state;
-    OMVirtualGearbox::GearboxCycleState _cycleState;
-
-  public:
-
-    OMVirtualGearbox(OMVirtualReplica *replica)
-    :_replica(replica),_state(OMVirtualGearbox::stateResting),_cycleState(OMVirtualGearbox::stateCocking)
-    {};
-
-    void cycle(unsigned int precockDuration_ms);
-    
-    OMVirtualGearbox::GearboxState getState(void){ return this->_state; }
-
-    void cycleEndDetected(void);
-    
-    void endCycle(OMVirtualGearbox::GearboxState state);
-
-    void update(void);
-    
-    
-    //unsigned int precockedTime_ms;
+private:
+  static unsigned int _precockDuration_ms;
+  static unsigned long _precockEndTime_ms;
+  static OMVirtualGearbox::GearboxState _state;
+  static OMVirtualGearbox::GearboxCycleState _cycleState;
 };
-
-
-
 
 //----------------------------- SELECTOR -------------------------------------
 
-
-
-
 class OMVirtualSelector
 {
-  public:    
-    enum SelectorState
-    {
-      stateSafe,
-      stateSemi,
-      stateAuto,
-    };
+public:
+  enum SelectorState
+  {
+    stateSafe = 0,
+    stateSemi = 1,
+    stateAuto = 2,
+  };
+  static void setState(OMVirtualSelector::SelectorState state);
+  static OMVirtualSelector::SelectorState getState(void) { return OMVirtualSelector::_state; }
+  static OMFiringSettings *currentFiringSettings;
 
-  private:
-    OMVirtualReplica *_replica;
-    OMVirtualSelector::SelectorState _state;
-    
-    OMFiringSettings firingSettingsSemi;
-    OMFiringSettings firingSettingsFull;
-    
-  public:
-    OMVirtualSelector(OMVirtualReplica *replica)
-    :_replica(replica),_state(OMVirtualSelector::stateSafe)
-    {};
-    
-    OMVirtualSelector(OMVirtualReplica *replica, SelectorState state)
-    :OMVirtualSelector(replica)
-    {
-      this->_state = state;
-    };
-    
-    void setState(OMVirtualSelector::SelectorState state);
-    
-    OMVirtualSelector::SelectorState getState(void){ return this->_state; }
-  
-    OMFiringSettings *currentFiringSettings;
+private:
+  static OMVirtualSelector::SelectorState _state;
+  static OMFiringSettings _firingSettingsSemi;
+  static OMFiringSettings _firingSettingsFull;
 };
-
-
-
 
 //----------------------------- REPLICA -------------------------------------
 
-
-
-
 class OMVirtualReplica
-{  
+{
+  friend class OMVirtualGearbox;
+
   public:
     enum ReplicaState
     {
       stateIdle,
       stateFiring,
     };
+    static void begin(void);
+    static void update(void);
+    static void updateLastActive(void);
+    static void triggerPulled(void);
+    static void triggerReleased(void);
+    static void gearboxCycleEndDetected(void);
+    static void setSelectorState(OMVirtualSelector::SelectorState state);
 
   private:
-    OMVirtualGearbox _gearbox;
-    OMVirtualTrigger _trigger;
-    OMVirtualSelector _selector;
+    static uint8_t _bbs_fired;
+    static OMVirtualReplica::ReplicaState _state;
+    static uint8_t _currentBurstBBCount;
+    static unsigned long _lastActiveTimeMs;
+    static unsigned long _lastTriggerReleaseMs;
+    static unsigned long _lastEndCycleMs;
 
-  public:
-    uint8_t _bbs_fired;
+    static void startFiringCycle();
+    static void endFiringCycle();
 
-  private:
-    OMVirtualReplica::ReplicaState _state;
-    uint8_t _currentBurstBBCount;
-    unsigned long _lastActiveTimeMs;
-    
-    void startFiringCycle();
-    void endFiringCycle();
-    
-  public:
-    OMVirtualReplica()
-    :_gearbox(this), _trigger(this), _selector(this), _bbs_fired(0), _state(OMVirtualReplica::stateIdle), _currentBurstBBCount(0), _lastActiveTimeMs(millis())
-    {}
-
-    OMVirtualReplica(OMVirtualSelector::SelectorState selectorState)
-    :OMVirtualReplica()
-    {
-      _selector.setState(selectorState);
-    }
-
-    void updateLastActive(void);
-    
-    void triggerPulled(void);
-    
-    void triggerReleased(void);
-
-    void gearboxCycleEndDetected(void);
-    
-    void setSelectorState(OMVirtualSelector::SelectorState state);
-
-    void update(void);
-
-
-    OMVirtualTrigger &getTrigger(){ return this->_trigger; }
-    OMVirtualGearbox &getGearbox(){ return this->_gearbox; }
-    OMVirtualSelector &getSelector(){ return this->_selector; }
-
-  friend class OMVirtualGearbox;
 };
 #endif

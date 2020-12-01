@@ -16,20 +16,21 @@
 
 
 /** Le nombre magique et le numéro de version actuelle */
-#define OM_CFG_VERSION 4 //NOTE: change this value if you modify the data structure ?
+#define OM_CFG_VERSION 5 //NOTE: change this value if you modify the data structure ?
 
 /** La structure qui contient les données */
 class OMConfiguration {
   public:
 
     #ifdef DEBUG
-      static void printCfg(void);
+      static void printCfg();
     #endif
     
     // NOTE: usefull ressource here: https://arduino.stackexchange.com/questions/60112/value-of-uninitialized-eeprom-in-esp8266
     static void loadFromJson(Stream &stream);
-    static boolean load(void);
-    static boolean save(void);
+    static boolean load();
+    static DynamicJsonDocument toJson();
+    static boolean save();
 
 
     byte versionNumber;
@@ -48,6 +49,8 @@ class OMConfiguration {
     static float batteryLowVoltage; // since OM_CFG_VERSION = 1
     static float batteryShutdownVoltage; // since OM_CFG_VERSION = 1
     static boolean useActiveBreaking; // since OM_CFG_VERSION = 1
+    static float decockAfter_s; // since OM_CFG_VERSION = 5
+    static boolean enablePrecocking; // since OM_CFG_VERSION = 5
 };
 
 #endif

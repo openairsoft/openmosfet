@@ -28,12 +28,16 @@
 #define OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE false
 #define OM_DEFAULT_USE_BATTERY_PROTECTION true
 #define OM_DEFAULT_USE_ACTIVE_BRAKING false
+#define OM_DEFAULT_DECOCK_AFTER_SECONDS 0
+#define OM_DEFAULT_ENABLE_PRECOCKING true
 
 #define OM_DNS_PORT  53
 
 // If motor is spinning and no cycle has been detected in this time interval, then somethings wrong
 // shut down the motor and report the error.
 #define MAX_TIME_BETWEEN_CYCLES_MS 500
+
+#define OM_JSON_DOCUMENT_SIZE 3000
 
 #ifdef DEBUG
 #define OM_MIN_WIFI_SHUTDOWN_DELAY_MINUTES 0
@@ -70,6 +74,8 @@
 #define OM_MAX_NB_STORED_MODES 2
 
 //--------------- REPLICA INTERFACE --------------
+#define OM_DEBOUNCE_TIME_MS 2
+
 #ifndef OM_DEFAULT_MOTOR_PIN
 	#define OM_DEFAULT_MOTOR_PIN 32
 #endif
