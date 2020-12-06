@@ -12,9 +12,12 @@ void setup();
 void loop();
 
 void setup() {
+  //important initialize the input interface first, beacause this the sets the outputs and it may be important depending on the fet input logic
+  OMInputsInterface::begin();
+  OMVirtualReplica::begin();
+
   Serial.begin(115200);
 
-  OMInputsInterface::begin();
   
   if (!FILESYSTEM.begin()) {
     #ifdef DEBUGM
@@ -34,19 +37,25 @@ void setup() {
     }
   }
   
+ 
+  OMConfiguration::load();
   #ifdef DEBUG
-    Serial.print("load status: ");
-    Serial.println(OMConfiguration::load());
     Serial.println("config chargée :");
     OMConfiguration::printCfg();
-  #else
-    OMConfiguration::load();
   #endif
 
+  #ifdef OM_ADDITIONAL_HIGH_PIN
+    pinMode (OM_ADDITIONAL_HIGH_PIN, OUTPUT);
+    digitalWrite(OM_ADDITIONAL_HIGH_PIN, HIGH);
+  #endif
+
+  #ifdef OM_ADDITIONAL_LOW_PIN
+    pinMode (OM_ADDITIONAL_LOW_PIN, OUTPUT);
+    digitalWrite(OM_ADDITIONAL_LOW_PIN, LOW);
+  #endif
 
   OMwifiserver::begin();
   OMOtaUploader::begin();
-  OMVirtualReplica::begin();
 }
 
 void loop() {

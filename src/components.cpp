@@ -49,7 +49,7 @@ void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
 void OMVirtualGearbox::cycleEndDetected(void)
 {
 #ifdef DEBUG
-  Serial.println("cycleEndDetected");
+  Serial.println("OMVirtualGearbox::cycleEndDetected");
 #endif
   if (OMVirtualGearbox::_precockDuration_ms <= 0 || !OMConfiguration::enablePrecocking)
   {

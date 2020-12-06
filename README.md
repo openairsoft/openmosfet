@@ -113,14 +113,15 @@ Here is a table (work in progress) listing the different configuration available
 
 `REPLICA_TYPE` value | pins behavior | examples
 ---------------------|---------------|--------------
-1 | `OM_DEFAULT_FIRINGGROUP_PIN` grounded when : trigger is pressed AND safety is off AND mag is not empty<br>`OM_DEFAULT_CUTOFF_PIN` grounded when cutoff is pressed<br>`OM_DEFAULT_SELECTOR_PIN` grounded when selector is on full auto position | G&G tr16 original input plate
+1 | `OM_DEFAULT_FIRINGGROUP_PIN` grounded when : trigger is pressed (AND safety is off AND mag is not empty)<br>`OM_DEFAULT_CYCLE_PIN` grounded when cutoff is pressed<br>`OM_DEFAULT_SELECTOR_PIN` grounded when selector is on full auto position | G&G tr16 original input plate
+2 | `OM_DEFAULT_FIRINGGROUP_PIN` grounded when : trigger is pressed<br>`OM_DEFAULT_CYCLE_PIN` grounded when when tappet plate is forwad (nozzle pressed against bucking)<br>`OM_DEFAULT_SELECTOR_PIN` cycle through firemodes and safety on falling edge | custom input plate with microswitch detecting tappet plate, simple press button as a selector
 
 ### Custom replica interface pinout
 For developpement reasons or other, you can change the default settings for the replica interface with the following flags :
 
 - `OM_DEFAULT_MOTOR_PIN`
 - `OM_DEFAULT_FIRINGGROUP_PIN`
-- `OM_DEFAULT_CUTOFF_PIN`
+- `OM_DEFAULT_CYCLE_PIN`
 - `OM_DEFAULT_SELECTOR_PIN`
 
 *Note: it is not recommended that you change this value in the source file, but rather as a build flag in platformio.ini for example.*  
