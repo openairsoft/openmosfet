@@ -31,9 +31,6 @@
       <ul>
         <li>
           <a href="#the-team">The team</a>
-          <ul>
-            <li><a href="#developers">Developers</a></li>
-          </ul>
         </li>
       </ul>
     </li>
@@ -79,12 +76,13 @@ The web dashboard allows full and easy controls over every settings as well an u
 ### The team
 
 
-The team is composed of two developers ([Simon](https://github.com/simonjamain) and [Zao Soula](https://github.com/zaosoula)) and two electronitians (Romain and Marcellin), all french airsofters.
+The team is composed of two developers and two electronitians, all french airsofters.
 
-#### Developers
-
-<img src="doc/assets/images/developers.svg" alt="Logo" width="100%">
-
+- 👨🏻‍💻 [Simon](https://github.com/simonjamain)
+- 👨🏽‍💻 [Zao Soula](https://github.com/zaosoula)
+- 👨🏻‍🔧 [Romain](https://github.com/rboutrois)
+- 👨‍🔧 [Marcellin](https://github.com/simonjamain)
+- **Feel free to [contribute](#contributing) to the project**
 
 ## Getting started
 ### Installation and build
