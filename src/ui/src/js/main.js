@@ -167,7 +167,7 @@ function renderConfig(config) {
     var clone = document.importNode(template.content, true);
 
     fillInputs(clone, mode);
-    clone.querySelector(':scope > div').setAttribute('data-firemode-index', index);
+    clone.children[0].setAttribute('data-firemode-index', index);
     clone.querySelector('[data=firemode_index]').textContent = index + 1;
     clone.querySelector('[name=motorPower]').value = mode.motorPower * 100;
     clone.querySelectorAll('[data=burstMode] button')[mode.burstMode].classList.add('active');
