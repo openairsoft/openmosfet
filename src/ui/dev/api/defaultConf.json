@@ -4,6 +4,7 @@
   "availableNetworkAppSsid": "wifi external",
   "availableNetworkAppPasswd": "password",
   "connectToNetworkIfAvailable": true,
+  "disableMotor": false,
   "enableBatteryProtection": true,
   "wifiShutdownDelayMinutes": 25,
   "deepSleepDelayMinutes": 40,
