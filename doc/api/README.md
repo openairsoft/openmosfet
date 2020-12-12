@@ -29,11 +29,11 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `availableNetworkAppPasswd` *string [8-16]* : External network password
       - `wifiShutdownDelayMinutes` *int* : delay for wifi shutdown after last network activity (0 = never shuts down)
       - `deepSleepDelayMinutes` *int* : delay for sleep mode after replica inactivity
-      - `useBatteryProtection` *boolean* : Will monitor battery voltage
+      - `enableBatteryProtection` *boolean* : Will monitor battery voltage
       - `batteryNominalVoltage` *float* : Honestly I don't precisely know yet what to do with that
       - `batteryLowVoltage` *float* : Will alert the user below this voltage
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
-      - `useActiveBreaking` *float* : Duh.
+      - `enableActiveBreaking` *boolean* : Duh.
       - `enablePrecocking` *boolean* : Enable precocking based on values specified for each firemode
       - `fireModes` *object array* :
         - `burstMode` *int [0-2]* : Burst mode, 0=interruptible, 1=normal, 2=extendible

@@ -270,14 +270,14 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
     OMConfiguration::connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
   }
   
-  //-------------------- useBatteryProtection -------------------------
-  if(json.containsKey("useBatteryProtection")) {
-    OMConfiguration::useBatteryProtection = json["useBatteryProtection"].as<boolean>();
+  //-------------------- enableBatteryProtection -------------------------
+  if(json.containsKey("enableBatteryProtection")) {
+    OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();
   }
   
-  //-------------------- useActiveBreaking -------------------------
-  if(json.containsKey("useActiveBreaking")) {
-    OMConfiguration::useActiveBreaking = json["useActiveBreaking"].as<boolean>();
+  //-------------------- enableActiveBreaking -------------------------
+  if(json.containsKey("enableActiveBreaking")) {
+    OMConfiguration::enableActiveBreaking = json["enableActiveBreaking"].as<boolean>();
   }
   
   //-------------------- decockAfter_s -------------------------

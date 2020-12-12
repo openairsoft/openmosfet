@@ -42,13 +42,13 @@ class OMConfiguration {
     static char availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static char availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static boolean connectToNetworkIfAvailable; // since OM_CFG_VERSION = 3
-    static boolean useBatteryProtection; // since OM_CFG_VERSION = 1
+    static boolean enableBatteryProtection; // since OM_CFG_VERSION = 1
     static int wifiShutdownDelayMinutes; // since OM_CFG_VERSION = 2
     static int deepSleepDelayMinutes; // since OM_CFG_VERSION = 2
     static float batteryNominalVoltage; // since OM_CFG_VERSION = 1
     static float batteryLowVoltage; // since OM_CFG_VERSION = 1
     static float batteryShutdownVoltage; // since OM_CFG_VERSION = 1
-    static boolean useActiveBreaking; // since OM_CFG_VERSION = 1
+    static boolean enableActiveBreaking; // since OM_CFG_VERSION = 1
     static float decockAfter_s; // since OM_CFG_VERSION = 5
     static boolean enablePrecocking; // since OM_CFG_VERSION = 5
 };
