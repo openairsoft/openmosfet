@@ -27,6 +27,9 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `connectToNetworkIfAvailable` *boolean* : Will try to connect at startup
       - `availableNetworkAppSsid` *string [8-32]* : External network ssid
       - `availableNetworkAppPasswd` *string [8-16]* : External network password
+      - `enableEspNow` *boolean* : Enable communication with esp-now protocol
+      - `espNowPeers` *uint8_t[6] array array* :
+        - *uint8_t[6] array* : Status updates will be sent to this peer MAC address via esp-now
       - `wifiShutdownDelayMinutes` *int* : delay for wifi shutdown after last network activity (0 = never shuts down)
       - `deepSleepDelayMinutes` *int* : delay for sleep mode after replica inactivity
       - `enableBatteryProtection` *boolean* : Will monitor battery voltage

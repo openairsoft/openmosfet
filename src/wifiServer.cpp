@@ -269,26 +269,7 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   if(json.containsKey("connectToNetworkIfAvailable")) {
     OMConfiguration::connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
   }
-  
-  //-------------------- enableBatteryProtection -------------------------
-  if(json.containsKey("enableBatteryProtection")) {
-    OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();
-  }
-  
-  //-------------------- enableActiveBreaking -------------------------
-  if(json.containsKey("enableActiveBreaking")) {
-    OMConfiguration::enableActiveBreaking = json["enableActiveBreaking"].as<boolean>();
-  }
-  
-  //-------------------- decockAfter_s -------------------------
-  if(json.containsKey("decockAfter_s")) {
-    OMConfiguration::decockAfter_s = json["decockAfter_s"].as<float>();
-  }
 
-  //-------------------- enablePrecocking -------------------------
-  if(json.containsKey("enablePrecocking")) {
-    OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
-  }
   //-------------------- appSsid -------------------------
   if(json.containsKey("appSsid")) {
     String appSsid = json["appSsid"].as<String>();//compairing to false for safety reasons
@@ -308,6 +289,32 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
       appPasswd.toCharArray(OMConfiguration::appPasswd, appPasswdLength+1);
     }
   }
+
+  //-------------------- enableEspNow -------------------------
+  if(json.containsKey("enableEspNow")) {
+    OMConfiguration::enableEspNow = json["enableEspNow"].as<boolean>();
+  }
+
+  //-------------------- enableBatteryProtection -------------------------
+  if(json.containsKey("enableBatteryProtection")) {
+    OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();
+  }
+  
+  //-------------------- enableActiveBreaking -------------------------
+  if(json.containsKey("enableActiveBreaking")) {
+    OMConfiguration::enableActiveBreaking = json["enableActiveBreaking"].as<boolean>();
+  }
+  
+  //-------------------- decockAfter_s -------------------------
+  if(json.containsKey("decockAfter_s")) {
+    OMConfiguration::decockAfter_s = json["decockAfter_s"].as<float>();
+  }
+
+  //-------------------- enablePrecocking -------------------------
+  if(json.containsKey("enablePrecocking")) {
+    OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
+  }
+  
 
   
   //-------------------- availableNetworkAppSsid -------------------------

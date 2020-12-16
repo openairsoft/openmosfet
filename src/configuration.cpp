@@ -9,10 +9,10 @@ const int capacity = OM_JSON_DOCUMENT_SIZE;//see https://arduinojson.org/v6/assi
 OMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0), OMFiringSettings(OMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
 char OMConfiguration::appSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_APSSID;
 char OMConfiguration::appPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_APP_PASSWD;
+boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE;
 char OMConfiguration::availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APSSID;
 char OMConfiguration::availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD;
-
-boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE;
+boolean OMConfiguration::enableEspNow = OM_DEFAULT_ENABLE_ESP_NOW;
 boolean OMConfiguration::enableBatteryProtection = OM_DEFAULT_USE_BATTERY_PROTECTION;
 int OMConfiguration::wifiShutdownDelayMinutes = OM_DEFAULT_WIFI_SHUTDOWN_DELAY_MINUTES;
 int OMConfiguration::deepSleepDelayMinutes = OM_DEFAULT_DEEP_SLEEP_DELAY_MINUTES;
@@ -35,9 +35,10 @@ void OMConfiguration::loadFromJson(Stream &stream){
   
   strcpy(OMConfiguration::appSsid, doc["appSsid"]);
   strcpy(OMConfiguration::appPasswd, doc["appPasswd"]);
+  OMConfiguration::connectToNetworkIfAvailable = doc["connectToNetworkIfAvailable"];
   strcpy(OMConfiguration::availableNetworkAppSsid, doc["availableNetworkAppSsid"]);
   strcpy(OMConfiguration::availableNetworkAppPasswd, doc["availableNetworkAppPasswd"]);
-  OMConfiguration::connectToNetworkIfAvailable = doc["connectToNetworkIfAvailable"];
+  OMConfiguration::enableEspNow = doc["enableEspNow"];
   OMConfiguration::enableBatteryProtection = doc["enableBatteryProtection"];
   OMConfiguration::wifiShutdownDelayMinutes = doc["wifiShutdownDelayMinutes"];
   OMConfiguration::deepSleepDelayMinutes = doc["deepSleepDelayMinutes"];
@@ -96,9 +97,10 @@ DynamicJsonDocument OMConfiguration::toJson(){
   
   doc["appSsid"] = OMConfiguration::appSsid;
   doc["appPasswd"] = OMConfiguration::appPasswd;
+  doc["connectToNetworkIfAvailable"] = OMConfiguration::connectToNetworkIfAvailable;
   doc["availableNetworkAppSsid"] = OMConfiguration::availableNetworkAppSsid;
   doc["availableNetworkAppPasswd"] = OMConfiguration::availableNetworkAppPasswd;
-  doc["connectToNetworkIfAvailable"] = OMConfiguration::connectToNetworkIfAvailable;
+  doc["enableEspNow"] = OMConfiguration::enableEspNow;
   doc["enableBatteryProtection"] = OMConfiguration::enableBatteryProtection;
   doc["wifiShutdownDelayMinutes"] = OMConfiguration::wifiShutdownDelayMinutes;
   doc["deepSleepDelayMinutes"] = OMConfiguration::deepSleepDelayMinutes;
@@ -180,6 +182,8 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::availableNetworkAppSsid);
     Serial.print("availableNetworkAppPasswd=");
     Serial.println(OMConfiguration::availableNetworkAppPasswd);
+    Serial.print("enableEspNow=");
+    Serial.println(OMConfiguration::enableEspNow);
     Serial.print("enableBatteryProtection=");
     Serial.println(OMConfiguration::enableBatteryProtection);
     Serial.print("wifiShutdownDelayMinutes=");
