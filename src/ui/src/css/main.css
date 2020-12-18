@@ -103,7 +103,7 @@ section .container {
 
 
 
-section .container>div {
+section .container>div:not(#SHOOTMODE), section .container #SHOOTMODE>div {
   background-color: #ffffff;
   position: relative;
   box-shadow: 0px 0px 9px 0px rgba(0, 0, 0, 0.3);
@@ -247,41 +247,82 @@ label+.button-group {
 }
 
 .is_updateavailable,
-.is_uptodate {
+.is_uptodate,
+.is_updating:not(#UPDATE) {
   display: none;
 }
 
+#updatefromgithub {
+  padding: 15px 35px;
+}
+
+#UPDATE.is_updating h3 svg {
+  -webkit-animation-name: spin;
+  -webkit-animation-duration: 4000ms;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+  -moz-animation-name: spin;
+  -moz-animation-duration: 4000ms;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: linear;
+  -ms-animation-name: spin;
+  -ms-animation-duration: 4000ms;
+  -ms-animation-iteration-count: infinite;
+  -ms-animation-timing-function: linear;
+  animation-name: spin;
+  animation-duration: 4000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
 .collapse {
-  overflow: hidden;
   margin-bottom: 1em;
 }
 
 .collapse > a, .collapse > a:hover, .collapse > a:active{
   text-decoration: none;
-
 }
 
 .collapse > a svg{
   width: 6px;
   height: 11px;
+  transition: all .25s;
+}
+
+.collapse.open > a svg{
+  transform: rotate(90deg);
 }
 
 .collapse > div{
   max-height: 0px;
+  overflow: hidden;
   transition: all 0.25s;
   padding-top: 1em;
 }
 
+@-moz-keyframes spin {
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  from {transform:rotate(0deg);}
+  to {transform:rotate(360deg);}
+}
 
 @media (min-width: 992px) {
   section .container {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto auto;
     grid-template-areas:
       "WIFI WIFI WIFI UPDATE UPDATE UPDATE"
       "WIFI WIFI WIFI SLEEP SLEEP SLEEP"
       "BATTERY BATTERY SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE"
       "AB AB SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE"
+      "PC PC SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE"
       ". . SHOOTMODE SHOOTMODE SHOOTMODE SHOOTMODE";
   }
 
@@ -309,6 +350,10 @@ label+.button-group {
 
   #AB {
     grid-area: AB;
+  }
+
+  #PC {
+    grid-area: PC;
   }
 
 
