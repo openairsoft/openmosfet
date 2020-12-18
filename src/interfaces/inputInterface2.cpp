@@ -1,4 +1,4 @@
-#if REPLICA_TYPE == 1
+#if REPLICA_TYPE == 2
 
 #include "../inputsInterface.h"
 #include "../config.h"
@@ -27,7 +27,7 @@ void OMInputsInterface::begin()
   // motor pwm setup
   ledcAttachPin(motorPin, MOTOR_LEDC_CHANNEL);
   ledcSetup(MOTOR_LEDC_CHANNEL, MOTOR_LEDC_FREQ, MOTOR_LEDC_RES);
-  ledcWrite(MOTOR_LEDC_CHANNEL, 0); //turn off motor
+  ledcWrite(MOTOR_LEDC_CHANNEL, 255); //turn off motor
   
   pinMode(motorPin, OUTPUT);
 
@@ -40,14 +40,7 @@ void OMInputsInterface::begin()
   selectorDebouncer.attach(selectorPin,INPUT_PULLUP);
   selectorDebouncer.interval(OM_DEBOUNCE_TIME_MS);
 
-  if(digitalRead(selectorPin) == LOW)
-  {
-    OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
-  }else
-  {
-    OMVirtualSelector::setState(OMVirtualSelector::stateSemi);//NOTE: here we have no mean to know when selector is on safe, it just physicaly disable the firing group, so we have to initialize on semi.
-  }
-
+  OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
 }
 
 void OMInputsInterface::update()
@@ -62,14 +55,27 @@ void OMInputsInterface::update()
     OMVirtualTrigger::release();
   }
    
-  if( cutoffDebouncer.fell()) {
+  if( cutoffDebouncer.rose()) {
     OMVirtualGearbox::cycleEndDetected();
   }
 
+  // cycling throught modes on selector press
   if( selectorDebouncer.fell()) {
-    OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
-  }else if( selectorDebouncer.rose()) {
-    OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
+    switch (OMVirtualSelector::getState())
+    {      
+      case OMVirtualSelector::stateSafe:
+        OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
+      break;
+
+      case OMVirtualSelector::stateSemi:
+        OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
+      break;
+
+      case OMVirtualSelector::stateAuto:
+      default:
+        OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
+      break;
+    }
   }
 }
 

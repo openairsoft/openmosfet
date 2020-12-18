@@ -95,6 +95,31 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   });
 
+  document.querySelector('#updatefromgithub').addEventListener('click', async (e)=>{
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'block')
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
+    
+    try {
+      document.querySelector('#UPDATE').classList.add('is_updating');
+      updatedConfig = await _fetch('/api/core/update/', {
+        method: 'POST',
+      });
+
+      renderConfig(config);
+
+    } catch (error) {
+      setWifiStatus('interrupted');
+      console.log('[CONFIG] Cannot request update');
+    } finally {
+      document.getElementById('loader').classList.remove('hide');
+      setTimeout(()=>{
+        document.location.reload();
+      }, 600);
+    }
+
+
+  })
   // Delay for debugging
   // await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -135,23 +160,28 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (latestUpdate) {
-    setWifiStatus('connected');
-    console.log('[LATEST_UPDATE]', latestUpdate);
-
-    document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = 'v' + latestUpdate.tag_name);
-    document.querySelectorAll('[data=newversionurl]').forEach((el) => el.href = latestUpdate.html_url);
-
-    if (latestUpdate.tag_name != version) {
-      document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
-      document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'block')
-    } else {
-      document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'block')
-      document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
-    }
+    renderUpdate(latestUpdate);
   }
 
 });
 
+function renderUpdate(latestUpdate) {
+  setWifiStatus('connected');
+  console.log('[LATEST_UPDATE]', latestUpdate);
+
+  document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = 'v' + latestUpdate.tag_name);
+  document.querySelectorAll('[data=newversionurl]').forEach((el) => el.href = latestUpdate.html_url);
+
+  if (latestUpdate.tag_name != version) {
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none')
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'block')
+  } else {
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'block')
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none')
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
+  }
+}
 
 function renderConfig(config) {
   console.log('[CONFIG]', config);
@@ -167,7 +197,7 @@ function renderConfig(config) {
     var clone = document.importNode(template.content, true);
 
     fillInputs(clone, mode);
-    clone.querySelector(':scope > div').setAttribute('data-firemode-index', index);
+    clone.children[0].setAttribute('data-firemode-index', index);
     clone.querySelector('[data=firemode_index]').textContent = index + 1;
     clone.querySelector('[name=motorPower]').value = mode.motorPower * 100;
     clone.querySelectorAll('[data=burstMode] button')[mode.burstMode].classList.add('active');

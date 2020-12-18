@@ -16,7 +16,7 @@
 
 
 /** Le nombre magique et le numéro de version actuelle */
-#define OM_CFG_VERSION 5 //NOTE: change this value if you modify the data structure ?
+#define OM_CFG_VERSION 6 //NOTE: change this value if you modify the data structure ?
 
 /** La structure qui contient les données */
 class OMConfiguration {
@@ -42,13 +42,14 @@ class OMConfiguration {
     static char availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static char availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static boolean connectToNetworkIfAvailable; // since OM_CFG_VERSION = 3
-    static boolean useBatteryProtection; // since OM_CFG_VERSION = 1
+    static boolean disableMotor;// since OM_CFG_VERSION = 6
+    static boolean enableBatteryProtection; // since OM_CFG_VERSION = 1
     static int wifiShutdownDelayMinutes; // since OM_CFG_VERSION = 2
     static int deepSleepDelayMinutes; // since OM_CFG_VERSION = 2
     static float batteryNominalVoltage; // since OM_CFG_VERSION = 1
     static float batteryLowVoltage; // since OM_CFG_VERSION = 1
     static float batteryShutdownVoltage; // since OM_CFG_VERSION = 1
-    static boolean useActiveBreaking; // since OM_CFG_VERSION = 1
+    static boolean enableActiveBreaking; // since OM_CFG_VERSION = 1
     static float decockAfter_s; // since OM_CFG_VERSION = 5
     static boolean enablePrecocking; // since OM_CFG_VERSION = 5
 };
