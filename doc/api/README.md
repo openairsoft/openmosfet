@@ -29,6 +29,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `availableNetworkAppPasswd` *string [8-16]* : External network password
       - `wifiShutdownDelayMinutes` *int* : delay for wifi shutdown after last network activity (0 = never shuts down)
       - `deepSleepDelayMinutes` *int* : delay for sleep mode after replica inactivity
+      - `disableMotor` *boolean* : Motor won't run if this is true (safety feature)
       - `enableBatteryProtection` *boolean* : Will monitor battery voltage
       - `batteryNominalVoltage` *float* : Honestly I don't precisely know yet what to do with that
       - `batteryLowVoltage` *float* : Will alert the user below this voltage

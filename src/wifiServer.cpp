@@ -270,6 +270,11 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
     OMConfiguration::connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
   }
   
+  //-------------------- disableMotor -------------------------
+  if(json.containsKey("disableMotor")) {
+    OMConfiguration::disableMotor = json["disableMotor"].as<boolean>();
+  }
+  
   //-------------------- enableBatteryProtection -------------------------
   if(json.containsKey("enableBatteryProtection")) {
     OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();

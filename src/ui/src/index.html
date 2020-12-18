@@ -75,6 +75,7 @@
 
                 <h4 class="is_updateavailable">Une mise à jour est disponible (<span data="newversion"></span>)</h4>
                 <h4 class="is_uptodate">Votre OpenMosfet est à jour (<span data="newversion"></span>)</h4>
+                <h4 class="is_updating">Mise à jour en cours vers (<span data="newversion"></span>)</h4>
 
                 <a data="newversionurl" target="_blank">
                     <span class="is_updateavailable">Voir les details de la mise à jour</span>
@@ -82,7 +83,7 @@
                 </a>
                 </p>
 
-                <button class="is_updateavailable" id="update" class="btn">TODO_UPDATE</button>
+                <button class="is_updateavailable btn" id="updatefromgithub" type="button">TODO_UPDATE</button>
 
             </div>
             <div id="WIFI">
@@ -193,16 +194,16 @@
 
             </div>
             <div id="SHOOTMODE">
-                <h3>
-                    <svg>
-                        <use xlink:href="#icon_shoot"></use>
-                    </svg>
-                    Modes de tir
-                </h3>
-
-                <div id="shootmode_container"></div>
-
-
+                <div>
+                    <h3>
+                        <svg>
+                            <use xlink:href="#icon_shoot"></use>
+                        </svg>
+                        Modes de tir
+                    </h3>
+    
+                    <div id="shootmode_container"></div>
+                </div>
             </div>
             <div id="AB">
                 <h3>
@@ -217,8 +218,22 @@
                 <p class="help">Envoie un courant inverse dans le moteur pour le freiner et stopper la rotation du
                     moteur après le tire.</p>
             </div>
-            </div>
 
+            <div id="PC">
+                <h3>
+                    <svg>
+                        <use xlink:href="#icon_ab"></use>
+                    </svg>
+                    Interupteurs avancées
+                </h3>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="enablePrecocking"> Activer le PreCocking</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="disableMotor"> Desactiver le moteur</label>
+                </div>
+            </div>
+        </div>
     </section>
 
     <template id="shootmode_template">
@@ -271,6 +286,22 @@
                                 <span>%</span>
                             </div>
                             <p class="help">Peut affecter la réactivité</p>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-3">
+                        <div>
+                           
+                        </div>
+                        <div>
+                            <label>Temps avant decocking</label>
+                            <div class="input-group">
+                                <input type="number" name="decockAfter_s" step="1" min="0">
+                                <span>Millisecondes</span>
+                            </div>
+                            <p class="help">If the trigger is maintained pressed for set ammount of time after end of burst, cycle and decock ⚠this fires a bb⚠. (0 = no decocking)</p>
+                        </div>
+                        <div>
+                            
                         </div>
                     </div>
                 </div>
