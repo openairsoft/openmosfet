@@ -96,12 +96,12 @@ OMFiringSettings &OMInputsInterface::getCurrentFiringSetting()
 
 void OMInputsInterface::motorOn()
 {
-  ledcWrite(MOTOR_LEDC_CHANNEL, 0);
+  ledcWrite(MOTOR_LEDC_CHANNEL, 255);
 }
 
 void OMInputsInterface::motorOff()
 {
-  ledcWrite(MOTOR_LEDC_CHANNEL, 255);
+  ledcWrite(MOTOR_LEDC_CHANNEL, 0);
 }
 
 #endif
