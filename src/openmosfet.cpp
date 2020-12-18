@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <esp_now.h>
-#include "nowInterface.h"
+#include <openMosfetEspNow.h>
 
 #include "utilities.h"
 #include "config.h"
@@ -92,10 +92,18 @@ void loop() {
   OMOtaUploader::update();
   OMInputsInterface::update();
   OMVirtualReplica::update();
+  // Send message via ESP-NOW
+  Serial.println("---------------------");
+  unsigned long beforeSend1 = micros(); 
   struct_status_MacAdress macAddress_s;
   WiFi.macAddress(macAddress_s.macAddress);
-  // Send message via ESP-NOW
+  unsigned long afterSend1 = micros();
+  Serial.printf("delta 1 : %lu\n", afterSend1 - beforeSend1);
+  unsigned long beforeSend2 = micros();
   esp_err_t result = esp_now_send(peer, (uint8_t *) &macAddress_s, sizeof(struct_status_MacAdress));
+  unsigned long afterSend2 = micros();
+  Serial.printf("delta 2 : %lu\n", afterSend2 - beforeSend2);
+  Serial.println("---------------------");
    
   if (result == ESP_OK) {
     Serial.println("Sent with success");
