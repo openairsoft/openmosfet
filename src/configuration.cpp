@@ -13,13 +13,14 @@ char OMConfiguration::availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_D
 char OMConfiguration::availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD;
 
 boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE;
-boolean OMConfiguration::useBatteryProtection = OM_DEFAULT_USE_BATTERY_PROTECTION;
+boolean OMConfiguration::disableMotor = OM_DEFAULT_DISABLE_MOTOR;
+boolean OMConfiguration::enableBatteryProtection = OM_DEFAULT_USE_BATTERY_PROTECTION;
 int OMConfiguration::wifiShutdownDelayMinutes = OM_DEFAULT_WIFI_SHUTDOWN_DELAY_MINUTES;
 int OMConfiguration::deepSleepDelayMinutes = OM_DEFAULT_DEEP_SLEEP_DELAY_MINUTES;
 float OMConfiguration::batteryNominalVoltage = OM_DEFAULT_NOMINAL_VOLTAGE;
 float OMConfiguration::batteryLowVoltage = OM_DEFAULT_LOW_VOLTAGE;
 float OMConfiguration::batteryShutdownVoltage = OM_DEFAULT_SHUTDOWN_VOLTAGE;
-boolean OMConfiguration::useActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
+boolean OMConfiguration::enableActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
 float OMConfiguration::decockAfter_s = OM_DEFAULT_DECOCK_AFTER_SECONDS;
 boolean OMConfiguration::enablePrecocking = OM_DEFAULT_ENABLE_PRECOCKING;
 
@@ -38,13 +39,14 @@ void OMConfiguration::loadFromJson(Stream &stream){
   strcpy(OMConfiguration::availableNetworkAppSsid, doc["availableNetworkAppSsid"]);
   strcpy(OMConfiguration::availableNetworkAppPasswd, doc["availableNetworkAppPasswd"]);
   OMConfiguration::connectToNetworkIfAvailable = doc["connectToNetworkIfAvailable"];
-  OMConfiguration::useBatteryProtection = doc["useBatteryProtection"];
+  OMConfiguration::enableBatteryProtection = doc["enableBatteryProtection"];
+  OMConfiguration::disableMotor = doc["disableMotor"];
   OMConfiguration::wifiShutdownDelayMinutes = doc["wifiShutdownDelayMinutes"];
   OMConfiguration::deepSleepDelayMinutes = doc["deepSleepDelayMinutes"];
   OMConfiguration::batteryNominalVoltage = doc["batteryNominalVoltage"];
   OMConfiguration::batteryLowVoltage = doc["batteryLowVoltage"];
   OMConfiguration::batteryShutdownVoltage = doc["batteryShutdownVoltage"];
-  OMConfiguration::useActiveBreaking = doc["useActiveBreaking"];
+  OMConfiguration::enableActiveBreaking = doc["enableActiveBreaking"];
   OMConfiguration::decockAfter_s = doc["decockAfter_s"];
   OMConfiguration::enablePrecocking = doc["enablePrecocking"];
   
@@ -99,13 +101,14 @@ DynamicJsonDocument OMConfiguration::toJson(){
   doc["availableNetworkAppSsid"] = OMConfiguration::availableNetworkAppSsid;
   doc["availableNetworkAppPasswd"] = OMConfiguration::availableNetworkAppPasswd;
   doc["connectToNetworkIfAvailable"] = OMConfiguration::connectToNetworkIfAvailable;
-  doc["useBatteryProtection"] = OMConfiguration::useBatteryProtection;
+  doc["disableMotor"] = OMConfiguration::disableMotor;
+  doc["enableBatteryProtection"] = OMConfiguration::enableBatteryProtection;
   doc["wifiShutdownDelayMinutes"] = OMConfiguration::wifiShutdownDelayMinutes;
   doc["deepSleepDelayMinutes"] = OMConfiguration::deepSleepDelayMinutes;
   doc["batteryNominalVoltage"] = OMConfiguration::batteryNominalVoltage;
   doc["batteryLowVoltage"] = OMConfiguration::batteryLowVoltage;
   doc["batteryShutdownVoltage"] = OMConfiguration::batteryShutdownVoltage;
-  doc["useActiveBreaking"] = OMConfiguration::useActiveBreaking;
+  doc["enableActiveBreaking"] = OMConfiguration::enableActiveBreaking;
   doc["decockAfter_s"] = OMConfiguration::decockAfter_s;
   doc["enablePrecocking"] = OMConfiguration::enablePrecocking;
   
@@ -180,8 +183,10 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::availableNetworkAppSsid);
     Serial.print("availableNetworkAppPasswd=");
     Serial.println(OMConfiguration::availableNetworkAppPasswd);
-    Serial.print("useBatteryProtection=");
-    Serial.println(OMConfiguration::useBatteryProtection);
+    Serial.print("disableMotor=");
+    Serial.println(OMConfiguration::disableMotor);
+    Serial.print("enableBatteryProtection=");
+    Serial.println(OMConfiguration::enableBatteryProtection);
     Serial.print("wifiShutdownDelayMinutes=");
     Serial.println(OMConfiguration::wifiShutdownDelayMinutes);
     Serial.print("deepSleepDelayMinutes=");
@@ -192,8 +197,8 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::batteryLowVoltage);
     Serial.print("batteryShutdownVoltage=");
     Serial.println(OMConfiguration::batteryShutdownVoltage);
-    Serial.print("useActiveBreaking=");
-    Serial.println(OMConfiguration::useActiveBreaking);
+    Serial.print("enableActiveBreaking=");
+    Serial.println(OMConfiguration::enableActiveBreaking);
     Serial.print("decockAfter_s=");
     Serial.println(OMConfiguration::decockAfter_s);
     Serial.print("enablePrecocking=");
