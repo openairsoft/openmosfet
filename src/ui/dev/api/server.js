@@ -56,7 +56,11 @@ app.get('/api/core/version', (req, res) => {
 app.post('/api/core/update', (req, res) => {
   console.log('[POST /api/core/update] Update from github requested'.request);
   console.log('This feature is not available in local development mode\n\n\n'.warn);
-  res.json(config);
+  console.log('Delay of 30 seconds before response\n\n\n'.warn);
+
+  setTimeout(()=>{
+    res.json(config);
+  }, 5000);
 })
 
 app.put('/api/core/update', (req, res) => {

@@ -13,6 +13,7 @@ boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NET
 char OMConfiguration::availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APSSID;
 char OMConfiguration::availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD;
 boolean OMConfiguration::enableEspNow = OM_DEFAULT_ENABLE_ESP_NOW;
+boolean OMConfiguration::disableMotor = OM_DEFAULT_DISABLE_MOTOR;
 boolean OMConfiguration::enableBatteryProtection = OM_DEFAULT_USE_BATTERY_PROTECTION;
 int OMConfiguration::wifiShutdownDelayMinutes = OM_DEFAULT_WIFI_SHUTDOWN_DELAY_MINUTES;
 int OMConfiguration::deepSleepDelayMinutes = OM_DEFAULT_DEEP_SLEEP_DELAY_MINUTES;
@@ -40,6 +41,7 @@ void OMConfiguration::loadFromJson(Stream &stream){
   strcpy(OMConfiguration::availableNetworkAppPasswd, doc["availableNetworkAppPasswd"]);
   OMConfiguration::enableEspNow = doc["enableEspNow"];
   OMConfiguration::enableBatteryProtection = doc["enableBatteryProtection"];
+  OMConfiguration::disableMotor = doc["disableMotor"];
   OMConfiguration::wifiShutdownDelayMinutes = doc["wifiShutdownDelayMinutes"];
   OMConfiguration::deepSleepDelayMinutes = doc["deepSleepDelayMinutes"];
   OMConfiguration::batteryNominalVoltage = doc["batteryNominalVoltage"];
@@ -101,6 +103,7 @@ DynamicJsonDocument OMConfiguration::toJson(){
   doc["availableNetworkAppSsid"] = OMConfiguration::availableNetworkAppSsid;
   doc["availableNetworkAppPasswd"] = OMConfiguration::availableNetworkAppPasswd;
   doc["enableEspNow"] = OMConfiguration::enableEspNow;
+  doc["disableMotor"] = OMConfiguration::disableMotor;
   doc["enableBatteryProtection"] = OMConfiguration::enableBatteryProtection;
   doc["wifiShutdownDelayMinutes"] = OMConfiguration::wifiShutdownDelayMinutes;
   doc["deepSleepDelayMinutes"] = OMConfiguration::deepSleepDelayMinutes;
@@ -184,6 +187,8 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::availableNetworkAppPasswd);
     Serial.print("enableEspNow=");
     Serial.println(OMConfiguration::enableEspNow);
+    Serial.print("disableMotor=");
+    Serial.println(OMConfiguration::disableMotor);
     Serial.print("enableBatteryProtection=");
     Serial.println(OMConfiguration::enableBatteryProtection);
     Serial.print("wifiShutdownDelayMinutes=");

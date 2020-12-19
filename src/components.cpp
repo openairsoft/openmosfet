@@ -39,7 +39,7 @@ void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
     #ifdef DEBUG
       Serial.println("OMVirtualGearbox::cycle");
     #endif
-    OMInputsInterface::motorOn();
+    if(!OMConfiguration::disableMotor) {OMInputsInterface::motorOn();}
     OMVirtualGearbox::_precockDuration_ms = precockDuration_ms;
     OMVirtualGearbox::_state = OMVirtualGearbox::stateCycling;
     OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;

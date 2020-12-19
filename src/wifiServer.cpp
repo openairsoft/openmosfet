@@ -315,7 +315,10 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
     OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
   }
   
-
+  //-------------------- disableMotor -------------------------
+  if(json.containsKey("disableMotor")) {
+    OMConfiguration::disableMotor = json["disableMotor"].as<boolean>();
+  }
   
   //-------------------- availableNetworkAppSsid -------------------------
   if(json.containsKey("availableNetworkAppSsid")) {

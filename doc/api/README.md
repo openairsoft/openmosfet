@@ -32,6 +32,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
         - *uint8_t[6] array* : Status updates will be sent to this peer MAC address via esp-now
       - `wifiShutdownDelayMinutes` *int* : delay for wifi shutdown after last network activity (0 = never shuts down)
       - `deepSleepDelayMinutes` *int* : delay for sleep mode after replica inactivity
+      - `disableMotor` *boolean* : Motor won't run if this is true (safety feature)
       - `enableBatteryProtection` *boolean* : Will monitor battery voltage
       - `batteryNominalVoltage` *float* : Honestly I don't precisely know yet what to do with that
       - `batteryLowVoltage` *float* : Will alert the user below this voltage

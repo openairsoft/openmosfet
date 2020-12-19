@@ -43,6 +43,7 @@ class OMConfiguration {
     static char availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static char availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 4
     static boolean enableEspNow; // since OM_CFG_VERSION = 6
+    static boolean disableMotor;// since OM_CFG_VERSION = 6
     static boolean enableBatteryProtection; // since OM_CFG_VERSION = 1
     static int wifiShutdownDelayMinutes; // since OM_CFG_VERSION = 2
     static int deepSleepDelayMinutes; // since OM_CFG_VERSION = 2
