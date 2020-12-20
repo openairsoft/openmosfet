@@ -27,7 +27,7 @@ void OMInputsInterface::begin()
   // motor pwm setup
   ledcAttachPin(motorPin, MOTOR_LEDC_CHANNEL);
   ledcSetup(MOTOR_LEDC_CHANNEL, MOTOR_LEDC_FREQ, MOTOR_LEDC_RES);
-  ledcWrite(MOTOR_LEDC_CHANNEL, 255); //turn off motor
+  ledcWrite(MOTOR_LEDC_CHANNEL, 0); //turn off motor
   
   pinMode(motorPin, OUTPUT);
 
