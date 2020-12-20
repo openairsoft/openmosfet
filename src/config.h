@@ -14,7 +14,7 @@
 #define OM_DEFAULT_AVAILABLE_NETWORK_APSSID "externalssid"//Note : must be [OM_WIFI_SSID_MIN_SIZE-OM_WIFI_SSID_MAX_SIZE] character (exluding '\0') in order to work
 #define OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD  "externalpassword"//Note : must be [OM_WIFI_PSSWD_MIN_SIZE-OM_WIFI_PSSWD_MAX_SIZE] character (exluding '\0') in order to work
 
-#define OM_DEFAULT_GITHUB_API_LATEST_RELEASE_URL "https://api.github.com/repos/simonjamain/openmosfet/releases/latest"
+#define OM_DEFAULT_GITHUB_API_LATEST_RELEASE_URL "https://api.github.com/repos/openairsoft/openmosfet/releases/latest"
 #ifndef OM_DEFAULT_BINARY_FILE_NAME
 	#define OM_DEFAULT_BINARY_FILE_NAME "openmosfet.espressif32.1.bin"
 #endif
