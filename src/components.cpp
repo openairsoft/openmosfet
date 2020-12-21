@@ -1,3 +1,5 @@
+#include <openMosfetEspNow.h>
+
 #include "components.h"
 #include "configuration.h"
 #include "inputsInterface.h"
@@ -95,6 +97,7 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
   Serial.println("OMVirtualSelector::setState");
 #endif
   _state = state;
+  if(OMConfiguration::enableEspNow){ OpenMosfetEspNowAsyncServer::sendSelectorState((uint8_t)state); }
   OMVirtualReplica::updateLastActive();
 }
 

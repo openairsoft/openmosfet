@@ -1,3 +1,9 @@
+#include <Update.h>
+#include <esp_wifi.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <openMosfetEspNow.h>
+
 #include "wifiServer.h"
 #include "ui.h"
 #include "config.h"
@@ -5,11 +11,6 @@
 #include "autoUpdater.h"
 #include "configuration.h"
 #include "components.h"
-
-#include <Update.h>
-#include <esp_wifi.h>
-#include <AsyncJson.h>
-#include <ArduinoJson.h>
 
 //TODO: penser à tout gzipper (ah ?)
 
@@ -35,6 +36,7 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersionApi);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
+  OMwifiserver::webServer.on("/api/network/espnow/pair", HTTP_POST, OMwifiserver::handleEspNowPairApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_GET, OMwifiserver::handleTriggerStateApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_POST, OMwifiserver::handleTriggerStateApi, NULL, OMwifiserver::handleTriggerStateApiBody);
   OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
@@ -169,6 +171,10 @@ void OMwifiserver::handleAutoUpdateApi(AsyncWebServerRequest *request) {
   request->send(200, "text/html", "ok");
 }
 
+void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
+  request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
+}
+
 void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request) {
   AsyncResponseStream *response = request->beginResponseStream("application/json");
   serializeJson(OMConfiguration::toJson(), *response);
@@ -292,7 +298,11 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
 
   //-------------------- enableEspNow -------------------------
   if(json.containsKey("enableEspNow")) {
+    bool prevEnableEspNow = OMConfiguration::enableEspNow;
     OMConfiguration::enableEspNow = json["enableEspNow"].as<boolean>();
+    if(!prevEnableEspNow && OMConfiguration::enableEspNow){
+      OpenMosfetEspNowAsyncServer::begin();
+    }
   }
 
   //-------------------- enableBatteryProtection -------------------------
@@ -351,10 +361,14 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   #endif
 }
 
-void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
-  request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
+void OMwifiserver::handleEspNowPairApi(AsyncWebServerRequest *request) {
+  if(OMConfiguration::enableEspNow){
+    OpenMosfetEspNowAsyncServer::autoAddPeers();
+    request->send(200);
+  }else{
+    request->send(400, "text/html", "please enable esp-now first");
+  }
 }
-
 
 void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
@@ -473,7 +487,11 @@ void OMwifiserver::update() {
     Serial.println(" minutes.");
     #endif
     //esp_bt_controller_disable();
-    esp_wifi_stop();
+    if(OMConfiguration::enableEspNow){
+      esp_wifi_disconnect();
+    }else{
+      esp_wifi_stop();
+    }
     //esp_light_sleep_start();
     
     OMwifiserver::wifiIsOn = false;

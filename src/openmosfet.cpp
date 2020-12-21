@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <esp_now.h>
 #include <openMosfetEspNow.h>
 
 #include "utilities.h"
@@ -40,7 +39,6 @@ void setup() {
     }
   }
   
- 
   OMConfiguration::load();
   #ifdef DEBUG
     Serial.println("config chargée :");
@@ -62,9 +60,9 @@ void setup() {
 
   OMwifiserver::begin();
   OMOtaUploader::begin();
-
-  Serial.println(WiFi.macAddress());
-  Serial.print("macAddress_s.status: ");
+  if(OMConfiguration::enableEspNow){
+    OpenMosfetEspNowAsyncServer::begin();
+  }
 }
 
 void loop() {

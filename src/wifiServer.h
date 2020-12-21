@@ -28,6 +28,8 @@ class OMwifiserver
         static void handleConfigApi(AsyncWebServerRequest *request);
         static void handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 
+        static void handleEspNowPairApi(AsyncWebServerRequest *request);
+
         static void handleTriggerStateApi(AsyncWebServerRequest *request);
         static void handleTriggerStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 

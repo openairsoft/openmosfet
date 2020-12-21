@@ -53,6 +53,11 @@ This is closely linked to [configuration.h](/src/configuration.h)
     - parameters *application/json*  
     same data format as `GET`
 
+### Network
+
+- **ESP-NOW pairing** : `/api/network/espnow/pair`
+  - `POST` : instantly scan and auto-pair with all available esp-now modules (see: https://github.com/openairsoft/openmosfet_esp-now)
+
 ### Replica
  
 This is closely linked to [components.h](/src/components.h)
