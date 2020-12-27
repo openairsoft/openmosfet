@@ -61,11 +61,11 @@ void OMInputsInterface::update()
     int threshold1 = (OMConfiguration::selectorCalibration[0] + OMConfiguration::selectorCalibration[1]) / 2;
     int threshold2 = (OMConfiguration::selectorCalibration[1] + OMConfiguration::selectorCalibration[2]) / 2;
 
-    if( selectorValue < threshold1) {
-       OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
-    } else if (selectorValue < threshold2) {
+    if( selectorValue < threshold1 && OMVirtualSelector::getState() != OMVirtualSelector::stateSafe) {
+      OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
+    } else if (selectorValue < threshold2 && OMVirtualSelector::getState() != OMVirtualSelector::stateSemi) {
       OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
-    } else {
+    } else if(OMVirtualSelector::getState() != OMVirtualSelector::stateAuto){
       OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
     }
   }
