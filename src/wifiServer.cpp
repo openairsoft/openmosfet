@@ -11,6 +11,7 @@
 #include "autoUpdater.h"
 #include "configuration.h"
 #include "components.h"
+#include "inputsInterface.h"
 
 //TODO: penser à tout gzipper (ah ?)
 
@@ -42,6 +43,7 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_GET, OMwifiserver::handleSelectorStateApi);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
+  OMwifiserver::webServer.on("/api/components/selector/state", HTTP_PATCH, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
   OMwifiserver::webServer.on("/api/components/gearbox/uncock", OMwifiserver::handleGearboxUncockingApi);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
@@ -413,13 +415,13 @@ void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
       request->send(200, "application/json", String(OMVirtualSelector::getState()));
     break;
     default:
-      request->send(405, "text/html", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
     break;
   }
 }
 
 void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
-  if(request->method() == HTTP_POST) {
+  if(request->method() == HTTP_POST || request->method() == HTTP_PATCH) {
       DynamicJsonDocument selectorStateJson(0);
       deserializeJson(selectorStateJson, (const char*)bodyData);
 
@@ -430,14 +432,29 @@ void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, ui
         case OMVirtualSelector::stateSemi:
         case OMVirtualSelector::stateAuto:
           OMVirtualSelector::setState(receivedState);
+          if (request->method() == HTTP_PATCH){
+            OMConfiguration::selectorCalibration[(unsigned int)receivedState] = OMInputsInterface::getSelectorCalibrationValue();
+            if(OMConfiguration::selectorCalibration[(unsigned int)receivedState] < 0) {
+              request->send(403, "text/html", "this interface does not seems ot need/allow selector calibration");
+            }else if(!OMConfiguration::isSelectorCalibrated()){
+              request->send(206, "text/html", String( ((float)OMConfiguration::selectorCalibration[(unsigned int)receivedState]) / (4095.0f/3.3f) ));
+              // request->send(206, "text/html", String( (unsigned int)receivedState) );
+              // request->send(206, "text/html", String( OMConfiguration::selectorCalibration[(unsigned int)receivedState]));
+            }else{
+              request->send(200, "text/html", String( ((float)OMConfiguration::selectorCalibration[(unsigned int)receivedState]) / (4095.0f/3.3f) ));
+              // request->send(200, "text/html", String( (unsigned int)receivedState) );
+              // request->send(200, "text/html", String( OMConfiguration::selectorCalibration[(unsigned int)receivedState]));
+            }
+            OMConfiguration::save();
+            break;
+          }
         break;
         default:
-          request->send(400, "text/html", "unknown selctor state value");
+          request->send(400, "text/html", "unknown selector state value");
         break;
       }
-
   }else{
-      request->send(405, "text/html", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
   }
 }
 

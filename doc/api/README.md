@@ -37,6 +37,10 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
       - `enableActiveBreaking` *boolean* : Duh.
       - `enablePrecocking` *boolean* : Enable precocking based on values specified for each firemode
+      - `selectorCalibration` *array* [READONLY]: The calibration of the selector optic sensor (update the values via the `/api/components/selector/state` endpoint)
+        - [0] *int* [0-4095] : value for selector position 1 or negative value if not calibrated (divide by 1241 to obtain real voltage)
+        - [1] *int* [0-4095] : value for selector position 2 or negative value if not calibrated (divide by 1241 to obtain real voltage)
+        - [2] *int* [0-4095] : value for selector position 3 or negative value if not calibrated (divide by 1241 to obtain real voltage)
       - `fireModes` *object array* :
         - `burstMode` *int [0-2]* : Burst mode, 0=interruptible, 1=normal, 2=extendible
         - `burstLength` *int* :  
@@ -67,9 +71,17 @@ This is closely linked to [components.h](/src/components.h)
 - **Trigger short pull** : `/api/components/trigger/bump`
   - `POST` : pull and release the trigger
 - **Selector state** : `/api/components/selector/state`
-  - `GET,POST` : set/read the selector state
-    - parameters *application/json*
+  - `GET,POST` : respectively reads or sets the selector state
+    - returnvalues/input parameters *application/json*
       - *int* : [`0`, `1`, `2`]
+  - `PATCH` : calibrates the sensor for a given state (`PATCH`)
+    - input parameters *application/json*
+      - *int* : [`0`, `1`, `2`] the current position of the selector
+    - return value :
+      - *float* : voltage read from the sensor and stored in the configuration
+    - highlighted return codes :
+      - `206` : value accepted but calibration incomplete (other positions still needs calibrating)
+      - `200` : value accepted and calibration complete
 - **Gearbox uncocking** : `/api/components/gearbox/uncock`
   - `POST` : uncock the piston (if cocked) ⚠Be careful, this will eventully fire a BB⚠
 

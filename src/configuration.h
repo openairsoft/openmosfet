@@ -16,7 +16,7 @@
 
 
 /** Le nombre magique et le numéro de version actuelle */
-#define OM_CFG_VERSION 6 //NOTE: change this value if you modify the data structure ?
+#define OM_CFG_VERSION 7 //NOTE: change this value if you modify the data structure ?
 
 /** La structure qui contient les données */
 class OMConfiguration {
@@ -32,11 +32,11 @@ class OMConfiguration {
     static DynamicJsonDocument toJson();
     static boolean save();
 
+    static boolean isSelectorCalibrated();
 
     byte versionNumber;
     uint16_t checksum;
   
-    static OMFiringSettings fireModes[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 1
     static char appSsid[OM_WIFI_SSID_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 1
     static char appPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE]; // since OM_CFG_VERSION = 1
     static boolean connectToNetworkIfAvailable; // since OM_CFG_VERSION = 3
@@ -53,6 +53,9 @@ class OMConfiguration {
     static boolean enableActiveBreaking; // since OM_CFG_VERSION = 1
     static float decockAfter_s; // since OM_CFG_VERSION = 5
     static boolean enablePrecocking; // since OM_CFG_VERSION = 5
+    static int selectorCalibration[OM_MAX_NB_STORED_MODES+1]; // since OM_CFG_VERSION = 7
+    //static float selectorThresholds[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 7 //this is a calculated value
+    static OMFiringSettings fireModes[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 1
 };
 
 #endif
