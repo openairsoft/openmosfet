@@ -98,4 +98,9 @@ void OMInputsInterface::motorOff()
   ledcWrite(MOTOR_LEDC_CHANNEL, 0);
 }
 
+//this interface do not wrok with analog slector values
+float OMInputsInterface::getSelectorCalibrationValue()
+{
+  return -1;
+}
 #endif

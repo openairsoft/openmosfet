@@ -1,4 +1,4 @@
-#if REPLICA_TYPE == 2
+#if REPLICA_TYPE == 3
 
 #include "../inputsInterface.h"
 #include "../config.h"
@@ -20,7 +20,6 @@ uint8_t selectorPin = OM_DEFAULT_SELECTOR_PIN;
 
 Bounce triggerDebouncer = Bounce();
 Bounce cutoffDebouncer = Bounce();
-Bounce selectorDebouncer = Bounce();
 
 void OMInputsInterface::begin()
 {
@@ -37,9 +36,6 @@ void OMInputsInterface::begin()
   cutoffDebouncer.attach(cyclePin,INPUT_PULLUP);
   cutoffDebouncer.interval(OM_DEBOUNCE_TIME_MS);
 
-  selectorDebouncer.attach(selectorPin,INPUT_PULLUP);
-  selectorDebouncer.interval(OM_DEBOUNCE_TIME_MS);
-
   OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
 }
 
@@ -47,7 +43,6 @@ void OMInputsInterface::update()
 {
   triggerDebouncer.update();
   cutoffDebouncer.update();
-  selectorDebouncer.update();
    
   if( triggerDebouncer.fell()) {
     OMVirtualTrigger::pull();
@@ -60,21 +55,18 @@ void OMInputsInterface::update()
   }
 
   // cycling throught modes on selector press
-  if( selectorDebouncer.fell()) {
-    switch (OMVirtualSelector::getState())
-    {      
-      case OMVirtualSelector::stateSafe:
-        OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
-      break;
+  if(OMConfiguration::isSelectorCalibrated())
+  {
+    int selectorValue =  analogRead(selectorPin);
+    int threshold1 = (OMConfiguration::selectorCalibration[0] + OMConfiguration::selectorCalibration[1]) / 2;
+    int threshold2 = (OMConfiguration::selectorCalibration[1] + OMConfiguration::selectorCalibration[2]) / 2;
 
-      case OMVirtualSelector::stateSemi:
-        OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
-      break;
-
-      case OMVirtualSelector::stateAuto:
-      default:
-        OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
-      break;
+    if( selectorValue < threshold1) {
+       OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
+    } else if (selectorValue < threshold2) {
+      OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
+    } else {
+      OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
     }
   }
 }
@@ -107,6 +99,7 @@ void OMInputsInterface::motorOff()
 //this interface do not wrok with analog slector values
 float OMInputsInterface::getSelectorCalibrationValue()
 {
-  return -1;
+  return analogRead(selectorPin);
+  // return selectorPin;
 }
 #endif
