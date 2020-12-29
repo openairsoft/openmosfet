@@ -18,6 +18,11 @@ uint8_t selectorPin = OM_DEFAULT_SELECTOR_PIN;
 #define MOTOR_LEDC_FREQ 12000
 #define MOTOR_LEDC_RES 8
 
+#define OM_DELAY_BETWEEN_SELECTOR_CHANGE_MS 200 //remove a bit of noise, also important for esp-now
+
+
+unsigned int nextSelectorStateAllowChange_ms = 0;
+
 Bounce triggerDebouncer = Bounce();
 Bounce cutoffDebouncer = Bounce();
 
@@ -61,19 +66,25 @@ void OMInputsInterface::update()
     int threshold1 = (OMConfiguration::selectorCalibration[0] + OMConfiguration::selectorCalibration[1]) / 2;
     int threshold2 = (OMConfiguration::selectorCalibration[1] + OMConfiguration::selectorCalibration[2]) / 2;
 
-    if( selectorValue < threshold1) {
-      if(OMVirtualSelector::getState() != OMVirtualSelector::stateSafe) {
-        OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
-      }
-    } else if (selectorValue < threshold2) {
-      if(OMVirtualSelector::getState() != OMVirtualSelector::stateSemi) {
-        OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
-      }
-    } else {
-      if(OMVirtualSelector::getState() != OMVirtualSelector::stateAuto) {
-        OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
+    if(millis() > nextSelectorStateAllowChange_ms) {
+      if( selectorValue < threshold1) {
+        if(OMVirtualSelector::getState() != OMVirtualSelector::stateSafe) {
+          OMVirtualSelector::setState(OMVirtualSelector::stateSafe);
+          nextSelectorStateAllowChange_ms = millis() + OM_DELAY_BETWEEN_SELECTOR_CHANGE_MS;
+        }
+      } else if (selectorValue < threshold2) {
+        if(OMVirtualSelector::getState() != OMVirtualSelector::stateSemi) {
+          OMVirtualSelector::setState(OMVirtualSelector::stateSemi);
+          nextSelectorStateAllowChange_ms = millis() + OM_DELAY_BETWEEN_SELECTOR_CHANGE_MS;
+        }
+      } else {
+        if(OMVirtualSelector::getState() != OMVirtualSelector::stateAuto) {
+          OMVirtualSelector::setState(OMVirtualSelector::stateAuto);
+          nextSelectorStateAllowChange_ms = millis() + OM_DELAY_BETWEEN_SELECTOR_CHANGE_MS;
+        }
       }
     }
+    
   }
 }
 
