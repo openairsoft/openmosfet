@@ -88,15 +88,37 @@ The team is composed of two developers and two electronitians, all french airsof
 ### Installation and build
 - Install platformio
 - "open" the project
+- it is recommended that you create your custom platformio environements in a `custom_env.ini` (you can copy `custom_env.example.ini` file).
+  This way you can assign different pins or use different boards types without messing with the git versionning and you can still inherit from envs defined in the `platformio.ini` file.
+  - *Note : don't forget to include the parent build flags if you inherhit an env*
 - for building the ui (mandatory) :
   - install node.js
   - inside the `ui` folder, run `npm install`
-  - *Note : `ui.h` is recompiled by running the command `npm run build` inside the `ui` folder. this is done automaticaly before each platformio build (see platformio.ini and build_ui.py)*
-- OTA upload is enabled by default, if your board hasn't ota enabled or you want to upload with serial, comment that following parameters in `platformio.ini`
-  - `upload_protocol`
-  - `upload_port`
+  - *Note : `ui.h` is recompiled by running the command `npm run build` inside the `ui` folder. this is done automaticaly before each platformio build (see [UI Development](#ui-development) section, platformio.ini and build_ui.py)*
+- *Note :* OTA upload is enabled by default, if your board hasn't ota enabled or you want to upload with serial, you can :
+  - QUICK AND DIRTY WAY : comment that following parameters in `platformio.ini`
+    - `upload_protocol`
+    - `upload_port`
+  - PROPER WAY
+    - use `custom_env.ini` and create an environement with redifined `upload_protocol` and `upload_port` (see `custom_env.example.ini`), ex :
+      - upload_protocol = esptool
+      - upload_port = *
 - default password for access point is "password"
 - I think thats about it...
+
+## UI Development
+
+### Local UI (without board)
+To serve the UI locally on your computer, we provide a fake server to simulate the board behavior.
+
+#### Install and serve
+  - inside the `/src/ui/` folder, run `npm install`
+  - run `npm run serve-dev`
+  - open http://localhost:3000/ in your browser
+  - you can now edit ``src/`` without having to re-launch the server
+
+*Note: The configuration is loaded from ``defaultConf.json`` and can be updated as long as the server is running.
+Once it stops the updated configuration is lost*
 
 ### Replica interface types
 Depending on your replica and the way you connect the mosfet, the signals received are not the same.
@@ -128,20 +150,6 @@ For developpement reasons or other, you can change the default settings for the 
 ### http rest-like API
 
 Got to the [API documentation](/doc/api).
-
-## Development
-
-### Local UI (without board)
-To serve the UI locally on your computer, we provide a fake server to simulate the board behavior.
-
-#### Install and serve
-  - inside the `/src/ui/` folder, run `npm install`
-  - run `npm run serve-dev`
-  - open http://localhost:3000/ in your browser
-  - you can now edit ``src/`` without having to re-launch the server
-
-*Note: The configuration is loaded from ``defaultConf.json`` and can be updated as long as the server is running.
-Once it stops the updated configuration is lost*
 
 ## Contributing
 Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/XuzSSbgE).
