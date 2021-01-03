@@ -145,8 +145,9 @@ class OMVirtualReplica
     static unsigned long _lastActiveTimeMs;
     static unsigned long _lastTriggerReleaseMs;
     static unsigned long _lastEndCycleMs;
+    static unsigned long _lastShotFiredMs;
 
-    static void startFiringCycle();
+    static void testFiringCycle();
     static void endFiringCycle();
 
 };

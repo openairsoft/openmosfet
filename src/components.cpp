@@ -106,6 +106,7 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 #define COND_SAFETY_OFF OMVirtualSelector::getState() != OMVirtualSelector::stateSafe
 #define COND_GEARBOX_NOT_CYCLING OMVirtualGearbox::getState() != OMVirtualGearbox::stateCycling
 #define COND_TRIGGER_PULLED OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
+#define COND_DELAY_BETWEEN_SHOTS_PASSED (millis() - OMVirtualReplica::_lastShotFiredMs) >= OMInputsInterface::getCurrentFiringSetting().getTimeBetweenShotsMs()
 #define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() != OMFiringSettings::burstModeInterruptible
 #define COND_BURST_NOT_FINISHED OMVirtualReplica::_bbs_fired < OMInputsInterface::getCurrentFiringSetting().getBurstLength()
 #define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() == OMFiringSettings::burstModeExtendible
@@ -117,6 +118,7 @@ uint8_t OMVirtualReplica::_currentBurstBBCount = 0;
 unsigned long OMVirtualReplica::_lastActiveTimeMs = 0;
 unsigned long OMVirtualReplica::_lastTriggerReleaseMs = 0;
 unsigned long OMVirtualReplica::_lastEndCycleMs = 0;
+unsigned long OMVirtualReplica::_lastShotFiredMs = 0;
 
 void OMVirtualReplica::begin(void)
 {
@@ -129,6 +131,8 @@ void OMVirtualReplica::begin(void)
 
 void OMVirtualReplica::update(void)
 {
+  OMVirtualReplica::testFiringCycle();
+  
   // uncock if trigger is maintained after a set amount of time
   if(
     OMVirtualReplica::_state == OMVirtualReplica::stateIdle
@@ -173,7 +177,7 @@ void OMVirtualReplica::triggerPulled(void)
     Serial.println("triggerPulled");
   #endif
   OMVirtualReplica::_bbs_fired = 0;
-  OMVirtualReplica::startFiringCycle();
+  OMVirtualReplica::testFiringCycle();
 }
 
 void OMVirtualReplica::triggerReleased(void)
@@ -188,10 +192,10 @@ void OMVirtualReplica::triggerReleased(void)
   OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
 }
 
-void OMVirtualReplica::startFiringCycle(void)
+void OMVirtualReplica::testFiringCycle(void)
 {
 #ifdef DEBUG
-  Serial.println("startFiringCycle");
+  Serial.println("testFiringCycle");
 #endif
 
   if
@@ -199,6 +203,8 @@ void OMVirtualReplica::startFiringCycle(void)
     COND_SAFETY_OFF
     &&
     COND_GEARBOX_NOT_CYCLING
+    &&
+    COND_DELAY_BETWEEN_SHOTS_PASSED
     &&
     (
       (
@@ -212,6 +218,7 @@ void OMVirtualReplica::startFiringCycle(void)
   )
   {
     OMVirtualReplica::_state = OMVirtualReplica::stateFiring;
+    OMVirtualReplica::_lastShotFiredMs = millis();
     OMVirtualGearbox::cycle(OMInputsInterface::getCurrentFiringSetting().getPrecockDurationMs());
   }else{
     OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
@@ -232,5 +239,5 @@ void OMVirtualReplica::endFiringCycle(void)
     printf("OMVirtualReplica::_lastEndCycleMs : %lu\n", OMVirtualReplica::_lastEndCycleMs);
   #endif
   OMVirtualReplica::_bbs_fired++;
-  OMVirtualReplica::startFiringCycle();
+  OMVirtualReplica::testFiringCycle();
 }
