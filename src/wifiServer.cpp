@@ -44,6 +44,8 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_GET, OMwifiserver::handleSelectorStateApi);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_PATCH, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
+  OMwifiserver::webServer.on("/api/components/gearbox/state", HTTP_GET, OMwifiserver::handleGearboxStateApi);
+  OMwifiserver::webServer.on("/api/components/gearbox/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
   OMwifiserver::webServer.on("/api/components/gearbox/uncock", OMwifiserver::handleGearboxUncockingApi);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
@@ -455,6 +457,41 @@ void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, ui
       }
   }else{
       request->send(405, "text/html", "bad method, POST, GET or PATCH only");
+  }
+}
+
+void OMwifiserver::handleGearboxStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_POST:
+    case HTTP_GET:
+      request->send(200, "application/json", String(OMVirtualGearbox::getState()));
+    break;
+    default:
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
+    break;
+  }
+}
+
+void OMwifiserver::handleGearboxStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
+  if(request->method() == HTTP_POST) {
+      DynamicJsonDocument gearboxStateJson(0);
+      deserializeJson(gearboxStateJson, (const char*)bodyData);
+
+      OMVirtualGearbox::GearboxState receivedState =  gearboxStateJson.as<OMVirtualGearbox::GearboxState>();
+
+      switch(receivedState){
+        case OMVirtualGearbox::stateResting:
+        case OMVirtualGearbox::statePrecocked:
+        case OMVirtualGearbox::stateCycling:
+        case OMVirtualGearbox::stateError:
+          OMVirtualGearbox::setState(receivedState);
+        break;
+        default:
+          request->send(400, "text/html", "unknown gearbox state value");
+        break;
+      }
+  }else{
+      request->send(405, "text/html", "bad method, POST, GET only");
   }
 }
 

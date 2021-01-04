@@ -74,9 +74,10 @@ class OMVirtualGearbox
 public:
   enum GearboxState
   {
-    stateResting,
-    statePrecocked,
-    stateCycling,
+    stateResting = 0,
+    statePrecocked = 1,
+    stateCycling = 2,
+    stateError = 3,
   };
 
   enum GearboxCycleState
@@ -86,11 +87,16 @@ public:
   };
   static void cycle(unsigned int precockDuration_ms);
   static OMVirtualGearbox::GearboxState getState(void) { return OMVirtualGearbox::_state; }
+  /**
+   * Only use this method if you know what you're doing.
+  */
+  static void setState(OMVirtualGearbox::GearboxState state);
   static void cycleEndDetected(void);
   static void endCycle(OMVirtualGearbox::GearboxState state);
   static void update(void);
 
 private:
+  static unsigned long _cycleStartTime_ms;
   static unsigned int _precockDuration_ms;
   static unsigned long _precockEndTime_ms;
   static OMVirtualGearbox::GearboxState _state;
@@ -127,8 +133,8 @@ class OMVirtualReplica
   public:
     enum ReplicaState
     {
-      stateIdle,
-      stateFiring,
+      stateIdle = 0,
+      stateFiring = 1,
     };
     static void begin(void);
     static void update(void);
@@ -136,7 +142,7 @@ class OMVirtualReplica
     static void triggerPulled(void);
     static void triggerReleased(void);
     static void gearboxCycleEndDetected(void);
-    static void setSelectorState(OMVirtualSelector::SelectorState state);
+    static OMVirtualReplica::ReplicaState getState(void) { return OMVirtualReplica::_state; }
 
   private:
     static uint8_t _bbs_fired;

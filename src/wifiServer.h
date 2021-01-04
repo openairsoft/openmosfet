@@ -38,6 +38,8 @@ class OMwifiserver
         static void handleSelectorStateApi(AsyncWebServerRequest *request);
         static void handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 
+        static void handleGearboxStateApi(AsyncWebServerRequest *request);
+        static void handleGearboxStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
         static void handleGearboxUncockingApi(AsyncWebServerRequest *request);
 
         static AsyncWebServer webServer;

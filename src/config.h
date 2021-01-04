@@ -35,10 +35,6 @@
 
 #define OM_DNS_PORT  53
 
-// If motor is spinning and no cycle has been detected in this time interval, then somethings wrong
-// shut down the motor and report the error.
-#define MAX_TIME_BETWEEN_CYCLES_MS 500
-
 #define OM_JSON_DOCUMENT_SIZE 3000
 
 #ifdef DEBUG

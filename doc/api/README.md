@@ -64,15 +64,19 @@ This is closely linked to [configuration.h](/src/configuration.h)
  
 This is closely linked to [components.h](/src/components.h)
 
+[comment]: # (todo: a method to get all the components state in one request)
+
+[comment]: # (todo: uniformize Selector state api values, include both voltage and state)
+
 - **Trigger state** : `/api/components/trigger/state`
-  - `GET,POST` : set/read the trigger state
-    - parameters *application/json*
+  - `GET,POST` : reads/sets the trigger state
+    - return values/input parameters *application/json*
       - *boolean* : [true, false] true for pulling the trigger, false for releasing
 - **Trigger short pull** : `/api/components/trigger/bump`
   - `POST` : pull and release the trigger
 - **Selector state** : `/api/components/selector/state`
   - `GET,POST` : respectively reads or sets the selector state
-    - returnvalues/input parameters *application/json*
+    - return values/input parameters *application/json*
       - *int* : [`0`, `1`, `2`]
   - `PATCH` : calibrates the sensor for a given state (`PATCH`)
     - input parameters *application/json*
@@ -82,6 +86,10 @@ This is closely linked to [components.h](/src/components.h)
     - highlighted return codes :
       - `206` : value accepted but calibration incomplete (other positions still needs calibrating)
       - `200` : value accepted and calibration complete
+- **Gearbox state** : `/api/components/gearbox/state`
+  - `GET,POST` : reads/sets the gearbox state, this can be used to reset the gearbox state after an error
+    - return values/input parameters *application/json*
+      - *int* : [`0`: resting, `1`: precocked, `2`: cycling, `3`: error]
 - **Gearbox uncocking** : `/api/components/gearbox/uncock`
   - `POST` : uncock the piston (if cocked) ⚠Be careful, this will eventully fire a BB⚠
 

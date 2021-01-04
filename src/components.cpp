@@ -28,24 +28,34 @@ void OMVirtualTrigger::release(void)
 }
 
 //----------------------------- GEARBOX -------------------------------------
-
-OMVirtualGearbox::GearboxState OMVirtualGearbox::_state = OMVirtualGearbox::stateResting;
-OMVirtualGearbox::GearboxCycleState OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;
+unsigned long OMVirtualGearbox::_cycleStartTime_ms = 0;
 unsigned int OMVirtualGearbox::_precockDuration_ms = 0;
 unsigned long OMVirtualGearbox::_precockEndTime_ms = 0;
+OMVirtualGearbox::GearboxState OMVirtualGearbox::_state = OMVirtualGearbox::stateResting;
+OMVirtualGearbox::GearboxCycleState OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;
 
 void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
 {
-  if(OMVirtualGearbox::_state != OMVirtualGearbox::stateCycling)
+  if(OMVirtualGearbox::_state != OMVirtualGearbox::stateCycling || OMVirtualGearbox::_state != OMVirtualGearbox::stateError)
   {
     #ifdef DEBUG
       Serial.println("OMVirtualGearbox::cycle");
     #endif
-    if(!OMConfiguration::disableMotor) {OMInputsInterface::motorOn();}
+    if(!OMConfiguration::disableMotor){OMInputsInterface::motorOn();}
     OMVirtualGearbox::_precockDuration_ms = precockDuration_ms;
     OMVirtualGearbox::_state = OMVirtualGearbox::stateCycling;
     OMVirtualGearbox::_cycleState = OMVirtualGearbox::stateCocking;
+    OMVirtualGearbox::_cycleStartTime_ms = millis();
   }
+}
+
+void OMVirtualGearbox::setState(OMVirtualGearbox::GearboxState state)
+{
+#ifdef DEBUG
+  Serial.println("OMVirtualGearbox::setState");
+#endif
+  OMVirtualGearbox::_state = state;
+  OMVirtualReplica::updateLastActive();
 }
 
 void OMVirtualGearbox::cycleEndDetected(void)
@@ -66,14 +76,21 @@ void OMVirtualGearbox::cycleEndDetected(void)
 
 void OMVirtualGearbox::update(void)
 {
-  if (
-      OMVirtualGearbox::_state == OMVirtualGearbox::stateCycling &&
-      OMVirtualGearbox::_cycleState == OMVirtualGearbox::statePrecocking)
+  if(OMVirtualGearbox::_state == OMVirtualGearbox::stateCycling)
   {
-    if (millis() >= OMVirtualGearbox::_precockEndTime_ms)
+    if(millis() - OMVirtualGearbox::_cycleStartTime_ms > MAX_TIME_BETWEEN_CYCLES_MS){
+      OMVirtualGearbox::endCycle(OMVirtualGearbox::stateError);
+      OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
+      //todo: beep
+    }else if
+    (
+      OMVirtualGearbox::_cycleState == OMVirtualGearbox::statePrecocking &&
+      millis() >= OMVirtualGearbox::_precockEndTime_ms
+    )
     {
-      OMVirtualGearbox::endCycle(OMVirtualGearbox::statePrecocked);
+      OMVirtualGearbox::endCycle(OMVirtualGearbox::statePrecocked);  
     }
+
   }
 }
 
@@ -96,7 +113,7 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 #ifdef DEBUG
   Serial.println("OMVirtualSelector::setState");
 #endif
-  _state = state;
+  OMVirtualSelector::_state = state;
   if(OMConfiguration::enableEspNow){ OpenMosfetEspNowAsyncServer::sendSelectorState((uint8_t)state); }
   OMVirtualReplica::updateLastActive();
 }
@@ -110,6 +127,7 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 #define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() != OMFiringSettings::burstModeInterruptible
 #define COND_BURST_NOT_FINISHED OMVirtualReplica::_bbs_fired < OMInputsInterface::getCurrentFiringSetting().getBurstLength()
 #define COND_BURST_EXTENDIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() == OMFiringSettings::burstModeExtendible
+#define COND_CURRENTLY_FIRING OMVirtualReplica::_state == OMVirtualReplica::stateFiring
 #define COND_TRIGGER_AS_BEEN_MAINTAINED_AFTER_LAST_END_CYCLE OMVirtualReplica::_lastTriggerReleaseMs < OMVirtualReplica::_lastEndCycleMs && OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
 
 uint8_t OMVirtualReplica::_bbs_fired = 0;
@@ -207,13 +225,9 @@ void OMVirtualReplica::testFiringCycle(void)
     COND_DELAY_BETWEEN_SHOTS_PASSED
     &&
     (
-      (
-        COND_TRIGGER_PULLED
-        &&
-        (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE)
-      )
+      ( COND_TRIGGER_PULLED && (COND_BURST_NOT_FINISHED || COND_BURST_EXTENDIBLE) )
       ||
-      (COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED)
+      ( COND_CURRENTLY_FIRING && COND_BURST_NOT_INTERRUPTIBLE && COND_BURST_NOT_FINISHED )
     )
   )
   {
