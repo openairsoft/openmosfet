@@ -64,10 +64,18 @@ This is closely linked to [configuration.h](/src/configuration.h)
  
 This is closely linked to [components.h](/src/components.h)
 
-[comment]: # (todo: a method to get all the components state in one request)
-
 [comment]: # (todo: uniformize Selector state api values, include both voltage and state)
 
+
+- **Components states** : `/api/components/state`
+  - `GET` : reads all the components state in a unified request
+    - return values *application/json*
+      - `trigger` : [true, false] true if pulled
+      - `selector` *object*: 
+        - `position` : [`0`, `1`, `2`] the current position of the selector
+        - `calibration` *float array* :  calibration voltages(or null) for each selector position, in order.
+      - `gearbox` *int* : [`0`: resting, `1`: precocked, `2`: cycling, `3`: error] the gearbox state
+      
 - **Trigger state** : `/api/components/trigger/state`
   - `GET,POST` : reads/sets the trigger state
     - return values/input parameters *application/json*
@@ -77,7 +85,7 @@ This is closely linked to [components.h](/src/components.h)
 - **Selector state** : `/api/components/selector/state`
   - `GET,POST` : respectively reads or sets the selector state
     - return values/input parameters *application/json*
-      - *int* : [`0`, `1`, `2`]
+      - *int* : [`0`, `1`, `2`] the position of the selector
   - `PATCH` : calibrates the sensor for a given state (`PATCH`)
     - input parameters *application/json*
       - *int* : [`0`, `1`, `2`] the current position of the selector

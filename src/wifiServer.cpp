@@ -38,6 +38,7 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
   OMwifiserver::webServer.on("/api/network/espnow/pair", HTTP_POST, OMwifiserver::handleEspNowPairApi);
+  OMwifiserver::webServer.on("/api/components/state", HTTP_GET, OMwifiserver::handleComponentsStateApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_GET, OMwifiserver::handleTriggerStateApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_POST, OMwifiserver::handleTriggerStateApi, NULL, OMwifiserver::handleTriggerStateApiBody);
   OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
@@ -371,6 +372,36 @@ void OMwifiserver::handleEspNowPairApi(AsyncWebServerRequest *request) {
     request->send(200);
   }else{
     request->send(400, "text/html", "please enable esp-now first");
+  }
+}
+
+void OMwifiserver::handleComponentsStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_GET:
+      {
+        DynamicJsonDocument doc(256);//OPTIMISATION : bare minimum value here is 128 -> https://arduinojson.org/v6/assistant/
+
+        doc["trigger"] = OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled;
+
+        JsonObject selector = doc.createNestedObject("selector");
+        selector["position"] = (int)OMVirtualSelector::getState();
+
+        JsonArray selector_calibration = selector.createNestedArray("calibration");
+        for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+        {
+          selector_calibration.add(OMConfiguration::selectorCalibration[i]);
+        }
+
+        doc["gearbox"] = (int)OMVirtualGearbox::getState();
+        
+        AsyncResponseStream *response = request->beginResponseStream("application/json");
+        serializeJson(doc, *response);
+        request->send(response);
+      }
+    break;
+    default:
+      request->send(405, "text/html", "bad method, GET only");
+    break;
   }
 }
 
