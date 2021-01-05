@@ -393,7 +393,7 @@ void OMwifiserver::handleComponentsStateApi(AsyncWebServerRequest *request) {
         }
 
         doc["gearbox"] = (int)OMVirtualGearbox::getState();
-        
+
         AsyncResponseStream *response = request->beginResponseStream("application/json");
         serializeJson(doc, *response);
         request->send(response);
@@ -445,7 +445,21 @@ void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
     case HTTP_GET:
-      request->send(200, "application/json", String(OMVirtualSelector::getState()));
+      {
+        DynamicJsonDocument doc(96);//https://arduinojson.org/v6/assistant/
+
+        doc["selector"] = (int)OMVirtualSelector::getState();
+
+        JsonArray selector_calibration = doc.createNestedArray("calibration");
+        for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+        {
+          selector_calibration.add( OMConfiguration::selectorCalibration[i] );
+        }
+
+        AsyncResponseStream *response = request->beginResponseStream("application/json");
+        serializeJson(doc, *response);
+        request->send(response);
+      }
     break;
     default:
       request->send(405, "text/html", "bad method, POST, GET or PATCH only");
