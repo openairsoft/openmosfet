@@ -122,6 +122,7 @@ void OMVirtualSelector::setState(OMVirtualSelector::SelectorState state)
 
 #define COND_SAFETY_OFF OMVirtualSelector::getState() != OMVirtualSelector::stateSafe
 #define COND_GEARBOX_NOT_CYCLING OMVirtualGearbox::getState() != OMVirtualGearbox::stateCycling
+#define COND_STATE_NOT_ERROR OMVirtualGearbox::getState() != OMVirtualGearbox::stateError
 #define COND_TRIGGER_PULLED OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled
 #define COND_DELAY_BETWEEN_SHOTS_PASSED (millis() - OMVirtualReplica::_lastShotFiredMs) >= OMInputsInterface::getCurrentFiringSetting().getTimeBetweenShotsMs()
 #define COND_BURST_NOT_INTERRUPTIBLE OMInputsInterface::getCurrentFiringSetting().getBurstMode() != OMFiringSettings::burstModeInterruptible
@@ -218,6 +219,8 @@ void OMVirtualReplica::testFiringCycle(void)
 
   if
   (
+    COND_STATE_NOT_ERROR
+    &&
     COND_SAFETY_OFF
     &&
     COND_GEARBOX_NOT_CYCLING
