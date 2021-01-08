@@ -33,6 +33,12 @@
 #define OM_DEFAULT_DECOCK_AFTER_SECONDS 0
 #define OM_DEFAULT_ENABLE_PRECOCKING true
 
+#define OM_DEFAULT_BUZZER_DURATION_MS 700
+#define OM_DEFAULT_BUZZER_FREQ_HZ 2000.
+#define OM_DEFAULT_BUZZER_CHANNEL 2
+#define OM_DEFAULT_BUZZER_RESOLUTION 8
+
+
 #define OM_DNS_PORT  53
 
 #define OM_JSON_DOCUMENT_SIZE 3000
@@ -73,6 +79,8 @@
 
 //--------------- REPLICA INTERFACE --------------
 #define OM_DEBOUNCE_TIME_MS 2
+#define OM_INTERFACE_PWM_CHANNEL_1 0
+#define OM_INTERFACE_PWM_CHANNEL_2 1
 
 #ifndef OM_DEFAULT_MOTOR_PIN
 	#define OM_DEFAULT_MOTOR_PIN 32
@@ -85,6 +93,9 @@
 #endif
 #ifndef OM_DEFAULT_SELECTOR_PIN
 	#define OM_DEFAULT_SELECTOR_PIN 10
+#endif
+#ifndef OM_DEFAULT_BUZZER_PIN
+	#define OM_DEFAULT_BUZZER_PIN 33
 #endif
 
 //This constant specify the replica used (better used with compiler flags)

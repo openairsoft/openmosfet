@@ -3,6 +3,7 @@
 #include "components.h"
 #include "configuration.h"
 #include "inputsInterface.h"
+#include "OMBuzzer.h"
 
 //----------------------------- TRIGGER -------------------------------------
 OMVirtualTrigger::TriggerState OMVirtualTrigger::_state = OMVirtualTrigger::stateReleased;
@@ -36,7 +37,7 @@ OMVirtualGearbox::GearboxCycleState OMVirtualGearbox::_cycleState = OMVirtualGea
 
 void OMVirtualGearbox::cycle(unsigned int precockDuration_ms)
 {
-  if(OMVirtualGearbox::_state != OMVirtualGearbox::stateCycling || OMVirtualGearbox::_state != OMVirtualGearbox::stateError)
+  if(OMVirtualGearbox::_state != OMVirtualGearbox::stateCycling/* && OMVirtualGearbox::_state != OMVirtualGearbox::stateError*/)
   {
     #ifdef DEBUG
       Serial.println("OMVirtualGearbox::cycle");
@@ -81,7 +82,7 @@ void OMVirtualGearbox::update(void)
     if(millis() - OMVirtualGearbox::_cycleStartTime_ms > MAX_TIME_BETWEEN_CYCLES_MS){
       OMVirtualGearbox::endCycle(OMVirtualGearbox::stateError);
       OMVirtualReplica::_state = OMVirtualReplica::stateIdle;
-      //todo: beep
+      OMBuzzer::buzz();
     }else if
     (
       OMVirtualGearbox::_cycleState == OMVirtualGearbox::statePrecocking &&

@@ -8,13 +8,14 @@
 #include "configuration.h"
 #include "wifiServer.h"
 #include "otaUploader.h"
+#include "OMBuzzer.h"
 
 void setup();
 void loop();
 
-
 void setup() {
   //important initialize the input interface first, beacause this the sets the outputs and it may be important depending on the fet input logic
+  OMBuzzer::begin();
   OMInputsInterface::begin();
   OMVirtualReplica::begin();
 
@@ -55,20 +56,20 @@ void setup() {
     digitalWrite(OM_ADDITIONAL_LOW_PIN, LOW);
   #endif
 
-
-
-
   OMwifiserver::begin();
   OMOtaUploader::begin();
   if(OMConfiguration::enableEspNow){
     OpenMosfetEspNowAsyncServer::begin();
   }
+
+  //at the end
+  OMBuzzer::buzz((unsigned int)1000);
 }
 
 void loop() {
+  OMBuzzer::update();
   OMwifiserver::update();
   OMOtaUploader::update();
   OMInputsInterface::update();
   OMVirtualReplica::update();
-  
 }
