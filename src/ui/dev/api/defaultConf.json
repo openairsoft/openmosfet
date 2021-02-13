@@ -15,6 +15,7 @@
   "decockAfter_s": 1,
   "enablePrecocking": true,
   "disableMotor": true,
+  "enableEspNow": false,
   "fireModes": [
     {
       "burstMode": 0,

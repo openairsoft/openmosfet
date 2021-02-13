@@ -48,7 +48,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       let modeindex = parseInt(module.getAttribute('data-firemode-index'));
 
       let mode = extractInputs(module);
-      mode.motorPower =  mode.motorPower / 100;
+      mode.motorPower = mode.motorPower / 100;
 
       module.querySelectorAll('[data=burstMode] button').forEach((modeBtn, index) => {
         if (modeBtn.matches('.active')) {
@@ -75,18 +75,18 @@ window.addEventListener("DOMContentLoaded", async () => {
       console.log('[CONFIG] Cannot send config');
     }
 
-    if(updatedConfig) {
+    if (updatedConfig) {
       // Convert to string to allow simple object comparison
       sorting = Object.keys(newConfig).sort()
-      if(JSON.stringify(newConfig, sorting) == JSON.stringify(updatedConfig, sorting)){
+      if (JSON.stringify(newConfig, sorting) == JSON.stringify(updatedConfig, sorting)) {
         console.log('[CONFIG] Update sucessfull');
-      }else{
+      } else {
         console.log('[CONFIG] Data sended not equal to data received:');
         console.log('-->', newConfig);
         console.log('<--', updatedConfig);
         alert('Your OpenMosfet returned a different value from what you wanted to save. You should check every value you typed to detect any changes.')
       }
-      
+
       renderConfig(updatedConfig);
     }
 
@@ -95,11 +95,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   });
 
-  document.querySelector('#updatefromgithub').addEventListener('click', async (e)=>{
+  document.querySelector('#updatefromgithub').addEventListener('click', async (e) => {
     document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
     document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'block')
     document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
-    
+
     try {
       document.querySelector('#UPDATE').classList.add('is_updating');
       updatedConfig = await _fetch('/api/core/update/', {
@@ -113,15 +113,18 @@ window.addEventListener("DOMContentLoaded", async () => {
       console.log('[CONFIG] Cannot request update');
     } finally {
       document.getElementById('loader').classList.remove('hide');
-      setTimeout(()=>{
+      setTimeout(() => {
         document.location.reload();
       }, 600);
     }
 
 
   })
+
   // Delay for debugging
   // await new Promise(resolve => setTimeout(resolve, 2000));
+
+  renderSetup();
 
   setWifiStatus('interrupted');
 
@@ -208,6 +211,44 @@ function renderConfig(config) {
 
 }
 
+function renderSetup() {
+  const isFirstLaunch = localStorage.getItem('isFirstLaunch');
+  const intervals = [];
+  if (isFirstLaunch !== '0') {
+    document.querySelector('#setup').classList.remove('hide');
+    document.querySelectorAll('#setup .close').forEach((x) => {
+      x.addEventListener('click', () => {
+        document.removeEventListener('scroll', onSetupScroll);
+        localStorage.setItem('isFirstLaunch', '0');
+        document.querySelector('#setup').classList.add('hide');
+        intervals.forEach(function (interval) {
+          clearInterval(interval);
+        })
+      });
+    });
+
+    document.querySelector('#setup .slides').addEventListener('scroll', onSetupScroll);
+
+    function onSetupScroll() {
+      debounce(onSetupScrolled, 500);
+    }
+
+    function onSetupScrolled() {
+      if (isInViewport(document.querySelector('#gearboxmodel'))) {
+        intervals.push(setInterval(async function () {
+          componentsState = await _fetch('/api/components/state');
+          if(componentsState.trigger) {
+            document.querySelector('#gearboxmodel').classList.add('active');
+          }else{
+            document.querySelector('#gearboxmodel').classList.remove('active');
+          }
+        }, 200));
+      }
+    }
+  }
+  console.log('isFirstLaunch', isFirstLaunch);
+}
+
 function fillInputs(el, data) {
   for (const key in data) {
     let val = data[key];
@@ -230,9 +271,9 @@ function extractInputs(el) {
     if (input.matches('[type="checkbox"]')) {
       data[input.name] = input.checked;
     } else {
-      
+
       data[input.name] = input.value
-      if(input.type=='number') data[input.name] = Number(data[input.name])
+      if (input.type == 'number') data[input.name] = Number(data[input.name])
     }
   });
 
@@ -248,7 +289,7 @@ function getVersion() {
 }
 
 function checkUpdates() {
-  return _fetch('https://api.github.com/repos/simonjamain/openmosfet/releases/latest');
+  return _fetch('https://api.github.com/repos/openairsoft/openmosfet/releases/latest');
 }
 
 async function _fetch(url, options, retry_count) {
@@ -262,7 +303,7 @@ async function _fetch(url, options, retry_count) {
       throw new Error('TRY_LIMIT_REACHED');
     } else {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      return _fetch(url, options,retry_count);
+      return _fetch(url, options, retry_count);
     }
   }
 }
@@ -280,4 +321,21 @@ function setWifiStatus(status) {
       break;
 
   }
+}
+
+function isInViewport(element) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+
+function debounce(method, delay) {
+  clearTimeout(method._tId);
+  method._tId = setTimeout(function () {
+    method();
+  }, delay);
 }

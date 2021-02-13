@@ -3,7 +3,7 @@ const colors = require('colors'),
       path = require('path'),
       port = 3000;
 
-const VERSION = '0.2.2-alpha';
+const VERSION = '1.7.4-beta';
 
 let config = require('./defaultConf.json');
 
@@ -20,6 +20,7 @@ app.use(express.json())
 
 // Map src folder to server root
 app.use('/', express.static(path.join(__dirname, '../../src/')));
+app.use('/build', express.static(path.join(__dirname, '../../build/')));
 
 // Return the config
 app.get(['/api/config', '/cfg.json'], (req, res) => {
@@ -68,6 +69,19 @@ app.put('/api/core/update', (req, res) => {
   console.log('This feature is not available in local development mode\n\n\n'.warn);
   res.json(config);
 })
+
+
+app.get('/api/components/state', (req, res) => {
+  setTimeout(()=>{
+    console.log('[GET /api/components/state] Components state'.request);
+    let ComponentsState = {
+      trigger: Boolean((Date.now()/1000).toFixed()%2) // Random value
+    }
+    res.json(ComponentsState);
+    console.log(JSON.stringify(ComponentsState).dataSent+"\n\n\n");
+  }, 500);
+})
+
 
 app.listen(port, () => {
   console.log(`Local development server is running at http://localhost:${port}\n`)
