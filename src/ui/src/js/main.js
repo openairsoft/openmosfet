@@ -213,7 +213,7 @@ function renderConfig(config) {
 
 function renderSetup() {
   const isFirstLaunch = localStorage.getItem('isFirstLaunch');
-  const intervals = [];
+  const intervals = {};
   if (isFirstLaunch !== '0') {
     document.querySelector('#setup').classList.remove('hide');
     document.querySelectorAll('#setup .close').forEach((x) => {
@@ -221,8 +221,19 @@ function renderSetup() {
         document.removeEventListener('scroll', onSetupScroll);
         localStorage.setItem('isFirstLaunch', '0');
         document.querySelector('#setup').classList.add('hide');
-        intervals.forEach(function (interval) {
-          clearInterval(interval);
+
+        for (const intervalKey in intervals) {
+          clearInterval(intervals[intervalKey]);
+        }
+      });
+    });
+    
+    document.querySelectorAll('#setup a[data-target]').forEach((x) => {
+      x.addEventListener('click', function(e){
+        e.preventDefault();
+        console.log();
+        document.querySelector(e.target.getAttribute('data-target')).scrollIntoView({
+          behavior: "smooth"
         })
       });
     });
@@ -235,14 +246,16 @@ function renderSetup() {
 
     function onSetupScrolled() {
       if (isInViewport(document.querySelector('#gearboxmodel'))) {
-        intervals.push(setInterval(async function () {
+        intervals.trigger = setInterval(async function () {
           componentsState = await _fetch('/api/components/state');
           if(componentsState.trigger) {
             document.querySelector('#gearboxmodel').classList.add('active');
           }else{
             document.querySelector('#gearboxmodel').classList.remove('active');
           }
-        }, 200));
+        }, 500);
+      }else{
+        clearInterval(intervals.trigger);
       }
     }
   }
