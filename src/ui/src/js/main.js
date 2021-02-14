@@ -163,14 +163,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (latestUpdate) {
-    renderUpdate(latestUpdate);
+    renderUpdate(latestUpdate, version);
   }
 
 });
 
-function renderUpdate(latestUpdate) {
+function renderUpdate(latestUpdate, version) {
   setWifiStatus('connected');
-  console.log('[LATEST_UPDATE]', latestUpdate);
+  console.log('[LATEST_VERSION]', latestUpdate.tag_name);
 
   document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = 'v' + latestUpdate.tag_name);
   document.querySelectorAll('[data=newversionurl]').forEach((el) => el.href = latestUpdate.html_url);
@@ -322,12 +322,14 @@ async function _fetch(url, options, retry_count) {
 }
 
 function setWifiStatus(status) {
+  document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'none')
   switch (status) {
     case 'connected':
       document.getElementById('wifistatus').style.fill = '#009432';
       break;
     case 'only_local':
       document.getElementById('wifistatus').style.fill = '#f39c12';
+      document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'block')
       break;
     case 'interrupted':
       document.getElementById('wifistatus').style.fill = '#EA2027';
