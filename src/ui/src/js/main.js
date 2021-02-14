@@ -18,7 +18,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       let collapseContent = el.parentElement.querySelector(':scope > div');
 
       if (el.parentElement.classList.toggle('open')) {
-        collapseContent.style.maxHeight = collapseContent.offsetWidth + 'px';
+        collapseContent.style.maxHeight = collapseContent.scrollHeight + 'px';
       } else {
         collapseContent.style.maxHeight = '0px';
       }
