@@ -6,13 +6,12 @@ const int capacity = OM_JSON_DOCUMENT_SIZE;//see https://arduinojson.org/v6/assi
 
 
 //initialization
-OMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0), OMFiringSettings(OMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
 char OMConfiguration::appSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_APSSID;
 char OMConfiguration::appPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_APP_PASSWD;
+boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE;
 char OMConfiguration::availableNetworkAppSsid[OM_WIFI_SSID_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APSSID;
 char OMConfiguration::availableNetworkAppPasswd[OM_WIFI_PSSWD_REAL_MAX_SIZE] = OM_DEFAULT_AVAILABLE_NETWORK_APP_PASSWD;
-
-boolean OMConfiguration::connectToNetworkIfAvailable = OM_DEFAULT_CONNECT_TO_NETWORK_IF_AVAILABLE;
+boolean OMConfiguration::enableEspNow = OM_DEFAULT_ENABLE_ESP_NOW;
 boolean OMConfiguration::disableMotor = OM_DEFAULT_DISABLE_MOTOR;
 boolean OMConfiguration::enableBatteryProtection = OM_DEFAULT_USE_BATTERY_PROTECTION;
 int OMConfiguration::wifiShutdownDelayMinutes = OM_DEFAULT_WIFI_SHUTDOWN_DELAY_MINUTES;
@@ -23,6 +22,8 @@ float OMConfiguration::batteryShutdownVoltage = OM_DEFAULT_SHUTDOWN_VOLTAGE;
 boolean OMConfiguration::enableActiveBreaking = OM_DEFAULT_USE_ACTIVE_BRAKING;
 float OMConfiguration::decockAfter_s = OM_DEFAULT_DECOCK_AFTER_SECONDS;
 boolean OMConfiguration::enablePrecocking = OM_DEFAULT_ENABLE_PRECOCKING;
+int OMConfiguration::selectorCalibration[OM_MAX_NB_STORED_MODES+1] = {-1, -1, -1};
+OMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0), OMFiringSettings(OMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
 
 void OMConfiguration::loadFromJson(Stream &stream){
   DynamicJsonDocument doc(capacity);
@@ -36,9 +37,10 @@ void OMConfiguration::loadFromJson(Stream &stream){
   
   strcpy(OMConfiguration::appSsid, doc["appSsid"]);
   strcpy(OMConfiguration::appPasswd, doc["appPasswd"]);
+  OMConfiguration::connectToNetworkIfAvailable = doc["connectToNetworkIfAvailable"];
   strcpy(OMConfiguration::availableNetworkAppSsid, doc["availableNetworkAppSsid"]);
   strcpy(OMConfiguration::availableNetworkAppPasswd, doc["availableNetworkAppPasswd"]);
-  OMConfiguration::connectToNetworkIfAvailable = doc["connectToNetworkIfAvailable"];
+  OMConfiguration::enableEspNow = doc["enableEspNow"];
   OMConfiguration::enableBatteryProtection = doc["enableBatteryProtection"];
   OMConfiguration::disableMotor = doc["disableMotor"];
   OMConfiguration::wifiShutdownDelayMinutes = doc["wifiShutdownDelayMinutes"];
@@ -50,8 +52,12 @@ void OMConfiguration::loadFromJson(Stream &stream){
   OMConfiguration::decockAfter_s = doc["decockAfter_s"];
   OMConfiguration::enablePrecocking = doc["enablePrecocking"];
   
-  int i = 0;
-  for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
+  for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+  {
+    OMConfiguration::selectorCalibration[i] = doc["selectorCalibration"][i].as<int>();
+  }
+  
+  for(int i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
     JsonObject currentFireMode = doc["fireModes"][i];
 
@@ -98,9 +104,10 @@ DynamicJsonDocument OMConfiguration::toJson(){
   
   doc["appSsid"] = OMConfiguration::appSsid;
   doc["appPasswd"] = OMConfiguration::appPasswd;
+  doc["connectToNetworkIfAvailable"] = OMConfiguration::connectToNetworkIfAvailable;
   doc["availableNetworkAppSsid"] = OMConfiguration::availableNetworkAppSsid;
   doc["availableNetworkAppPasswd"] = OMConfiguration::availableNetworkAppPasswd;
-  doc["connectToNetworkIfAvailable"] = OMConfiguration::connectToNetworkIfAvailable;
+  doc["enableEspNow"] = OMConfiguration::enableEspNow;
   doc["disableMotor"] = OMConfiguration::disableMotor;
   doc["enableBatteryProtection"] = OMConfiguration::enableBatteryProtection;
   doc["wifiShutdownDelayMinutes"] = OMConfiguration::wifiShutdownDelayMinutes;
@@ -112,10 +119,14 @@ DynamicJsonDocument OMConfiguration::toJson(){
   doc["decockAfter_s"] = OMConfiguration::decockAfter_s;
   doc["enablePrecocking"] = OMConfiguration::enablePrecocking;
   
+  for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+  {
+    doc["selectorCalibration"][i] = OMConfiguration::selectorCalibration[i];
+  }
+
   JsonArray fireModes = doc.createNestedArray("fireModes");
   
-  int i = 0;
-  for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
+  for(int i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
   {
     //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
     JsonObject currentFireMode = fireModes.createNestedObject();
@@ -150,6 +161,25 @@ boolean OMConfiguration::save(void){
   return true;
 }
 
+boolean OMConfiguration::isSelectorCalibrated(void){
+  boolean isCalibrated = true;
+  int previousValue = -1;
+
+  // values should go up from safe to last mode, if not there is a problem or gardient is in wrong direction
+  for(int selectorPosition = 0 ; selectorPosition < OM_MAX_NB_STORED_MODES + 1 ; selectorPosition++)
+  {
+    if(OMConfiguration::selectorCalibration[selectorPosition] < 0 && previousValue < OMConfiguration::selectorCalibration[selectorPosition])
+    {
+      isCalibrated = false;
+      break;
+    }
+
+    previousValue = OMConfiguration::selectorCalibration[selectorPosition];
+  }
+
+  return isCalibrated;
+}
+
 #ifdef DEBUG
   void OMConfiguration::printCfg(void){
 
@@ -158,21 +188,7 @@ boolean OMConfiguration::save(void){
     Serial.println("Mémoire SPIFFS : " + String(SPIFFS.usedBytes()) + "/" + String(SPIFFS.totalBytes()) + " (" + String(((float)SPIFFS.usedBytes()/(float)SPIFFS.totalBytes())*100) + "%)");
     Serial.println("---------------");
     Serial.println(" ");
-
-    int i = 0;
-    for(i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
-    {
-      //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
-      Serial.print(F("fireMode"));
-      Serial.printf(
-        "%i,%i,%i,%f,%i",
-        OMConfiguration::fireModes[i].getBurstMode(),
-        OMConfiguration::fireModes[i].getBurstLength(),
-        OMConfiguration::fireModes[i].getPrecockDurationMs(),
-        OMConfiguration::fireModes[i].getMotorPower(),
-        OMConfiguration::fireModes[i].getTimeBetweenShotsMs()
-        );
-    }
+    
     Serial.print("appSsid=");
     Serial.println(OMConfiguration::appSsid);
     Serial.print("appPasswd=");
@@ -183,6 +199,8 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::availableNetworkAppSsid);
     Serial.print("availableNetworkAppPasswd=");
     Serial.println(OMConfiguration::availableNetworkAppPasswd);
+    Serial.print("enableEspNow=");
+    Serial.println(OMConfiguration::enableEspNow);
     Serial.print("disableMotor=");
     Serial.println(OMConfiguration::disableMotor);
     Serial.print("enableBatteryProtection=");
@@ -203,7 +221,26 @@ boolean OMConfiguration::save(void){
     Serial.println(OMConfiguration::decockAfter_s);
     Serial.print("enablePrecocking=");
     Serial.println(OMConfiguration::enablePrecocking);
-    
+    Serial.println("selectorCalibration={");
+    for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+    {
+      Serial.printf("%i: %i(%f.2v)\n", i, OMConfiguration::selectorCalibration[i], ((float)OMConfiguration::selectorCalibration[i]) / (4095.0f/3.3f));
+    }
+    Serial.println("}");
+
+    for(int i = 0; i < OM_MAX_NB_STORED_MODES; ++i)
+      {
+        //info: OMFiringSettings(OMFiringSettings::BurstMode burstMode, uint8_t burstLength, unsigned int _precockDuration_ms, float motorPower, unsigned int timeBetweenShots_ms)
+        Serial.print(F("fireMode"));
+        Serial.printf(
+          "%i,%i,%i,%f,%i",
+          OMConfiguration::fireModes[i].getBurstMode(),
+          OMConfiguration::fireModes[i].getBurstLength(),
+          OMConfiguration::fireModes[i].getPrecockDurationMs(),
+          OMConfiguration::fireModes[i].getMotorPower(),
+          OMConfiguration::fireModes[i].getTimeBetweenShotsMs()
+          );
+      }
     Serial.println(" ");
     Serial.println("---------------");
     Serial.println(" ");

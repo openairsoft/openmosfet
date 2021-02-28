@@ -1,3 +1,9 @@
+#include <Update.h>
+#include <esp_wifi.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <openMosfetEspNow.h>
+
 #include "wifiServer.h"
 #include "ui.h"
 #include "config.h"
@@ -5,11 +11,7 @@
 #include "autoUpdater.h"
 #include "configuration.h"
 #include "components.h"
-
-#include <Update.h>
-#include <esp_wifi.h>
-#include <AsyncJson.h>
-#include <ArduinoJson.h>
+#include "inputsInterface.h"
 
 //TODO: penser à tout gzipper (ah ?)
 
@@ -35,11 +37,16 @@ void OMwifiserver::begin()
   OMwifiserver::webServer.on("/api/core/version", HTTP_GET, OMwifiserver::handleVersionApi);
   OMwifiserver::webServer.on("/api/config", HTTP_GET, OMwifiserver::handleConfigApi);
   OMwifiserver::webServer.on("/api/config", HTTP_POST, OMwifiserver::handleConfigApi, NULL, OMwifiserver::handleConfigApiBody);
+  OMwifiserver::webServer.on("/api/network/espnow/pair", HTTP_POST, OMwifiserver::handleEspNowPairApi);
+  OMwifiserver::webServer.on("/api/components/state", HTTP_GET, OMwifiserver::handleComponentsStateApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_GET, OMwifiserver::handleTriggerStateApi);
   OMwifiserver::webServer.on("/api/components/trigger/state", HTTP_POST, OMwifiserver::handleTriggerStateApi, NULL, OMwifiserver::handleTriggerStateApiBody);
   OMwifiserver::webServer.on("/api/components/trigger/bump", HTTP_POST, OMwifiserver::handleTriggerBumpApi);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_GET, OMwifiserver::handleSelectorStateApi);
   OMwifiserver::webServer.on("/api/components/selector/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
+  OMwifiserver::webServer.on("/api/components/selector/state", HTTP_PATCH, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
+  OMwifiserver::webServer.on("/api/components/gearbox/state", HTTP_GET, OMwifiserver::handleGearboxStateApi);
+  OMwifiserver::webServer.on("/api/components/gearbox/state", HTTP_POST, OMwifiserver::handleSelectorStateApi, NULL, OMwifiserver::handleSelectorStateApiBody);
   OMwifiserver::webServer.on("/api/components/gearbox/uncock", OMwifiserver::handleGearboxUncockingApi);
   OMwifiserver::webServer.addHandler(&OMwifiserver::events);
   OMwifiserver::webServer.serveStatic("/", FILESYSTEM, "/");
@@ -169,6 +176,10 @@ void OMwifiserver::handleAutoUpdateApi(AsyncWebServerRequest *request) {
   request->send(200, "text/html", "ok");
 }
 
+void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
+  request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
+}
+
 void OMwifiserver::handleConfigApi(AsyncWebServerRequest *request) {
   AsyncResponseStream *response = request->beginResponseStream("application/json");
   serializeJson(OMConfiguration::toJson(), *response);
@@ -269,31 +280,7 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   if(json.containsKey("connectToNetworkIfAvailable")) {
     OMConfiguration::connectToNetworkIfAvailable = json["connectToNetworkIfAvailable"].as<boolean>();
   }
-  
-  //-------------------- disableMotor -------------------------
-  if(json.containsKey("disableMotor")) {
-    OMConfiguration::disableMotor = json["disableMotor"].as<boolean>();
-  }
-  
-  //-------------------- enableBatteryProtection -------------------------
-  if(json.containsKey("enableBatteryProtection")) {
-    OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();
-  }
-  
-  //-------------------- enableActiveBreaking -------------------------
-  if(json.containsKey("enableActiveBreaking")) {
-    OMConfiguration::enableActiveBreaking = json["enableActiveBreaking"].as<boolean>();
-  }
-  
-  //-------------------- decockAfter_s -------------------------
-  if(json.containsKey("decockAfter_s")) {
-    OMConfiguration::decockAfter_s = json["decockAfter_s"].as<float>();
-  }
 
-  //-------------------- enablePrecocking -------------------------
-  if(json.containsKey("enablePrecocking")) {
-    OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
-  }
   //-------------------- appSsid -------------------------
   if(json.containsKey("appSsid")) {
     String appSsid = json["appSsid"].as<String>();//compairing to false for safety reasons
@@ -314,6 +301,39 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
     }
   }
 
+  //-------------------- enableEspNow -------------------------
+  if(json.containsKey("enableEspNow")) {
+    bool prevEnableEspNow = OMConfiguration::enableEspNow;
+    OMConfiguration::enableEspNow = json["enableEspNow"].as<boolean>();
+    if(!prevEnableEspNow && OMConfiguration::enableEspNow){
+      OpenMosfetEspNowAsyncServer::begin();
+    }
+  }
+
+  //-------------------- enableBatteryProtection -------------------------
+  if(json.containsKey("enableBatteryProtection")) {
+    OMConfiguration::enableBatteryProtection = json["enableBatteryProtection"].as<boolean>();
+  }
+  
+  //-------------------- enableActiveBreaking -------------------------
+  if(json.containsKey("enableActiveBreaking")) {
+    OMConfiguration::enableActiveBreaking = json["enableActiveBreaking"].as<boolean>();
+  }
+  
+  //-------------------- decockAfter_s -------------------------
+  if(json.containsKey("decockAfter_s")) {
+    OMConfiguration::decockAfter_s = json["decockAfter_s"].as<float>();
+  }
+
+  //-------------------- enablePrecocking -------------------------
+  if(json.containsKey("enablePrecocking")) {
+    OMConfiguration::enablePrecocking = json["enablePrecocking"].as<boolean>();
+  }
+  
+  //-------------------- disableMotor -------------------------
+  if(json.containsKey("disableMotor")) {
+    OMConfiguration::disableMotor = json["disableMotor"].as<boolean>();
+  }
   
   //-------------------- availableNetworkAppSsid -------------------------
   if(json.containsKey("availableNetworkAppSsid")) {
@@ -346,10 +366,44 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   #endif
 }
 
-void OMwifiserver::handleVersionApi(AsyncWebServerRequest *request) {
-  request->send(200, "application/json", String("\"") + OM_FIRMWARE_VERSION + "\"");
+void OMwifiserver::handleEspNowPairApi(AsyncWebServerRequest *request) {
+  if(OMConfiguration::enableEspNow){
+    OpenMosfetEspNowAsyncServer::autoAddPeers();
+    request->send(200);
+  }else{
+    request->send(400, "text/html", "please enable esp-now first");
+  }
 }
 
+void OMwifiserver::handleComponentsStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_GET:
+      {
+        DynamicJsonDocument doc(256);//OPTIMISATION : bare minimum value here is 128 -> https://arduinojson.org/v6/assistant/
+
+        doc["trigger"] = OMVirtualTrigger::getState() == OMVirtualTrigger::statePulled;
+
+        JsonObject selector = doc.createNestedObject("selector");
+        selector["position"] = (int)OMVirtualSelector::getState();
+
+        JsonArray selector_calibration = selector.createNestedArray("calibration");
+        for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+        {
+          selector_calibration.add(OMConfiguration::selectorCalibration[i]);
+        }
+
+        doc["gearbox"] = (int)OMVirtualGearbox::getState();
+
+        AsyncResponseStream *response = request->beginResponseStream("application/json");
+        serializeJson(doc, *response);
+        request->send(response);
+      }
+    break;
+    default:
+      request->send(405, "text/html", "bad method, GET only");
+    break;
+  }
+}
 
 void OMwifiserver::handleTriggerStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
@@ -391,16 +445,30 @@ void OMwifiserver::handleSelectorStateApi(AsyncWebServerRequest *request) {
   switch(request->method()){
     case HTTP_POST:
     case HTTP_GET:
-      request->send(200, "application/json", String(OMVirtualSelector::getState()));
+      {
+        DynamicJsonDocument doc(96);//https://arduinojson.org/v6/assistant/
+
+        doc["selector"] = (int)OMVirtualSelector::getState();
+
+        JsonArray selector_calibration = doc.createNestedArray("calibration");
+        for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
+        {
+          selector_calibration.add( OMConfiguration::selectorCalibration[i] );
+        }
+
+        AsyncResponseStream *response = request->beginResponseStream("application/json");
+        serializeJson(doc, *response);
+        request->send(response);
+      }
     break;
     default:
-      request->send(405, "text/html", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
     break;
   }
 }
 
 void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
-  if(request->method() == HTTP_POST) {
+  if(request->method() == HTTP_POST || request->method() == HTTP_PATCH) {
       DynamicJsonDocument selectorStateJson(0);
       deserializeJson(selectorStateJson, (const char*)bodyData);
 
@@ -411,14 +479,64 @@ void OMwifiserver::handleSelectorStateApiBody(AsyncWebServerRequest *request, ui
         case OMVirtualSelector::stateSemi:
         case OMVirtualSelector::stateAuto:
           OMVirtualSelector::setState(receivedState);
+          if (request->method() == HTTP_PATCH){
+            OMConfiguration::selectorCalibration[(unsigned int)receivedState] = OMInputsInterface::getSelectorCalibrationValue();
+            if(OMConfiguration::selectorCalibration[(unsigned int)receivedState] < 0) {
+              request->send(403, "text/html", "this interface does not seems ot need/allow selector calibration");
+            }else if(!OMConfiguration::isSelectorCalibrated()){
+              request->send(206, "text/html", String( ((float)OMConfiguration::selectorCalibration[(unsigned int)receivedState]) / (4095.0f/3.3f) ));
+              // request->send(206, "text/html", String( (unsigned int)receivedState) );
+              // request->send(206, "text/html", String( OMConfiguration::selectorCalibration[(unsigned int)receivedState]));
+            }else{
+              request->send(200, "text/html", String( ((float)OMConfiguration::selectorCalibration[(unsigned int)receivedState]) / (4095.0f/3.3f) ));
+              // request->send(200, "text/html", String( (unsigned int)receivedState) );
+              // request->send(200, "text/html", String( OMConfiguration::selectorCalibration[(unsigned int)receivedState]));
+            }
+            OMConfiguration::save();
+            break;
+          }
         break;
         default:
-          request->send(400, "text/html", "unknown selctor state value");
+          request->send(400, "text/html", "unknown selector state value");
         break;
       }
-
   }else{
-      request->send(405, "text/html", "bad method, POST or GET only");
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
+  }
+}
+
+void OMwifiserver::handleGearboxStateApi(AsyncWebServerRequest *request) {
+  switch(request->method()){
+    case HTTP_POST:
+    case HTTP_GET:
+      request->send(200, "application/json", String(OMVirtualGearbox::getState()));
+    break;
+    default:
+      request->send(405, "text/html", "bad method, POST, GET or PATCH only");
+    break;
+  }
+}
+
+void OMwifiserver::handleGearboxStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total) {
+  if(request->method() == HTTP_POST) {
+      DynamicJsonDocument gearboxStateJson(0);
+      deserializeJson(gearboxStateJson, (const char*)bodyData);
+
+      OMVirtualGearbox::GearboxState receivedState =  gearboxStateJson.as<OMVirtualGearbox::GearboxState>();
+
+      switch(receivedState){
+        case OMVirtualGearbox::stateResting:
+        case OMVirtualGearbox::statePrecocked:
+        case OMVirtualGearbox::stateCycling:
+        case OMVirtualGearbox::stateError:
+          OMVirtualGearbox::setState(receivedState);
+        break;
+        default:
+          request->send(400, "text/html", "unknown gearbox state value");
+        break;
+      }
+  }else{
+      request->send(405, "text/html", "bad method, POST, GET only");
   }
 }
 
@@ -468,7 +586,11 @@ void OMwifiserver::update() {
     Serial.println(" minutes.");
     #endif
     //esp_bt_controller_disable();
-    esp_wifi_stop();
+    if(OMConfiguration::enableEspNow){
+      esp_wifi_disconnect();
+    }else{
+      esp_wifi_stop();
+    }
     //esp_light_sleep_start();
     
     OMwifiserver::wifiIsOn = false;

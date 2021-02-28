@@ -16,6 +16,7 @@ class OMInputsInterface
     static OMFiringSettings &getCurrentFiringSetting();
     static void motorOn();
     static void motorOff();
+    static float getSelectorCalibrationValue();
 };
 
 #endif

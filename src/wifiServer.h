@@ -28,6 +28,10 @@ class OMwifiserver
         static void handleConfigApi(AsyncWebServerRequest *request);
         static void handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 
+        static void handleEspNowPairApi(AsyncWebServerRequest *request);
+
+        static void handleComponentsStateApi(AsyncWebServerRequest *request);
+
         static void handleTriggerStateApi(AsyncWebServerRequest *request);
         static void handleTriggerStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 
@@ -36,7 +40,10 @@ class OMwifiserver
         static void handleSelectorStateApi(AsyncWebServerRequest *request);
         static void handleSelectorStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
 
+        static void handleGearboxStateApi(AsyncWebServerRequest *request);
+        static void handleGearboxStateApiBody(AsyncWebServerRequest *request, uint8_t *bodyData, size_t bodyLen, size_t index, size_t total);
         static void handleGearboxUncockingApi(AsyncWebServerRequest *request);
+
         static AsyncWebServer webServer;
         static DNSServer dnsServer;
         static IPAddress ip;
