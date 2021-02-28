@@ -16,7 +16,7 @@
 
 
 /** Le nombre magique et le numéro de version actuelle */
-#define OM_CFG_VERSION 7 //NOTE: change this value if you modify the data structure ?
+#define OM_CFG_VERSION 8 //NOTE: change this value if you modify the data structure ?
 
 /** La structure qui contient les données */
 class OMConfiguration {
@@ -56,6 +56,7 @@ class OMConfiguration {
     static int selectorCalibration[OM_MAX_NB_STORED_MODES+1]; // since OM_CFG_VERSION = 7
     //static float selectorThresholds[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 7 //this is a calculated value
     static OMFiringSettings fireModes[OM_MAX_NB_STORED_MODES]; // since OM_CFG_VERSION = 1
+    static boolean enableSetupScreen; // since OM_CFG_VERSION = 8
 };
 
 #endif

@@ -24,6 +24,7 @@ float OMConfiguration::decockAfter_s = OM_DEFAULT_DECOCK_AFTER_SECONDS;
 boolean OMConfiguration::enablePrecocking = OM_DEFAULT_ENABLE_PRECOCKING;
 int OMConfiguration::selectorCalibration[OM_MAX_NB_STORED_MODES+1] = {-1, -1, -1};
 OMFiringSettings OMConfiguration::fireModes[OM_MAX_NB_STORED_MODES] = {OMFiringSettings(OMFiringSettings::burstModeNormal, 1, 0, 255, 0), OMFiringSettings(OMFiringSettings::burstModeExtendible, 1, 0, 255, 0)};
+boolean OMConfiguration::enableSetupScreen = OM_DEFAULT_ENABLE_STARTUP_SCREEN;
 
 void OMConfiguration::loadFromJson(Stream &stream){
   DynamicJsonDocument doc(capacity);
@@ -51,6 +52,7 @@ void OMConfiguration::loadFromJson(Stream &stream){
   OMConfiguration::enableActiveBreaking = doc["enableActiveBreaking"];
   OMConfiguration::decockAfter_s = doc["decockAfter_s"];
   OMConfiguration::enablePrecocking = doc["enablePrecocking"];
+  OMConfiguration::enableSetupScreen = doc["enableSetupScreen"];
   
   for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
   {
@@ -118,6 +120,7 @@ DynamicJsonDocument OMConfiguration::toJson(){
   doc["enableActiveBreaking"] = OMConfiguration::enableActiveBreaking;
   doc["decockAfter_s"] = OMConfiguration::decockAfter_s;
   doc["enablePrecocking"] = OMConfiguration::enablePrecocking;
+  doc["enableSetupScreen"] = OMConfiguration::enableSetupScreen;
   
   for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
   {
@@ -221,6 +224,8 @@ boolean OMConfiguration::isSelectorCalibrated(void){
     Serial.println(OMConfiguration::decockAfter_s);
     Serial.print("enablePrecocking=");
     Serial.println(OMConfiguration::enablePrecocking);
+    Serial.print("enableSetupScreen=");
+    Serial.println(OMConfiguration::enableSetupScreen);
     Serial.println("selectorCalibration={");
     for(int i = 0; i < OM_MAX_NB_STORED_MODES + 1; ++i)
     {

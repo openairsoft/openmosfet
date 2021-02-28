@@ -334,6 +334,11 @@ void OMwifiserver::handleConfigApiBody(AsyncWebServerRequest *request, uint8_t *
   if(json.containsKey("disableMotor")) {
     OMConfiguration::disableMotor = json["disableMotor"].as<boolean>();
   }
+
+  //-------------------- enableSetupScreen -------------------------
+  if(json.containsKey("enableSetupScreen")) {
+    OMConfiguration::enableSetupScreen = json["enableSetupScreen"].as<boolean>();
+  }
   
   //-------------------- availableNetworkAppSsid -------------------------
   if(json.containsKey("availableNetworkAppSsid")) {
