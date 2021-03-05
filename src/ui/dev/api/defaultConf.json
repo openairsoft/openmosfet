@@ -16,6 +16,7 @@
   "enablePrecocking": true,
   "disableMotor": true,
   "enableEspNow": false,
+  "enableSetupScreen": true,
   "fireModes": [
     {
       "burstMode": 0,

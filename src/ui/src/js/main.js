@@ -132,7 +132,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   setWifiStatus('only_local');
-  renderSetup();
 
   console.log('[VERSION]', version);
   document.getElementById('version').textContent = `v${version}`;
@@ -149,6 +148,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   setWifiStatus('only_local');
 
   renderConfig(config);
+  
+  if(config.enableSetupScreen) {
+    renderSetup();
+  }
+
 
   try {
     latestUpdate = await checkUpdates();
@@ -200,19 +204,22 @@ function renderConfig(config) {
 
     container.appendChild(clone);
   });
+
+  if(!config.enableSetupScreen) {
+      document.querySelector('#setup').classList.add('hide');
+  }
 }
 
 function renderSetup() {
-  const isFirstLaunch = localStorage.getItem('isFirstLaunch');
   const intervals = {};
-  if (isFirstLaunch !== '0') {
     document.querySelector('#setup').classList.remove('hide');
     document.querySelectorAll('#setup .close').forEach((x) => {
       x.addEventListener('click', () => {
         document.removeEventListener('scroll', onSetupScroll);
-        localStorage.setItem('isFirstLaunch', '0');
-        document.querySelector('#setup').classList.add('hide');
+        document.querySelector('[name=enableSetupScreen]').checked=false;
 
+        document.querySelector('#save').click();
+        
         for (const intervalKey in intervals) {
           if ({}.hasOwnProperty.call(intervals, intervalKey)) {
             clearInterval(intervals[intervalKey]);
@@ -250,8 +257,6 @@ function renderSetup() {
         clearInterval(intervals.trigger);
       }
     }
-  }
-  console.log('isFirstLaunch', isFirstLaunch);
 }
 
 function fillInputs(el, data) {

@@ -36,7 +36,10 @@ app.post('/api/config', (req, res) => {
   console.log('[POST /api/config] Form submitted'.request);
   console.log('There is no validation in local development mode,\nthe request body is saved and returned '.warn);
   console.log(JSON.stringify(req.body).dataReceived);
-  config = req.body;
+  config = {
+    ...config,
+    ...req.body
+  };
   setTimeout(()=>{
     console.log(JSON.stringify(config).dataSent+"\n\n\n");
     res.json(config);
