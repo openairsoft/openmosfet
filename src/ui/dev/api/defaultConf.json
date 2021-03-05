@@ -17,6 +17,11 @@
   "disableMotor": true,
   "enableEspNow": false,
   "enableSetupScreen": true,
+  "selectorCalibration":[
+  1061,
+  1261,
+  1471
+  ],
   "fireModes": [
     {
       "burstMode": 0,
