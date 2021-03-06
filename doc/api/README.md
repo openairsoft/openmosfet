@@ -18,6 +18,7 @@ For now, all endpoints doesn't require any Authentication.
 ### Configuration
 
 This is closely linked to [configuration.h](/src/configuration.h)
+*Note: you can ommit parameters when posting, they will be ignored. For example if you change to change a signle value*
 
 - **global configuration** : `/api/config/`
   - `GET` : reads the global configuration 
@@ -36,6 +37,7 @@ This is closely linked to [configuration.h](/src/configuration.h)
       - `batteryLowVoltage` *float* : Will alert the user below this voltage
       - `batteryShutdownVoltage` *float* : Will disable the replica below this voltage
       - `enableActiveBreaking` *boolean* : Duh.
+      - `enableSetupScreen` *boolean* : Display a setup screen on webapp loading
       - `enablePrecocking` *boolean* : Enable precocking based on values specified for each firemode
       - `selectorCalibration` *array* [READONLY]: The calibration of the selector optic sensor (update the values via the `/api/components/selector/state` endpoint)
         - [0] *int* [0-4095] : value for selector position 1 or negative value if not calibrated (divide by 1241 to obtain real voltage)

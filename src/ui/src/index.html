@@ -10,7 +10,7 @@
     <style>
         #loader {
             position: fixed;
-            z-index: 1000;
+            z-index: 899;
             width: 100vw;
             height: 100vh;
             display: flex;
@@ -28,8 +28,6 @@
         }
     </style>
     <link rel="stylesheet" type="text/css" href="css/main.css">
-
-    <!-- PWA MANIFEST & ICON -->
 </head>
 
 <body>
@@ -76,6 +74,7 @@
                 <h4 class="is_updateavailable">Une mise à jour est disponible (<span data="newversion"></span>)</h4>
                 <h4 class="is_uptodate">Votre OpenMosfet est à jour (<span data="newversion"></span>)</h4>
                 <h4 class="is_updating">Mise à jour en cours vers (<span data="newversion"></span>)</h4>
+                <h4 class="is_only_local">Impossible de récupérer les informations de mise à jour, votre OpenMosfet est en mode hotspot, ou le réseau connu n'est pas connecté un internet</h4>
 
                 <a data="newversionurl" target="_blank">
                     <span class="is_updateavailable">Voir les details de la mise à jour</span>
@@ -201,7 +200,7 @@
                         </svg>
                         Modes de tir
                     </h3>
-    
+
                     <div id="shootmode_container"></div>
                 </div>
             </div>
@@ -231,6 +230,75 @@
                 </div>
                 <div class="checkbox">
                     <label><input type="checkbox" name="disableMotor"> Desactiver le moteur</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="enableEspNow"> Activer les modules externes</label>
+                </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" name="enableSetupScreen"> Afficher l'écran de bienvenue</label>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section id="setup" class="hide">
+        <div class="slides">
+            <div class="slide">
+                <div class="slide-content">
+                    <svg width="100" height="100">
+                        <use xlink:href="#logo"></use>
+                    </svg>
+                    <h1>OpenMosfet</h1>
+                    <h3>Bienvenue sur l'interface <strong>OpenMosfet</strong></h3>
+                    <p>"Un maximum de fonctionnalités pour personnaliser votre réplique comme bon vous semble"</p>
+
+                    <div class="card">
+                        <svg>
+                            <use xlink:href="#icon_update"></use>
+                        </svg>
+                        Mises à jour
+                    </div>
+                    <div class="card">
+                        <svg>
+                            <use xlink:href="#icon_shoot"></use>
+                        </svg>
+                        Configuration des modes de tirs
+                    </div>
+                    <div class="card">
+                        <svg>
+                            <use xlink:href="#icon_shoot"></use>
+                        </svg>
+                        Statistiques de votre réplique
+                    </div>
+
+                    <a class="btn" data-target="#slide-2" type="button">Commencer la configuration</a>
+
+                </div>
+            </div>
+            <div class="slide" id="slide-2">
+                <div class="slide-content">
+                    <h1>Configuration</h1>
+                    <h3>Pour commencer, nous allons vérifier que votre queue de detente est bien detectée</h3>
+
+                    <svg id="gearboxmodel" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        viewBox="0 0 354.470000 207.690000" shape-rendering="geometricPrecision"
+                        text-rendering="geometricPrecision">
+                        <g id="svg-trigger-c" transform="translate(188.592705px,170.293060px)">
+                            <g id="svg-trigger" transform="rotate(0)">
+                                <path
+                                    d="M178.180000,148C178.180000,148,201.770000,177.220000,178.180000,199.930000C178.180000,199.930000,176.420000,206.800000,180.640000,204.680000C184.860000,202.560000,210.400000,182.170000,193.850000,148L188.590000,148L188.590000,135.500000L177.820000,135.500000Z"
+                                    transform="translate(-188.592705,-170.293060)" fill="rgb(28,28,27)" stroke="none"
+                                    stroke-width="1" />
+                            </g>
+                        </g>
+                        <path
+                            d="M19.090000,65.780000L19.090000,54.370000L1.650000,54.370000C1.650000,54.370000,-2.070000,46.280000,1.650000,39.020000L19.090000,39.020000L19.090000,4.170000C18.963849,3.629221,19.098796,3.060585,19.454482,2.634154C19.810169,2.207722,20.345362,1.972932,20.900000,2C23.020000,2,312.900000,0,312.900000,0C312.900000,0,320.700000,0.670000,320.700000,11.700000L320.700000,17L345.700000,17C345.700000,17,353.970000,21.860000,354.450000,27.470000L353.880000,86.250000L305.300000,135.760000C305.300000,135.760000,303.030000,137.860000,303.900000,144.680000L304.080000,178.100000L250.360000,207.670000L233.060000,162C233.060000,162,228.860000,146.780000,210.140000,147.830000L134.210000,148.880000C134.210000,148.880000,131.940000,147.830000,131.590000,144.160000L131.410000,106.160000L125.810000,106.160000C125.810000,106.160000,120.390000,106.160000,120.390000,100.910000L120.390000,96.010000L56,96.410000C56,96.410000,53.730000,97.290000,50.580000,83.640000L19.710000,83.640000Z"
+                            fill="rgb(177,178,175)" stroke="none" stroke-width="1" />
+                    </svg>
+                    <p>La queue de détente doit apparaitre verte quand elle est pressée</p>
+
+                    <button class="btn close">Ça fonctionne</button>
+
                 </div>
             </div>
         </div>
@@ -269,12 +337,13 @@
                                 <input type="number" name="timeBetweenShots_ms" step="1" min="0">
                                 <span>Millisecondes</span>
                             </div>
-                            <p class="help">Limite la cadence ou pour une réplique DMR (n’affecte pas la réactivité du tir)</p>
+                            <p class="help">Limite la cadence ou pour une réplique DMR (n’affecte pas la réactivité du
+                                tir)</p>
                         </div>
                         <div>
                             <label>Durée de précocking</label>
                             <div class="input-group">
-                                <input type="number" name="precockDuration_ms" step="1" min="0">
+                                <input type="number" name="precockDuration_ms" step="1" min="0" max="500">
                                 <span>Millisecondes</span>
                             </div>
                             <p class="help">0 = pas de précocking</p>
@@ -290,18 +359,19 @@
                     </div>
                     <div class="form-group form-group-3">
                         <div>
-                           
+
                         </div>
                         <div>
                             <label>Temps avant decocking</label>
                             <div class="input-group">
-                                <input type="number" name="decockAfter_s" step="1" min="0">
-                                <span>Millisecondes</span>
+                                <input type="number" name="decockAfter_s" step="0.1" min="0">
+                                <span>Secondes</span>
                             </div>
-                            <p class="help">If the trigger is maintained pressed for set ammount of time after end of burst, cycle and decock ⚠this fires a bb⚠. (0 = no decocking)</p>
+                            <p class="help">If the trigger is maintained pressed for set ammount of time after end of
+                                burst, cycle and decock ⚠this fires a bb⚠. (0 = no decocking)</p>
                         </div>
                         <div>
-                            
+
                         </div>
                     </div>
                 </div>
