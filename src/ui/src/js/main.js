@@ -1,54 +1,55 @@
 const TRY_LIMIT = 20;
 
-window.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOM entièrement chargé et analysé");
+window.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOM entièrement chargé et analysé');
 
-  if (!window.fetch || !("content" in document.createElement("template"))) {
+  if (!window.fetch || !('content' in document.createElement('template'))) {
     alert('Navigateur non compatible. Merci de mettre à jour');
   }
 
   // Remove grid gap if only one child exist
-  document.querySelectorAll('.form-group :only-child').forEach(el => el.parentElement.style.gap = 0);
+  document.querySelectorAll('.form-group :only-child').forEach((el) => {
+    el.parentElement.style.gap = 0;
+  });
 
   // Current and future DOM listener
-  document.querySelector('body').addEventListener('click', function (evt) {
-    let el = evt.target;
+  document.querySelector('body').addEventListener('click', (evt) => {
+    const el = evt.target;
 
     if (Array.from(document.querySelectorAll('.collapse > a')).includes(el)) {
-      let collapseContent = el.parentElement.querySelector(':scope > div');
+      const collapseContent = el.parentElement.querySelector(':scope > div');
 
       if (el.parentElement.classList.toggle('open')) {
-        collapseContent.style.maxHeight = collapseContent.offsetWidth + 'px';
+        collapseContent.style.maxHeight = `${collapseContent.scrollHeight}px`;
       } else {
         collapseContent.style.maxHeight = '0px';
       }
     }
 
     if (Array.from(document.querySelectorAll('.button-group button')).includes(el)) {
-      el.parentElement.querySelectorAll('button').forEach(el => el.classList.remove('active'))
+      el.parentElement.querySelectorAll('button').forEach((_el) => _el.classList.remove('active'));
       el.classList.add('active');
     }
   }, true);
 
-
-  document.querySelector('#config').addEventListener("submit", async (e) => {
+  document.querySelector('#config').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     console.log('Saving...');
 
-    var newConfig = {};
+    const newConfig = {};
 
-    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach(module => {
-      Object.assign(newConfig, extractInputs(module))
-    })
+    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach((module) => {
+      Object.assign(newConfig, extractInputs(module));
+    });
 
     newConfig.fireModes = [];
 
-    document.querySelector('#config').querySelectorAll('#SHOOTMODE [data-firemode-index]').forEach(module => {
-      let modeindex = parseInt(module.getAttribute('data-firemode-index'));
+    document.querySelector('#config').querySelectorAll('#SHOOTMODE [data-firemode-index]').forEach((module) => {
+      const modeindex = parseInt(module.getAttribute('data-firemode-index'), 10);
 
-      let mode = extractInputs(module);
-      mode.motorPower =  mode.motorPower / 100;
+      const mode = extractInputs(module);
+      mode.motorPower /= 100;
 
       module.querySelectorAll('[data=burstMode] button').forEach((modeBtn, index) => {
         if (modeBtn.matches('.active')) {
@@ -66,40 +67,38 @@ window.addEventListener("DOMContentLoaded", async () => {
       updatedConfig = await _fetch('/api/config', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newConfig)
-      })
+        body: JSON.stringify(newConfig),
+      });
     } catch (error) {
       setWifiStatus('interrupted');
       console.log('[CONFIG] Cannot send config');
     }
 
-    if(updatedConfig) {
+    if (updatedConfig) {
       // Convert to string to allow simple object comparison
-      sorting = Object.keys(newConfig).sort()
-      if(JSON.stringify(newConfig, sorting) == JSON.stringify(updatedConfig, sorting)){
+      const sorting = Object.keys(newConfig).sort();
+      if (JSON.stringify(newConfig, sorting) == JSON.stringify(updatedConfig, sorting)) {
         console.log('[CONFIG] Update sucessfull');
-      }else{
+      } else {
         console.log('[CONFIG] Data sended not equal to data received:');
         console.log('-->', newConfig);
         console.log('<--', updatedConfig);
-        alert('Your OpenMosfet returned a different value from what you wanted to save. You should check every value you typed to detect any changes.')
+        alert('Your OpenMosfet returned a different value from what you wanted to save. You should check every value you typed to detect any changes.');
       }
-      
+
       renderConfig(updatedConfig);
     }
 
     document.getElementById('loader').classList.add('hide');
-
-
   });
 
-  document.querySelector('#updatefromgithub').addEventListener('click', async (e)=>{
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'block')
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
-    
+  document.querySelector('#updatefromgithub').addEventListener('click', async () => {
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'block');
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none');
+
     try {
       document.querySelector('#UPDATE').classList.add('is_updating');
       updatedConfig = await _fetch('/api/core/update/', {
@@ -107,25 +106,23 @@ window.addEventListener("DOMContentLoaded", async () => {
       });
 
       renderConfig(config);
-
     } catch (error) {
       setWifiStatus('interrupted');
       console.log('[CONFIG] Cannot request update');
     } finally {
       document.getElementById('loader').classList.remove('hide');
-      setTimeout(()=>{
+      setTimeout(() => {
         document.location.reload();
       }, 600);
     }
-
-
-  })
-  // Delay for debugging
-  // await new Promise(resolve => setTimeout(resolve, 2000));
+  });
 
   setWifiStatus('interrupted');
 
-  let version, config, latestUpdate;
+  let version;
+  let config;
+  let
+    latestUpdate;
 
   try {
     version = await getVersion();
@@ -135,9 +132,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   setWifiStatus('only_local');
-  console.log('[VERSION]', version);
-  document.getElementById('version').textContent = 'v' + version;
 
+  console.log('[VERSION]', version);
+  document.getElementById('version').textContent = `v${version}`;
 
   try {
     config = await getConfig();
@@ -151,6 +148,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   setWifiStatus('only_local');
 
   renderConfig(config);
+  
+  if(config.enableSetupScreen) {
+    renderSetup();
+  }
 
 
   try {
@@ -160,26 +161,25 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (latestUpdate) {
-    renderUpdate(latestUpdate);
+    renderUpdate(latestUpdate, version);
   }
-
 });
 
-function renderUpdate(latestUpdate) {
+function renderUpdate(latestUpdate, version) {
   setWifiStatus('connected');
-  console.log('[LATEST_UPDATE]', latestUpdate);
+  console.log('[LATEST_VERSION]', latestUpdate.tag_name);
 
-  document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = 'v' + latestUpdate.tag_name);
+  document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = `v${latestUpdate.tag_name}`);
   document.querySelectorAll('[data=newversionurl]').forEach((el) => el.href = latestUpdate.html_url);
 
   if (latestUpdate.tag_name != version) {
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none')
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none')
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'block')
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'block');
   } else {
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'block')
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none')
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none')
+    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'block');
+    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none');
   }
 }
 
@@ -189,12 +189,12 @@ function renderConfig(config) {
   // Auto-fill input name matching with keys
   fillInputs(document.querySelector('#config'), config);
 
-  var template = document.querySelector("#shootmode_template");
-  var container = document.querySelector('#shootmode_container');
+  const template = document.querySelector('#shootmode_template');
+  const container = document.querySelector('#shootmode_container');
 
-  container.innerHTML = ""
+  container.innerHTML = '';
   config.fireModes.forEach((mode, index) => {
-    var clone = document.importNode(template.content, true);
+    const clone = document.importNode(template.content, true);
 
     fillInputs(clone, mode);
     clone.children[0].setAttribute('data-firemode-index', index);
@@ -203,36 +203,88 @@ function renderConfig(config) {
     clone.querySelectorAll('[data=burstMode] button')[mode.burstMode].classList.add('active');
 
     container.appendChild(clone);
+  });
 
-  })
+  if(!config.enableSetupScreen) {
+      document.querySelector('#setup').classList.add('hide');
+  }
+}
 
+function renderSetup() {
+  const intervals = {};
+    document.querySelector('#setup').classList.remove('hide');
+    document.querySelectorAll('#setup .close').forEach((x) => {
+      x.addEventListener('click', () => {
+        document.removeEventListener('scroll', onSetupScroll);
+        document.querySelector('[name=enableSetupScreen]').checked=false;
+
+        document.querySelector('#save').click();
+        
+        for (const intervalKey in intervals) {
+          if ({}.hasOwnProperty.call(intervals, intervalKey)) {
+            clearInterval(intervals[intervalKey]);
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('#setup a[data-target]').forEach((x) => {
+      x.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector(e.target.getAttribute('data-target')).scrollIntoView({
+          behavior: 'smooth',
+        });
+      });
+    });
+
+    document.querySelector('#setup .slides').addEventListener('scroll', onSetupScroll);
+
+    function onSetupScroll() {
+      debounce(onSetupScrolled, 500);
+    }
+
+    function onSetupScrolled() {
+      if (isInViewport(document.querySelector('#gearboxmodel'))) {
+        intervals.trigger = setInterval(async () => {
+          const componentsState = await _fetch('/api/components/state');
+          if (componentsState.trigger) {
+            document.querySelector('#gearboxmodel').classList.add('active');
+          } else {
+            document.querySelector('#gearboxmodel').classList.remove('active');
+          }
+        }, 500);
+      } else {
+        clearInterval(intervals.trigger);
+      }
+    }
 }
 
 function fillInputs(el, data) {
   for (const key in data) {
-    let val = data[key];
-    if (typeof val != 'object') {
-      el.querySelectorAll('[name="' + key + '"]').forEach((el) => {
-        if (el.matches('[type="checkbox"]')) {
-          el.checked = val
-        } else {
-          el.value = val
-        }
-      });
+    if ({}.hasOwnProperty.call(data, key)) {
+      const val = data[key];
+      if (typeof val !== 'object') {
+        el.querySelectorAll(`[name="${key}"]`).forEach((el) => {
+          if (el.matches('[type="checkbox"]')) {
+            el.checked = val;
+          } else {
+            el.value = val;
+          }
+        });
+      }
     }
   }
 }
 
 function extractInputs(el) {
-  let data = {};
+  const data = {};
 
-  el.querySelectorAll('[name]').forEach(input => {
+  el.querySelectorAll('[name]').forEach((input) => {
     if (input.matches('[type="checkbox"]')) {
       data[input.name] = input.checked;
     } else {
-      
-      data[input.name] = input.value
-      if(input.type=='number') data[input.name] = Number(data[input.name])
+      data[input.name] = input.value;
+      if (input.type == 'number') data[input.name] = Number(data[input.name]);
     }
   });
 
@@ -248,7 +300,7 @@ function getVersion() {
 }
 
 function checkUpdates() {
-  return _fetch('https://api.github.com/repos/simonjamain/openmosfet/releases/latest');
+  return _fetch('https://api.github.com/repos/openairsoft/openmosfet/releases/latest');
 }
 
 async function _fetch(url, options, retry_count) {
@@ -257,27 +309,45 @@ async function _fetch(url, options, retry_count) {
   try {
     return await fetch(url, options).then((response) => response.json());
   } catch (err) {
-    retry_count++
+    retry_count++;
     if (retry_count > TRY_LIMIT) {
       throw new Error('TRY_LIMIT_REACHED');
     } else {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return _fetch(url, options,retry_count);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return _fetch(url, options, retry_count);
     }
   }
 }
 
 function setWifiStatus(status) {
+  document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'none');
   switch (status) {
     case 'connected':
       document.getElementById('wifistatus').style.fill = '#009432';
       break;
     case 'only_local':
       document.getElementById('wifistatus').style.fill = '#f39c12';
+      document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'block');
       break;
     case 'interrupted':
       document.getElementById('wifistatus').style.fill = '#EA2027';
       break;
-
   }
+}
+
+function isInViewport(element) {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+
+function debounce(method, delay) {
+  clearTimeout(method._tId);
+  method._tId = setTimeout(() => {
+    method();
+  }, delay);
 }

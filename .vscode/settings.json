@@ -8,5 +8,15 @@
 		"unordered_map": "cpp",
 		"regex": "cpp",
 		"functional": "cpp"
-	}
+	},
+	"liveSassCompile.settings.autoprefix": null,
+	"liveSassCompile.settings.formats": [
+		{
+			"format": "compressed",
+			"extensionName": ".css",
+			"savePath": null
+		}
+	],
+	"liveSassCompile.settings.generateMap": false,
+	"liveSassCompile.settings.showOutputWindow": false
 }

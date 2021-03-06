@@ -14,7 +14,6 @@ uint8_t selectorPin = OM_DEFAULT_SELECTOR_PIN;
 
 
 //channels
-#define MOTOR_LEDC_CHANNEL 1
 #define MOTOR_LEDC_FREQ 12000
 #define MOTOR_LEDC_RES 8
 
@@ -25,9 +24,9 @@ Bounce selectorDebouncer = Bounce();
 void OMInputsInterface::begin()
 {
   // motor pwm setup
-  ledcAttachPin(motorPin, MOTOR_LEDC_CHANNEL);
-  ledcSetup(MOTOR_LEDC_CHANNEL, MOTOR_LEDC_FREQ, MOTOR_LEDC_RES);
-  ledcWrite(MOTOR_LEDC_CHANNEL, 0); //turn off motor
+  ledcAttachPin(motorPin, OM_INTERFACE_PWM_CHANNEL_1);
+  ledcSetup(OM_INTERFACE_PWM_CHANNEL_1, MOTOR_LEDC_FREQ, MOTOR_LEDC_RES);
+  ledcWrite(OM_INTERFACE_PWM_CHANNEL_1, 0); //turn off motor
   
   pinMode(motorPin, OUTPUT);
 
@@ -96,12 +95,17 @@ OMFiringSettings &OMInputsInterface::getCurrentFiringSetting()
 
 void OMInputsInterface::motorOn()
 {
-  ledcWrite(MOTOR_LEDC_CHANNEL, 255);
+  ledcWrite(OM_INTERFACE_PWM_CHANNEL_1, 255);
 }
 
 void OMInputsInterface::motorOff()
 {
-  ledcWrite(MOTOR_LEDC_CHANNEL, 0);
+  ledcWrite(OM_INTERFACE_PWM_CHANNEL_1, 0);
 }
 
+//this interface do not wrok with analog slector values
+float OMInputsInterface::getSelectorCalibrationValue()
+{
+  return -1;
+}
 #endif

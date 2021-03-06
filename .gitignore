@@ -5,3 +5,4 @@
 .vscode/ipch
 node_modules/
 src/ui.h
+custom_envs.ini

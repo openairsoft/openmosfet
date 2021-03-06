@@ -15,6 +15,13 @@
   "decockAfter_s": 1,
   "enablePrecocking": true,
   "disableMotor": true,
+  "enableEspNow": false,
+  "enableSetupScreen": true,
+  "selectorCalibration":[
+  1061,
+  1261,
+  1471
+  ],
   "fireModes": [
     {
       "burstMode": 0,
