@@ -153,6 +153,6 @@ For developpement reasons or other, you can change the default settings for the 
 Got to the [API documentation](/doc/api).
 
 ## Contributing
-Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/XuzSSbgE).
+Don't hesitate to contact us via github, or your can come and talk with us on our [discord server](https://discord.gg/xfuCUgGKxE).
 
 We are french but we can chat in english without problems.
