@@ -21,7 +21,7 @@
     ·
     <a href="https://github.com/simonjamain/openmosfet/issues">Request Feature</a>
     ·
-    <a href="https://discord.gg/mYEQJxRWnq">Discord</a>
+    <a href="https://discord.gg/xfuCUgGKxE">Discord</a>
   </p>
 </p>
 
