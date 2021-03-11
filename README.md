@@ -20,6 +20,8 @@
     <a href="https://github.com/simonjamain/openmosfet/issues">Report Bug</a>
     ·
     <a href="https://github.com/simonjamain/openmosfet/issues">Request Feature</a>
+    ·
+    <a href="https://discord.gg/mYEQJxRWnq">Discord</a>
   </p>
 </p>
 
@@ -87,7 +89,8 @@ The team is composed of two developers and two electronitians, all french airsof
 ## Getting started
 ### Installation and build
 - Install platformio
-- "open" the project
+- Clone the repo
+- Open it in your IDE (VSCode is suggested)
 - it is recommended that you create your custom platformio environements in a `custom_env.ini` (you can copy `custom_env.example.ini` file).
   This way you can assign different pins or use different boards types without messing with the git versionning and you can still inherit from envs defined in the `platformio.ini` file.
   - *Note : don't forget to include the parent build flags if you inherhit an env*
