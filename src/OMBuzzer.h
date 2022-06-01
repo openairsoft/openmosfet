@@ -1,7 +1,7 @@
 #ifndef OM_BUZZER_H
 #define OM_BUZZER_H
 
-#include <arduino.h>
+#include <Arduino.h>
 
 class OMBuzzer {
 	public:
