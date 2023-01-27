@@ -77,6 +77,7 @@ The hardware provides all the electronics needed and allows different boards to 
 The web dashboard allows full and easy controls over every settings as well an update manager.
 
 ![OpenMosfet Web Dashboard](doc/assets/images/ui.png)
+> The UI is now available in English
 
 ### The team
 
@@ -118,10 +119,10 @@ The team is composed of two developers and two electronitians, all french airsof
 To serve the UI locally on your computer, we provide a fake server to simulate the board behavior.
 
 #### Install and serve
-  - inside the `/src/ui/` folder, run `npm install`
-  - run `npm run serve-dev`
+  - inside the `/src/ui/` folder, run `npm install` or `yarn install`
+  - run `npm run dev` or `yarn dev`
   - open http://localhost:3000/ in your browser
-  - you can now edit ``src/`` without having to re-launch the server
+  - you can now edit ``src/ui/**/*`` without having to re-launch the server
 
 *Note: The configuration is loaded from ``defaultConf.json`` and can be updated as long as the server is running.
 Once it stops the updated configuration is lost*
