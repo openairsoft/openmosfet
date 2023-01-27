@@ -1,10 +1,9 @@
 const TRY_LIMIT = 20;
 
 window.addEventListener('DOMContentLoaded', async () => {
-  console.log('DOM entièrement chargé et analysé');
 
   if (!window.fetch || !('content' in document.createElement('template'))) {
-    alert('Navigateur non compatible. Merci de mettre à jour');
+    alert('Browser not supported. Please update');
   }
 
   // Remove grid gap if only one child exist
@@ -32,20 +31,26 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }, true);
 
-  document.querySelector('#config').addEventListener('submit', async (e) => {
+  const $config = document.querySelector('#config');
+
+  $config.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     console.log('Saving...');
 
+
+    // Process all inputs except firemodes
     const newConfig = {};
 
-    document.querySelector('#config').querySelectorAll('.container>div:not(#SHOOTMODE)').forEach((module) => {
+    $config.querySelectorAll('.container>div:not(#SHOOTMODE)').forEach((module) => {
       Object.assign(newConfig, extractInputs(module));
     });
 
+    // Process firemodes
+
     newConfig.fireModes = [];
 
-    document.querySelector('#config').querySelectorAll('#SHOOTMODE [data-firemode-index]').forEach((module) => {
+    $config.querySelectorAll('#SHOOTMODE [data-firemode-index]').forEach((module) => {
       const modeindex = parseInt(module.getAttribute('data-firemode-index'), 10);
 
       const mode = extractInputs(module);
