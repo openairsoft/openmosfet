@@ -1,12 +1,12 @@
 {
-  "name": "ui",
+  "name": "UI",
   "version": "1.0.0",
-  "description": "ui for OpenMosfet",
+  "description": "Web UI for OpenMosfet",
   "main": "index.js",
   "scripts": {
     "build": "(mkdir build || echo '') && html-inline src/index.html | html-minifier > build/out.html && node compress.js",
-    "build-dev": "(mkdir build || echo '') && html-inline src/index.html > build/out.html && node compress.js",
-    "serve-dev": "node ./dev/api/server.js"
+    "build:dev": "(mkdir build || echo '') && html-inline src/index.html > build/out.html && node compress.js",
+    "serve": "node ./dev/api/server.js"
   },
   "author": "",
   "license": "ISC",
