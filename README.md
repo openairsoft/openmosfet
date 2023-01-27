@@ -13,6 +13,9 @@
 
   <p align="center">
     An high quality open source <strong>airsoft mosfet</strong><br> based on arduino.
+    <div style="background-color: #161b22; padding: 2em; display: grid; place-content: center;">
+      <a href="https://github.com/openairsoft/openmosfet/issues/23">2023 Relaunch: Annoncement</a>
+    </div>
     <br/><br/>
     <a href="#"><strong>Explore the docs »</strong></a>
     <br />
