@@ -16,7 +16,7 @@
   "enablePrecocking": true,
   "disableMotor": true,
   "enableEspNow": false,
-  "enableSetupScreen": true,
+  "enableSetupScreen": false,
   "selectorCalibration":[
   1061,
   1261,

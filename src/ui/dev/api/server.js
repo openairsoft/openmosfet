@@ -1,9 +1,16 @@
 const colors = require('colors'),
       express = require('express'),
       path = require('path'),
+      livereload = require("livereload"),
+      connectLiveReload = require("connect-livereload"),
       port = 3000;
 
 const VERSION = '1.7.4-beta';
+
+const PATHS = {
+  src: path.join(__dirname, '../../src/'),
+  build: path.join(__dirname, '../../build/'),
+}
 
 let config = require('./defaultConf.json');
 
@@ -15,12 +22,18 @@ colors.setTheme({
   error: 'red'
 });
 
+const liveReloadServer = livereload.createServer();
+liveReloadServer.watch(PATHS.src);
+
 const app = express()
+
+app.use(connectLiveReload());
+
 app.use(express.json())
 
 // Map src folder to server root
-app.use('/', express.static(path.join(__dirname, '../../src/')));
-app.use('/build', express.static(path.join(__dirname, '../../build/')));
+app.use('/', express.static(PATHS.src));
+app.use('/build', express.static(PATHS.build));
 
 // Return the config
 app.get(['/api/config', '/cfg.json'], (req, res) => {

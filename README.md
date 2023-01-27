@@ -120,7 +120,7 @@ To serve the UI locally on your computer, we provide a fake server to simulate t
 
 #### Install and serve
   - inside the `/src/ui/` folder, run `npm install` or `yarn install`
-  - run `npm run dev` or `yarn dev`
+  - run `npm run watch` or `yarn watch`
   - open http://localhost:3000/ in your browser
   - you can now edit ``src/ui/**/*`` without having to re-launch the server
 
