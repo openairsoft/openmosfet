@@ -1,18 +1,25 @@
-const colors = require('colors'),
-      express = require('express'),
-      path = require('path'),
-      livereload = require("livereload"),
-      connectLiveReload = require("connect-livereload"),
-      port = 3000;
+import colors from 'colors';
+import express from 'express';
+import path from 'path';
+import livereload from "livereload";
+import connectLiveReload from "connect-livereload";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-const VERSION = '1.7.4-beta';
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
+
+let config = JSON.parse(fs.readFileSync(path.join(__dirname, './defaultConf.json'), { encoding: 'utf-8' }));
+
+const port = 3000;
+
+const VERSION = '1.10.0-beta';
 
 const PATHS = {
   src: path.join(__dirname, '../../src/'),
   build: path.join(__dirname, '../../build/'),
 }
-
-let config = require('./defaultConf.json');
 
 colors.setTheme({
   request: ['bgCyan', 'black'],
@@ -32,6 +39,13 @@ app.use(connectLiveReload());
 app.use(express.json())
 
 // Map src folder to server root
+app.get('/', (req, res) => {
+  let content = fs.readFileSync(path.join(PATHS.src, 'index.html'), 'utf8');
+  if(content.match(/<\/\s*body>/)) {
+    content = content.replace(/<\/\s*body>/, '<script src="js/main.js"></script></body>');
+  }
+  res.send(content);
+})
 app.use('/', express.static(PATHS.src));
 app.use('/build', express.static(PATHS.build));
 
@@ -73,7 +87,7 @@ app.get('/api/core/version', (req, res) => {
 app.post('/api/core/update', (req, res) => {
   console.log('[POST /api/core/update] Update from github requested'.request);
   console.log('This feature is not available in local development mode\n\n\n'.warn);
-  console.log('Delay of 30 seconds before response\n\n\n'.warn);
+  console.log('Delay of 5 seconds before response\n\n\n'.warn);
 
   setTimeout(()=>{
     res.json(config);

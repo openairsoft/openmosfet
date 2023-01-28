@@ -1,10 +1,13 @@
 const TRY_LIMIT = 20;
 
 window.addEventListener('DOMContentLoaded', async () => {
-
   if (!window.fetch || !('content' in document.createElement('template'))) {
     alert('Browser not supported. Please update');
   }
+
+  let version;
+  let config;
+  let latestUpdate;
 
   // Remove grid gap if only one child exist
   document.querySelectorAll('.form-group :only-child').forEach((el) => {
@@ -37,7 +40,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
 
     console.log('Saving...');
-
 
     // Process all inputs except firemodes
     const newConfig = {};
@@ -84,7 +86,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (updatedConfig) {
       // Convert to string to allow simple object comparison
       const sorting = Object.keys(newConfig).sort();
-      if (JSON.stringify(newConfig, sorting) == JSON.stringify(updatedConfig, sorting)) {
+      if (JSON.stringify(newConfig, sorting) === JSON.stringify(updatedConfig, sorting)) {
         console.log('[CONFIG] Update sucessfull');
       } else {
         console.log('[CONFIG] Data sended not equal to data received:');
@@ -100,17 +102,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.querySelector('#updatefromgithub').addEventListener('click', async () => {
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none');
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'block');
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_uptodate').forEach((el) => { el.style.display = 'none'; });
+    document.querySelectorAll('.is_updating').forEach((el) => { el.style.display = 'block'; });
+    document.querySelectorAll('.is_updateavailable').forEach((el) => { el.style.display = 'none'; });
 
     try {
       document.querySelector('#UPDATE').classList.add('is_updating');
-      updatedConfig = await _fetch('/api/core/update/', {
+      await _fetch('/api/core/update/', {
         method: 'POST',
       });
-
-      renderConfig(config);
     } catch (error) {
       setWifiStatus('interrupted');
       console.log('[CONFIG] Cannot request update');
@@ -123,11 +123,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   setWifiStatus('interrupted');
-
-  let version;
-  let config;
-  let
-    latestUpdate;
 
   try {
     version = await getVersion();
@@ -153,11 +148,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   setWifiStatus('only_local');
 
   renderConfig(config);
-  
-  if(config.enableSetupScreen) {
+
+  if (config.enableSetupScreen) {
     renderSetup();
   }
-
 
   try {
     latestUpdate = await checkUpdates();
@@ -174,17 +168,17 @@ function renderUpdate(latestUpdate, version) {
   setWifiStatus('connected');
   console.log('[LATEST_VERSION]', latestUpdate.tag_name);
 
-  document.querySelectorAll('[data=newversion]').forEach((el) => el.textContent = `v${latestUpdate.tag_name}`);
-  document.querySelectorAll('[data=newversionurl]').forEach((el) => el.href = latestUpdate.html_url);
+  document.querySelectorAll('[data=newversion]').forEach((el) => { el.textContent = `v${latestUpdate.tag_name}`; });
+  document.querySelectorAll('[data=newversionurl]').forEach((el) => { el.href = latestUpdate.html_url; });
 
-  if (latestUpdate.tag_name != version) {
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'none');
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none');
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'block');
+  if (latestUpdate.tag_name !== version) {
+    document.querySelectorAll('.is_uptodate').forEach((el) => { el.style.display = 'none'; });
+    document.querySelectorAll('.is_updating').forEach((el) => { el.style.display = 'none'; });
+    document.querySelectorAll('.is_updateavailable').forEach((el) => { el.style.display = 'block'; });
   } else {
-    document.querySelectorAll('.is_uptodate').forEach((el) => el.style.display = 'block');
-    document.querySelectorAll('.is_updating').forEach((el) => el.style.display = 'none');
-    document.querySelectorAll('.is_updateavailable').forEach((el) => el.style.display = 'none');
+    document.querySelectorAll('.is_uptodate').forEach((el) => { el.style.display = 'block'; });
+    document.querySelectorAll('.is_updating').forEach((el) => { el.style.display = 'none'; });
+    document.querySelectorAll('.is_updateavailable').forEach((el) => { el.style.display = 'none'; });
   }
 }
 
@@ -210,75 +204,68 @@ function renderConfig(config) {
     container.appendChild(clone);
   });
 
-  if(!config.enableSetupScreen) {
-      document.querySelector('#setup').classList.add('hide');
+  if (!config.enableSetupScreen) {
+    document.querySelector('#setup').classList.add('hide');
   }
 }
 
 function renderSetup() {
   const intervals = {};
-    document.querySelector('#setup').classList.remove('hide');
-    document.querySelectorAll('#setup .close').forEach((x) => {
-      x.addEventListener('click', () => {
-        document.removeEventListener('scroll', onSetupScroll);
-        document.querySelector('[name=enableSetupScreen]').checked=false;
+  document.querySelector('#setup').classList.remove('hide');
+  document.querySelectorAll('#setup .close').forEach((x) => {
+    x.addEventListener('click', () => {
+      document.removeEventListener('scroll', onSetupScroll);
+      document.querySelector('[name=enableSetupScreen]').checked = false;
 
-        document.querySelector('#save').click();
-        
-        for (const intervalKey in intervals) {
-          if ({}.hasOwnProperty.call(intervals, intervalKey)) {
-            clearInterval(intervals[intervalKey]);
-          }
+      document.querySelector('#save').click();
+
+      // Clear all intervals
+      Object.values(intervals).forEach(clearInterval);
+    });
+  });
+
+  document.querySelectorAll('#setup a[data-target]').forEach((x) => {
+    x.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector(e.target.getAttribute('data-target')).scrollIntoView({
+        behavior: 'smooth',
+      });
+    });
+  });
+
+  document.querySelector('#setup .slides').addEventListener('scroll', onSetupScroll);
+
+  function onSetupScroll() {
+    debounce(onSetupScrolled, 500);
+  }
+
+  function onSetupScrolled() {
+    if (isInViewport(document.querySelector('#gearboxmodel'))) {
+      intervals.trigger = setInterval(async () => {
+        const componentsState = await _fetch('/api/components/state');
+        if (componentsState.trigger) {
+          document.querySelector('#gearboxmodel').classList.add('active');
+        } else {
+          document.querySelector('#gearboxmodel').classList.remove('active');
         }
-      });
-    });
-
-    document.querySelectorAll('#setup a[data-target]').forEach((x) => {
-      x.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector(e.target.getAttribute('data-target')).scrollIntoView({
-          behavior: 'smooth',
-        });
-      });
-    });
-
-    document.querySelector('#setup .slides').addEventListener('scroll', onSetupScroll);
-
-    function onSetupScroll() {
-      debounce(onSetupScrolled, 500);
+      }, 500);
+    } else {
+      clearInterval(intervals.trigger);
     }
-
-    function onSetupScrolled() {
-      if (isInViewport(document.querySelector('#gearboxmodel'))) {
-        intervals.trigger = setInterval(async () => {
-          const componentsState = await _fetch('/api/components/state');
-          if (componentsState.trigger) {
-            document.querySelector('#gearboxmodel').classList.add('active');
-          } else {
-            document.querySelector('#gearboxmodel').classList.remove('active');
-          }
-        }, 500);
-      } else {
-        clearInterval(intervals.trigger);
-      }
-    }
+  }
 }
 
 function fillInputs(el, data) {
-  for (const key in data) {
-    if ({}.hasOwnProperty.call(data, key)) {
-      const val = data[key];
-      if (typeof val !== 'object') {
-        el.querySelectorAll(`[name="${key}"]`).forEach((el) => {
-          if (el.matches('[type="checkbox"]')) {
-            el.checked = val;
-          } else {
-            el.value = val;
-          }
-        });
+  Object.entries(data).forEach(([key, val]) => {
+    if (typeof val === 'object') return;
+    el.querySelectorAll(`[name="${key}"]`).forEach((input) => {
+      if (input.matches('[type="checkbox"]')) {
+        input.checked = val;
+      } else {
+        input.value = val;
       }
-    }
-  }
+    });
+  });
 }
 
 function extractInputs(el) {
@@ -289,7 +276,7 @@ function extractInputs(el) {
       data[input.name] = input.checked;
     } else {
       data[input.name] = input.value;
-      if (input.type == 'number') data[input.name] = Number(data[input.name]);
+      if (input.type === 'number') data[input.name] = Number(data[input.name]);
     }
   });
 
@@ -308,34 +295,40 @@ function checkUpdates() {
   return _fetch('https://api.github.com/repos/openairsoft/openmosfet/releases/latest');
 }
 
-async function _fetch(url, options, retry_count) {
-  if (retry_count === undefined) retry_count = 1;
+async function _fetch(url, options, retryCount) {
+  if (retryCount === undefined) retryCount = 1;
   if (options === undefined) options = {};
   try {
     return await fetch(url, options).then((response) => response.json());
   } catch (err) {
-    retry_count++;
-    if (retry_count > TRY_LIMIT) {
+    retryCount += 1;
+    if (retryCount > TRY_LIMIT) {
       throw new Error('TRY_LIMIT_REACHED');
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return _fetch(url, options, retry_count);
+      // wait for 1 sec
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+
+      return _fetch(url, options, retryCount);
     }
   }
 }
 
 function setWifiStatus(status) {
-  document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'none');
+  document.querySelectorAll('.is_only_local').forEach((el) => { el.style.display = 'none'; });
   switch (status) {
     case 'connected':
       document.getElementById('wifistatus').style.fill = '#009432';
       break;
     case 'only_local':
       document.getElementById('wifistatus').style.fill = '#f39c12';
-      document.querySelectorAll('.is_only_local').forEach((el) => el.style.display = 'block');
+      document.querySelectorAll('.is_only_local').forEach((el) => { el.style.display = 'block'; });
       break;
     case 'interrupted':
       document.getElementById('wifistatus').style.fill = '#EA2027';
+      break;
+    default:
       break;
   }
 }
@@ -343,10 +336,10 @@ function setWifiStatus(status) {
 function isInViewport(element) {
   const rect = element.getBoundingClientRect();
   return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    rect.top >= 0
+    && rect.left >= 0
+    && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    && rect.right <= (window.innerWidth || document.documentElement.clientWidth)
   );
 }
 

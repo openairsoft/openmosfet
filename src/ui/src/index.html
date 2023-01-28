@@ -2,7 +2,7 @@
 <html lang="fr">
 
 <head>
-    <link rel="icon" href="favicon.ico" />
+    <link rel="icon" href="favicon.svg" />
     <meta charset="utf-8">
     <title>OpenMosfet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,6 +26,7 @@
             opacity: 0;
             visibility: hidden;
         }
+
     </style>
     <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
@@ -74,7 +75,8 @@
                 <h4 class="is_updateavailable">An update is available (<span data="newversion"></span>)</h4>
                 <h4 class="is_uptodate">Your OpenMosfet is up to date (<span data="newversion"></span>)</h4>
                 <h4 class="is_updating">Updating to (<span data="newversion"></span>)</h4>
-                <h4 class="is_only_local">Unable to retrieve update information, your OpenMosfet is in hotspot mode, or the known network is not connected to an internet</h4>
+                <h4 class="is_only_local">Unable to retrieve update information, your OpenMosfet is in hotspot mode, or
+                    the known network is not connected to an internet</h4>
 
                 <a data="newversionurl" target="_blank">
                     <span class="is_updateavailable">See update details</span>
@@ -113,7 +115,8 @@
 
                 <h4>Known network</h4>
                 <div class="checkbox">
-                    <label><input type="checkbox" name="connectToNetworkIfAvailable">Use a known network if available</label>
+                    <label><input type="checkbox" name="connectToNetworkIfAvailable">Use a known network if
+                        available</label>
                 </div>
                 <div class="form-group">
                     <div>
@@ -151,7 +154,8 @@
                             <input type="number" name="deepSleepDelayMinutes" step="1">
                             <span>Minutes</span>
                         </div>
-                        <p class="help">Puts the system into standby mode after a certain time of inactivation of the replica</p>
+                        <p class="help">Puts the system into standby mode after a certain time of inactivation of the
+                            replica</p>
                     </div>
                 </div>
             </div>
@@ -210,7 +214,8 @@
                 <div class="checkbox">
                     <label><input type="checkbox" name="enableActiveBreaking"> Activate Active Breaking</label>
                 </div>
-                <p class="help">Sends a reverse current into the engine to brake it and stop the rotation of the engine after pulling it.</p>
+                <p class="help">Sends a reverse current into the engine to brake it and stop the rotation of the engine
+                    after pulling it.</p>
             </div>
 
             <div id="PC">
@@ -372,7 +377,6 @@
             </div>
         </div>
     </template>
-    <script src="js/main.js"></script>
 </body>
 <div hidden>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -403,6 +407,7 @@
                     stroke: #000000;
                     stroke-width: 17px;
                 }
+
             </style>
             <path d="M368,0H144c-26.5,0-48,21.5-48,48v416c0,26.5,21.5,48,48,48h224c26.5,0,48-21.5,48-48V48C416,21.5,394.5,0,368,0z M384,464
                 c0,8.8-7.2,16-16,16H144c-8.8,0-16-7.2-16-16V48c0-8.8,7.2-16,16-16h224c8.8,0,16,7.2,16,16V464z M512,106v12c0,3.3-2.7,6-6,6h-18v6
