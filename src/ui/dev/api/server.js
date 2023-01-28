@@ -2,9 +2,10 @@ import colors from 'colors';
 import express from 'express';
 import path from 'path';
 import livereload from "livereload";
-import connectLiveReload from "connect-livereload";
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { watch } from 'rollup';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -17,6 +18,7 @@ const port = 3000;
 const VERSION = '1.10.0-beta';
 
 const PATHS = {
+  tmp: path.join(__dirname, '../../tmp/'),
   src: path.join(__dirname, '../../src/'),
   build: path.join(__dirname, '../../build/'),
 }
@@ -29,12 +31,38 @@ colors.setTheme({
   error: 'red'
 });
 
-const liveReloadServer = livereload.createServer();
-liveReloadServer.watch(PATHS.src);
+const liveReloadServer = livereload.createServer({
+  exts: ['html', 'css'],
+});
+liveReloadServer.watch([PATHS.src, PATHS.tmp]);
+const watcher = watch({
+  input: path.join(PATHS.src, 'js/main.js'),
+  output: {
+    file: path.join(PATHS.tmp, 'bundle.js'),
+    sourcemap: "inline"
+  },
+  plugins: [
+    nodeResolve(),
+  ],
+});
+
+watcher.on('event', (event) => {
+  if(event.code === 'ERROR') {
+    console.error(event.error);
+  }
+
+  if(event.code === 'BUNDLE_END' && event.output[0].startsWith(PATHS.tmp)) {
+    liveReloadServer.refresh(event.output[0]);
+  }
+
+  if (event.result) {
+
+  	event.result.close();
+  }
+});
+
 
 const app = express()
-
-app.use(connectLiveReload());
 
 app.use(express.json())
 
@@ -42,12 +70,21 @@ app.use(express.json())
 app.get('/', (req, res) => {
   let content = fs.readFileSync(path.join(PATHS.src, 'index.html'), 'utf8');
   if(content.match(/<\/\s*body>/)) {
-    content = content.replace(/<\/\s*body>/, '<script src="js/main.js"></script></body>');
+    content = content.replace(/<\/\s*body>/, /* html */`
+    <script>
+      document.write('<script src="http://'
+      + (location.host || 'localhost').split(':')[0]
+      + ':35729/livereload.js"></'
+      + 'script>')
+    </script>
+    <script src="bundle.js" type="module"></script>
+    </body>`);
   }
   res.send(content);
 })
 app.use('/', express.static(PATHS.src));
 app.use('/build', express.static(PATHS.build));
+app.use('/', express.static(PATHS.tmp));
 
 // Return the config
 app.get(['/api/config', '/cfg.json'], (req, res) => {

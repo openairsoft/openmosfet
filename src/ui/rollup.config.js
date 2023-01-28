@@ -15,7 +15,9 @@ export default [{
         '!build/index.inline.html',
       ],
     }),
-    nodeResolve(),
+    nodeResolve({
+      browser: true,
+    }),
     terser(),
   ],
 }, {

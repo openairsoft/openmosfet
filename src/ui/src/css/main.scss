@@ -7,6 +7,12 @@ body {
   color: #000000;
 }
 
+[hidden] {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
 a,
 a:link,
 a:visited,
