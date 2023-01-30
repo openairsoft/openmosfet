@@ -15,7 +15,7 @@ let config = JSON.parse(fs.readFileSync(path.join(__dirname, './defaultConf.json
 
 const port = 3000;
 
-const VERSION = '1.10.0-beta';
+const VERSION = '1.11.0-beta';
 
 const PATHS = {
   tmp: path.join(__dirname, '../../tmp/'),
