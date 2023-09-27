@@ -33,7 +33,7 @@
     "eslint": "^8.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "livereload": "^0.9.3",
     "nodemon": "^2.0.20"
   },
