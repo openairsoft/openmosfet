@@ -5,7 +5,13 @@ export function fillInputs(el, data) {
       if (input.matches('[type="checkbox"]')) {
         input.checked = val;
       } else {
-        input.value = val;
+        if(input.type === 'number') {
+          const { step } = input;
+          const precision = (step ?? 1).toString().split(".")[1]?.length ?? 0;
+          input.value = Number(val).toFixed(precision);
+        } else {
+          input.value = val;
+        }
       }
     });
   });
