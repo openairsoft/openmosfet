@@ -1,5 +1,5 @@
 import { postConfig } from '../utils/config';
-import { extractInputs, fillInputs } from '../utils/inputs';
+import { extractInputs, fillInputs, map } from '../utils/inputs';
 import { renderWifiStatus } from './wifi-status';
 
 export function renderConfig(config) {
@@ -13,10 +13,9 @@ export function renderConfig(config) {
   config.fireModes.forEach((mode, index) => {
     const clone = document.importNode(template.content, true);
 
-    fillInputs(clone, mode);
+    fillInputs(clone, {...mode, motorPower: map(mode.motorPower, 0, 255, 0, 100) });
     clone.children[0].setAttribute('data-firemode-index', index);
     clone.querySelector('[data=firemode_index]').textContent = index + 1;
-    clone.querySelector('[name=motorPower]').value = mode.motorPower * 100;
     clone.querySelectorAll('[data=burstMode] button')[mode.burstMode].classList.add('active');
 
     container.appendChild(clone);
@@ -49,7 +48,7 @@ export async function updateConfig(e) {
     const modeindex = parseInt(module.getAttribute('data-firemode-index'), 10);
 
     const mode = extractInputs(module);
-    mode.motorPower /= 100;
+    mode.motorPower = map(mode.motorPower, 0, 100, 0, 255)
 
     module.querySelectorAll('[data=burstMode] button').forEach((modeBtn, index) => {
       if (modeBtn.matches('.active')) {

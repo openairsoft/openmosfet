@@ -104,7 +104,7 @@ OMFiringSettings &OMInputsInterface::getCurrentFiringSetting()
 
 void OMInputsInterface::motorOn()
 {
-  ledcWrite(OM_INTERFACE_PWM_CHANNEL_1, 255);
+  ledcWrite(OM_INTERFACE_PWM_CHANNEL_1, 255); // TODO: read the motor power value for the current firing setting from the config
 }
 
 void OMInputsInterface::motorOff()

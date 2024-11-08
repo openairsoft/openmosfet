@@ -8,26 +8,21 @@
   "enableBatteryProtection": true,
   "wifiShutdownDelayMinutes": 25,
   "deepSleepDelayMinutes": 40,
-  "batteryNominalVoltage": 11.1,
-  "batteryLowVoltage": 10.4,
+  "batteryNominalVoltage": 11.00030001,
+  "batteryLowVoltage": 10,
   "batteryShutdownVoltage": 9.9,
   "enableActiveBreaking": true,
   "decockAfter_s": 1,
   "enablePrecocking": true,
-  "disableMotor": true,
   "enableEspNow": false,
-  "enableSetupScreen": false,
-  "selectorCalibration":[
-  1061,
-  1261,
-  1471
-  ],
+  "enableSetupScreen": true,
+  "selectorCalibration": [1061, 1261, 1471],
   "fireModes": [
     {
       "burstMode": 0,
       "burstLength": 1,
       "precockDuration_ms": 10,
-      "motorPower": 1,
+      "motorPower": 255,
       "timeBetweenShots_ms": 0,
       "decockAfter_s": 0
     },
@@ -35,7 +30,7 @@
       "burstMode": 0,
       "burstLength": 3,
       "precockDuration_ms": 0,
-      "motorPower": 1,
+      "motorPower": 255,
       "timeBetweenShots_ms": 0,
       "decockAfter_s": 0
     }

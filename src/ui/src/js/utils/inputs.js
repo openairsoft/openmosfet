@@ -6,9 +6,12 @@ export function fillInputs(el, data) {
         input.checked = val;
       } else {
         if(input.type === 'number') {
-          const { step } = input;
-          const precision = (step ?? 1).toString().split(".")[1]?.length ?? 0;
-          input.value = Number(val).toFixed(precision);
+          let _val = val;
+          const { step, min, max } = input;
+          if(max !== '' && _val > max) _val = max;
+          if(min !== '' && _val < min) _val = min;
+          const precision = (step || 1).toString().split(".")[1]?.length ?? 0;
+          input.value = Number(_val).toFixed(precision);
         } else {
           input.value = val;
         }
@@ -30,4 +33,8 @@ export function extractInputs(el) {
   });
 
   return data;
+}
+
+export function map(x, in_min, in_max, out_min, out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
